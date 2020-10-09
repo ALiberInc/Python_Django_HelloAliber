@@ -1,28 +1,28 @@
 {% extends 'base.html' %}
-
-{% block title %}登録{% endblock %}
-
+{% load static %}
+{% block title %}社員新規{% endblock %}
 {% block active_signup %}active{% endblock %}
-
+{% block head %}
+<link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
+{% endblock %}
 {% block contents %}
 <div class="container">
     <div class="row">
         <div class="my-div-style">
-            <h1>登録</h1>
+            <h1>社員新規</h1>
+            <h5><span style="font-style: italic">New Member!～</span></h5>
             <form method="post" action="{% url 'account_signup' %}">
                 {% csrf_token %}
-
                 {{ form.as_p }}
 
-                <!-- {% if redirect_field_value %}
-                    #<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-
-                #{% endif %}
-                  -->
                 <input type="hidden" name="{{ redirect_field_name }}" value="http://127.0.0.1:8000"/>
 
-
-                <button class="btn btn-primary" type="submit">登録</button>
+                <button class="btn btn-primary" type="submit">登録情報を送信する</button>
+                <!--
+                <button class="btn btn-primary" type="button" onclick="location.href=' {% url 'account_login' %}'">戻る</button>
+                <a class="btn btn-primary btn-sm" type="submit" href="{% url 'account_login' %}">登録情報を送信する</a>
+                -->
+                <a class="btn btn-primary btn-sm" href="{% url 'account_login' %}">戻る</a>
             </form>
         </div>
     </div>
