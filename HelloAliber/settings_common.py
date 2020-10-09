@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'debug_toolbar',
+    'extra_views',
 ]
 
 MIDDLEWARE = [
@@ -88,13 +89,11 @@ AUTH_PASSWORD_VALIDATORS = [
     # {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 4, }
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    # { 'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    # {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
 # Internationalization
@@ -138,10 +137,13 @@ LOGIN_REDIRECT_URL = 'profile_app:employee'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
-DEFAULT_FROM_EMAIL = 'admin@example.com'
+DEFAULT_FROM_EMAIL = 'info@aliber.co.jp'
 
 ACCOUNT_FORMS = {
     'reset_password': 'accounts.forms.MyResetPasswordForm',
+    'signup': 'accounts.forms.MySignupForm',
+    # 'signup': 'profile_app.forms.MySignupForm',
 }
+ACCOUNT_ADAPTER = 'accounts.adapter.MyAccountAdapter'
 
 MEDIA_URL = '/media/'

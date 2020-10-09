@@ -1,11 +1,15 @@
 from __future__ import absolute_import
-from allauth.account.forms import ResetPasswordForm,EmailAwarePasswordResetTokenGenerator
-from django import forms
+from allauth.account.forms import ResetPasswordForm,\
+    EmailAwarePasswordResetTokenGenerator
+
 from .models import CustomUser
+from profile_app.models import Profile
+import random, string
 import logging
 
 logger = logging.getLogger(__name__)
 
+# リライトResetPasswordForm
 # リライトclean_email
 from allauth.account.utils import (
     filter_users_by_email,
@@ -15,16 +19,21 @@ from allauth.account.utils import (
 from django import forms
 from django.urls import reverse
 
-from allauth.utils import build_absolute_uri
+from allauth.utils import build_absolute_uri, set_form_field_order
 from allauth.account import app_settings
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import (
     user_pk_to_url_str,
+    setup_user_email,
     user_username,
+    user_email,
+    get_user_model,
 )
 
-default_token_generator = EmailAwarePasswordResetTokenGenerator()
+# リライトSignupForm
+from allauth.account.forms import BaseSignupForm, SignupForm
 
+default_token_generator = EmailAwarePasswordResetTokenGenerator()
 
 class MyResetPasswordForm(ResetPasswordForm):
     last_name = forms.CharField(label='姓', required=True, )
@@ -90,3 +99,69 @@ class MyResetPasswordForm(ResetPasswordForm):
                 email,
                 context)
         return self.cleaned_data["email"]
+
+
+def GetRandomStr(num):
+    # 英数字をすべて取得
+    dat = string.digits + string.ascii_lowercase + string.ascii_uppercase
+    return ''.join([random.choice(dat) for i in range(num)])
+
+
+class MySignupForm(BaseSignupForm):
+    """社員新規form 元登録form"""
+    # パスワード生成用（5桁ランダムテキスト）
+    random_password = ""
+
+    def __init__(self, *args, **kwargs):
+        super(MySignupForm, self).__init__(*args, **kwargs)
+        self.fields['password1'] = forms.CharField(label='password', initial=GetRandomStr(5), )
+        self.fields['password1'].widget = forms.HiddenInput()
+        self.fields['last_name'] = forms.CharField(label='姓p', )
+        self.fields['first_name'] = forms.CharField(label="名p", )
+        if hasattr(self, 'field_order'):
+            set_form_field_order(self, self.field_order)
+
+    field_order = [
+        "last_name", "first_name", "email", "department_pro"
+    ]
+
+    def clean(self):
+        # super().clean()
+        super(MySignupForm, self).clean()
+
+        # `password` cannot be of type `SetPasswordField`, as we don't
+        # have a `User` yet. So, let's populate a dummy user to be used
+        # for password validaton.
+
+        dummy_user = get_user_model()
+        user_username(dummy_user, self.cleaned_data.get("username"))
+        user_email(dummy_user, self.cleaned_data.get("email"))
+        password = self.cleaned_data.get('password1')
+        logger.info("新しいパスワード確認：{}".format(password))
+        self.random_password = password
+
+        if password:
+            try:
+                get_adapter().clean_password(
+                    password,
+                    user=dummy_user)
+            except forms.ValidationError as e:
+                self.add_error('email', e)
+                # パスワードfieldがないので、エラーを出力しない
+
+        return self.cleaned_data
+
+    def save(self, request):
+        request.password = self.random_password
+        request.last_name = self.data.get('last_name1')
+        adapter = get_adapter(request)
+        user = adapter.new_user(request)
+        adapter.save_user(request, user, self)
+
+        # add password
+        self.custom_signup(request, user)
+        # TODO: Move into adapter `save_user` ?
+        setup_user_email(request, user, [])
+        
+        return user
+
