@@ -58,3 +58,6 @@ class Profile(models.Model):
     # 　文字列でクラスを表示する
     def __str__(self):
         return self.last_name
+    
+    def __unicode__(self):
+        return self.last_name
