@@ -116,8 +116,8 @@ class MySignupForm(BaseSignupForm):
         super(MySignupForm, self).__init__(*args, **kwargs)
         self.fields['password1'] = forms.CharField(label='password', initial=GetRandomStr(5), )
         self.fields['password1'].widget = forms.HiddenInput()
-        self.fields['last_name'] = forms.CharField(label='姓p', )
-        self.fields['first_name'] = forms.CharField(label="名p", )
+        self.fields['last_name'] = forms.CharField(label='姓', )
+        self.fields['first_name'] = forms.CharField(label="名", )
         if hasattr(self, 'field_order'):
             set_form_field_order(self, self.field_order)
 
@@ -147,7 +147,7 @@ class MySignupForm(BaseSignupForm):
                     user=dummy_user)
             except forms.ValidationError as e:
                 self.add_error('email', e)
-                # パスワードfieldがないので、エラーを出力しない
+                # パスワードfieldが自動生成するので、エラーを出力しないはず
 
         return self.cleaned_data
 

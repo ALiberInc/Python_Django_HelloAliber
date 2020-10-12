@@ -66,3 +66,16 @@ class EmployeeView(generic.ListView, LoginRequiredMixin):
         profiles = Profile.objects.filter(id=self.request.user.id).first()
 
         return profiles
+
+class EmployeeView2(generic.DetailView, LoginRequiredMixin):
+    """社員詳細画面"""
+    model = Profile
+    template_name = "ENP002_employee.html"
+    context_object_name = 'member_list'
+
+    def get_queryset(self):
+        logger.info('ユーザー：{}'.format(self.request.user))
+        profiles = Profile.objects.filter(id=self.request.user.id).first()
+
+        return profiles
+
