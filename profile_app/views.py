@@ -1,6 +1,7 @@
 # リダイレクト、ビュー
 from django.urls import reverse_lazy
 from django.views import generic
+from django.shortcuts import render
 
 # モデル
 from .models import *
@@ -37,22 +38,38 @@ from .models import Profile, Department
 import logging
 logger = logging.getLogger(__name__)
 
+def lastname(request, user_id=1, template_name='lastname.html'):
+    data = Profile.objects.get(user_id__exact=user_id)
+    params = {'message': '共通画面_姓', 'data': data}
+    return render(request, template_name, params)
+
+class BaseView(generic.TemplateView):
+    """共通画面"""
+    context_object_name = 'data'
+    def get_queryset(self):
+        lastname1 = Profile.objects.get(user_id__exact=1)
+        return lastname1
+
+
 
 class IndexView(generic.TemplateView):
     """（仮）HP"""
     template_name = "index.html"
 
 
-class EmployeeListView(generic.ListView):
+class EmployeeListView(generic.ListView, BaseView):
     """社員一覧画面"""
     model = Profile
     template_name = "ENP001_employee_list.html"
     context_object_name = 'member_list'
     paginate_by = 6
+    #lastname(EmployeeListView,4,template_name)
 
     def get_queryset(self):
-        profiles = Profile.objects.order_by('user_id')
+        profiles = Profile.objects.filter(id=self.request.user.id).first()
         return profiles
+    
+
 
 
 class EmployeeView(generic.ListView, LoginRequiredMixin):
