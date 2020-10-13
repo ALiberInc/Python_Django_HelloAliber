@@ -13,3 +13,7 @@ class ProfileEditForm(ModelForm):
         model = Profile
         fields = ("last_name", "first_name", "department_pro")
 
+class ProfileCreateForm(ModelForm):
+    class Meta:
+        model = Profile
+        exclude = ("user", "created_at", "updated_at")
