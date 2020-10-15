@@ -8,7 +8,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class ProfileEditForm(ModelForm):
+class ProfileCreateForm(ModelForm):
     class Meta:
         model = Profile
         fields = ("last_name", "first_name", "department_pro")
