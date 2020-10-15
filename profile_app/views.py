@@ -2,6 +2,7 @@
 from django.urls import reverse_lazy
 from django.views import generic
 from django.shortcuts import render
+from django.http import HttpResponse
 
 # モデル
 from .models import *
@@ -25,13 +26,11 @@ from datetime import timedelta
 # EmployeeCreateView用（MySignUp）
 from allauth.account.views import SignupView
 from accounts.forms import MySignupForm
-# from extra_views import CreateWithInlinesView, InlineFormSet
 
 # ProfileInline
 from django.urls import reverse_lazy
 from extra_views import InlineFormSetFactory, CreateWithInlinesView, UpdateWithInlinesView
 from django.views.generic import TemplateView
-# from .forms import MySignupForm
 from .models import Profile, Department
 
 # Log用
@@ -39,14 +38,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 def lastname(request):
-    """共通画面用lastname"""
+    """共通画面用user_id,lastname"""
     try:
         logger.debug('ユーザー：{}'.format(request.user))
         data = Profile.objects.get(id_id__exact=request.user.id)
+        user_id = Profile.objects.get(id_id__exact=request.user.id).user_id
     except:
         logger.debug('profileにデータを登録していない')
         data = 'データ無し'
-    return {'common_last_name': data}
+        user_id = 0
+    return {'common_last_name': data ,'user_id': user_id}
 
 
 class IndexView(generic.TemplateView):
@@ -66,7 +67,6 @@ class EmployeeListView(generic.ListView):
         return profiles    
 
 
-
 class EmployeeView(generic.ListView, LoginRequiredMixin):
     """社員詳細画面"""
     model = Profile
@@ -74,20 +74,13 @@ class EmployeeView(generic.ListView, LoginRequiredMixin):
     context_object_name = 'member_list'
 
     def get_queryset(self):
-        logger.info('ユーザー：{}'.format(self.request.user))
+        logger.debug('ユーザー：{}'.format(self.request.user))
         profiles = Profile.objects.filter(id=self.request.user.id).first()
 
         return profiles
 
 class EmployeeView2(generic.DetailView, LoginRequiredMixin):
-    """社員詳細画面"""
+    """社員詳細画面2"""
     model = Profile
-    template_name = "ENP002_employee.html"
-    context_object_name = 'member_list'
-
-    def get_queryset(self):
-        logger.info('ユーザー：{}'.format(self.request.user))
-        profiles = Profile.objects.filter(id=self.request.user.id).first()
-
-        return profiles
+    template_name = "ENP002_employee2.html"
 

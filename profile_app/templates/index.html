@@ -10,5 +10,10 @@
 <a class="nav-link" href="{% url 'profile_app:employee_list' %}">社員一覧　employee_list</a><br>
 <a class="nav-link" href="{% url 'account_reset_password' %}">パスワード　password_reset</a><br>
 <a class="nav-link" href="{% url 'account_signup' %}">社員新規　account_signup</a><br>
+{% if user.is_authenticated %}
+    <br>
+    {{ common_last_name }}　ログイン状態<br>
+    <a class="nav-link" href="{% url 'profile_app:employee2' pk=user_id %}">社員詳細2　profile_app_employee2</a><br>
+{% endif %}
 </body>
 </html>
