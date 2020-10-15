@@ -13,7 +13,7 @@
                         {{ form.as_table }}
                     </table>
                     <button class="btn btn-primary" type="submit">更新</button>
-                    <a class="btn btn-secondary ml-2" href="{% url 'profile_app:employee' %}">キャンセル</a>
+                    <a class="btn btn-secondary ml-2" href="{% url 'profile_app:employee' object.pk %}">キャンセル</a>
                 </form>
             </div>
         </div>

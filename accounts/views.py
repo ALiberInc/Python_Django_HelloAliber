@@ -7,7 +7,7 @@ from django.contrib import messages
 # from allauth.account.adapter import get_adapter
 from accounts.forms import MySignupForm
 from profile_app.models import Profile
-from profile_app.forms import ProfileEditForm
+from profile_app.forms import ProfileCreateForm
 
 from django.views.generic.edit import FormView
 from allauth.account.views import AjaxCapableProcessFormViewMixin
