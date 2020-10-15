@@ -39,10 +39,8 @@
                 <ul class="navbar-nav ml-auto">
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        {% if user.last_name %}
-                        <a class="nav-link" href="{% url 'profile_app:employee' %}">{{ user.last_name }}様 こんにちは！</a>
-                        {% else %}
-                        <a class="nav-link" href="{% url 'profile_app:employee' %}">名無し管理者様 こんにちは！</a>
+                        {% if common_last_name %}
+                            <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様 こんにちは！</a>
                         {% endif %}
                         <a class="nav-link" href="{% url 'account_logout' %}">ログアウト</a>
                     </li>
