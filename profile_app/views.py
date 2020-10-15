@@ -71,4 +71,3 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
     """社員詳細画面"""
     model = Profile
     template_name = "ENP002_employee.html"
-
