@@ -40,7 +40,7 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         {% if common_last_name %}
-                            <a class="nav-link" href="{% url 'profile_app:employee' %}">{{ common_last_name }}様 こんにちは！</a>
+                            <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様 こんにちは！</a>
                         {% endif %}
                         <a class="nav-link" href="{% url 'account_logout' %}">ログアウト</a>
                     </li>

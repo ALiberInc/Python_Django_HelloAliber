@@ -46,7 +46,7 @@ def lastname(request):
     except:
         logger.debug('profileにデータを登録していない')
         data = 'データ無し'
-        user_id = 0
+        user_id = -1
     return {'common_last_name': data ,'user_id': user_id}
 
 
@@ -67,20 +67,8 @@ class EmployeeListView(generic.ListView):
         return profiles    
 
 
-class EmployeeView(generic.ListView, LoginRequiredMixin):
+class EmployeeView(generic.DetailView, LoginRequiredMixin):
     """社員詳細画面"""
     model = Profile
     template_name = "ENP002_employee.html"
-    context_object_name = 'member_list'
-
-    def get_queryset(self):
-        logger.debug('ユーザー：{}'.format(self.request.user))
-        profiles = Profile.objects.filter(id=self.request.user.id).first()
-
-        return profiles
-
-class EmployeeView2(generic.DetailView, LoginRequiredMixin):
-    """社員詳細画面2"""
-    model = Profile
-    template_name = "ENP002_employee2.html"
 
