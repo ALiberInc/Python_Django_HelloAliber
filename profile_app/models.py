@@ -21,6 +21,7 @@ class Profile(models.Model):
 
     user_id = models.SmallIntegerField(unique=True, primary_key=True)
     id = models.ForeignKey(CustomUser, verbose_name='ユーザーID', on_delete=models.PROTECT, related_name='customer_id')
+    # id = models.OneToOneField(CustomUser, verbose_name='ユーザーID', on_delete=models.PROTECT, related_name='customer_id')
     last_name_k = models.CharField(verbose_name='姓（カタカナ）', max_length=30, blank=True)
     first_name_k = models.CharField(verbose_name='名（カタカナ）', max_length=30, blank=True)
     last_name = models.CharField(verbose_name='姓', max_length=15)

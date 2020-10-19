@@ -62,13 +62,15 @@ class MyAccountAdapter(DefaultAccountAdapter):
     def get_login_redirect_url(self, request):
         if request.user.is_staff:
            logger.debug("{}は　管理者としてログインした".format(request.user.last_name))
-           return 'employee_list'
+           return '/employee_list'
         else:
             logger.debug("{}は　一般社員としてログインした".format(request.user.last_name))
-            return 'employee/1/'
-            path = "/accounts/{{user_id}}/"
-            return path
-            #return path.format(username=lastname.)
+            try:
+                user_id = Profile.objects.get(id_id__exact=request.user.id).user_id
+            except:
+                user_id = -1
+            path = "/employee/{user_id}/"
+            return path.format(user_id=user_id)
 
 
 """

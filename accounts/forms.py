@@ -35,6 +35,11 @@ from allauth.account.forms import BaseSignupForm, SignupForm
 
 default_token_generator = EmailAwarePasswordResetTokenGenerator()
 
+# リライトLoginForm
+from allauth.account.forms import LoginForm
+from django.utils.translation import gettext, gettext_lazy as _, pgettext
+
+
 class MyResetPasswordForm(ResetPasswordForm):
     last_name = forms.CharField(label='姓', required=True, )
     first_name = forms.CharField(label='名', required=True, )
@@ -137,7 +142,7 @@ class MySignupForm(BaseSignupForm):
         user_username(dummy_user, self.cleaned_data.get("username"))
         user_email(dummy_user, self.cleaned_data.get("email"))
         password = self.cleaned_data.get('password1')
-        logger.info("新しいパスワード確認：{}".format(password))
+        logger.debug("新しいパスワード確認：{}".format(password))
         self.random_password = password
 
         if password:
@@ -165,3 +170,36 @@ class MySignupForm(BaseSignupForm):
         
         return user
 
+class MyLoginForm(LoginForm):
+    """元LoginFormの入力チェックとエラーメッセージを修正する"""
+    error_messages = {
+        'account_inactive':
+        _("This account is currently inactive."),
+
+        'email_password_mismatch':
+        ("メールアドレスまたはパスワードが間違っています"),
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(MyLoginForm, self).__init__(*args, **kwargs)
+        self.fields['login'].widget.attrs['maxlength'] = '30'
+        self.fields['password'].widget.attrs['maxlength'] = '30'
+
+    def clean_login(self):
+        email = self.data.get('login')
+        if email:
+            if len(email) > 30:
+                raise forms.ValidationError("30桁以内を入力してください。")
+        else:
+            raise forms.ValidationError("メールアドレスを入力してください。")
+        return self.cleaned_data["login"]
+
+    
+    def clean_password(self):
+        my_password = self.data.get('password')
+        if my_password:
+            if len(my_password) > 30:
+                raise forms.ValidationError("30桁以内を入力してください。")
+        else:
+            raise forms.ValidationError("パスワードを入力してください。")
+        return self.cleaned_data["password"]
