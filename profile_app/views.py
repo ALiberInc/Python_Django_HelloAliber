@@ -83,7 +83,6 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         birth = Profile.objects.get(user_id=self.kwargs['pk']).birth # pkを指定してデータを絞り込む
-        logger.debug('私は{}だよねー'.format(birth))
         time0 = int("".join(str(birth).split("-")))
 
         time = str(datetime.date.today())
