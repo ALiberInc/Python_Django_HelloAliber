@@ -10,184 +10,194 @@
         <div class="my-div-style w-100">
             <hr>
             {% if object %}
-            <div class="row">
-                <div class="col-3">
-                    <strong>名前（カタカナ）：</strong>
-                </div>
-                <div class="col-9">
-                {{ object.last_name_k }}  {{ object.first_name_k }}
-                </div>
-
-                <div class="col-3">
-                    <strong>名前：</strong>
-                </div>
-                <div class="col-9">
-                {{ object.last_name }}  {{ object.first_name }}
-                </div>
-
-                <div class="col-3">
-                    <strong>性別：</strong>
-                </div>
-                <div class="col-9">
-                    {% if object.gender %}
-                        女性
-                    {% else %}
-                        男性
-                    {% endif %}
-                </div>
-
-                {% if object.age %}
-                <div class="col-3">
-                    <strong>年齢：</strong>
-                </div>
-                <div class="col-9">
-                    pass歳
-                </div>
-
-                <div class="col-3">
-                    <strong>生年月日：</strong>
-                </div>
-                <div class="col-9">
-                    {{ object.birth }}
-                </div>
+                {% if not common_is_staff and object.user_id != user_id %}
+                    <p>不正な操作です</p>
+                {% else %}
+                    <div class="row">
+                        <div class="col-3">
+                            <strong>名前（カタカナ）：</strong>
+                        </div>
+                        <div class="col-9">
+                        {{ object.last_name_k }}  {{ object.first_name_k }}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>名前：</strong>
+                        </div>
+                        <div class="col-9">
+                        {{ object.last_name }}  {{ object.first_name }}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>性別：</strong>
+                        </div>
+                        <div class="col-9">
+                            {% if object.gender %}
+                                女性
+                            {% else %}
+                                男性
+                            {% endif %}
+                        </div>
+        
+                        {% if object.birth %}
+                        <div class="col-3">
+                            <strong>年齢：</strong>
+                        </div>
+                        <div class="col-9">
+                            {{ count_age }}歳
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>生年月日：</strong>
+                        </div>
+                        <div class="col-9">
+                            {{ object.birth }}
+                        </div>
+                        {% endif %}
+        
+                        <div class="col-3">
+                            <strong>国籍：</strong>
+                        </div>
+                        <div class="col-9">
+                        {{ object.nationality }}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>メールアドレス：</strong>
+                        </div>
+                        <div class="col-9">
+                            {{ object.id.email }}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>携帯電話：</strong>
+                        </div>
+                        <div class="col-9">
+                        {{ object.phone }}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>郵便番号：</strong>
+                        </div>
+                        <div class="col-9">
+                        {{ object.postal_code }}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>住所：</strong>
+                        </div>
+                        <div class="col-9">
+                        {{ object.address1 }}
+                            <br>
+                        {{ object.address2 }}
+                        </div>
+        
+                        {% if object.nationality != "日本" %}
+                        <div class="col-3">
+                            <strong>在留カード番号：</strong>
+                        </div>
+                        <div class="col-9">
+                        {{ object.residence_card }}
+                        </div>
+                        {% endif %}
+        
+                        <div class="col-3">
+                            <strong>健康保険番号：</strong>
+                        </div>
+                        <div class="col-9">
+                        {{ object.health_insurance }}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>社員番号：</strong>
+                        </div>
+                        <div class="col-9">
+                        {{ object.user_id }}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>部門：</strong>
+                        </div>
+                        <div class="col-9">
+                            {% if object.department_pro %}
+                            {{ object.department_pro }}
+                            {% endif %}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>権限：</strong>
+                        </div>
+                        <div class="col-9">
+                            {% if object.id.is_staff %}
+                            管理者
+                            {% else %}
+                            一般社員
+                            {% endif %}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>緊急連絡先：</strong>
+                        </div>
+                        <div class="col-9">
+                            <div class="cp_actab">
+                                <input id="tab-one" type="checkbox" name="tabs" checked/>
+                                <label for="tab-one">緊急連絡先１</label>
+                                <div class="cp_actab-content">
+                                    <p>名前　　：{{ object.emergency_contact_1_name }}</p>
+                                    <p>続柄　　：{{ object.emergency_contact_1_relationship }}</p>
+                                    <p>電話番号：{{ object.emergency_contact_1_phone }}</p>
+                                </div>
+                            </div>
+        
+                            {% if object.emergency_contact_2_name %}
+                            <div class="cp_actab">
+                                <input id="tab-two" type="checkbox" name="tabs" checked/>
+                                <label for="tab-two">緊急連絡先２</label>
+                                <div class="cp_actab-content">
+                                    <p>名前　　：{{ object.emergency_contact_2_name }}</p>
+                                    <p>続柄　　：{{ object.emergency_contact_2_relationship }}</p>
+                                    <p>電話番号：{{ object.emergency_contact_2_phone }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+        
+                            {% if object.emergency_contact_3_name %}
+                            <div class="cp_actab">
+                                <input id="tab-three" type="checkbox" name="tabs" checked/>
+                                <label for="tab-three">緊急連絡先３</label>
+                                <div class="cp_actab-content">
+                                    <p>名前　　：{{ object.emergency_contact_3_name }}</p>
+                                    <p>続柄　　：{{ object.emergency_contact_3_relationship }}</p>
+                                    <p>電話番号：{{ object.emergency_contact_3_phone }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+        
+                        <div class="col-3">
+                            <strong>更新日時：</strong>
+                        </div>
+                        <div class="col-9">
+                        {{ object.update_date|date:"Y/n/d H:i" }}
+                        </div>
+                        <br>
+                        <br>
+                        <a class="btn btn-primary" href=#>編集</a>&nbsp;
+                        {% if common_is_staff %}
+                            <form method="post" action=
+                            "{% url 'profile_app:employee_delete' pk=object.id_id %}">{% csrf_token %}
+                                <button class="btn btn-primary" type="submit" 
+                                onclick='return confirm("{{ object.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>&nbsp;
+                            </form>
+                            <a class="btn btn-primary" href="{% url 'profile_app:employee_list' %}">戻る</a>&nbsp;
+                            {% endif %}
                 {% endif %}
-
-                <div class="col-3">
-                    <strong>国籍：</strong>
-                </div>
-                <div class="col-9">
-                {{ object.nationality }}
-                </div>
-
-                <div class="col-3">
-                    <strong>メールアドレス：</strong>
-                </div>
-                <div class="col-9">
-                    {{ object.id.email }}
-                </div>
-
-                <div class="col-3">
-                    <strong>携帯電話：</strong>
-                </div>
-                <div class="col-9">
-                {{ object.phone }}
-                </div>
-
-                <div class="col-3">
-                    <strong>郵便番号：</strong>
-                </div>
-                <div class="col-9">
-                {{ object.postal_code }}
-                </div>
-
-                <div class="col-3">
-                    <strong>住所：</strong>
-                </div>
-                <div class="col-9">
-                {{ object.address1 }}
-                    <br>
-                {{ object.address2 }}
-                </div>
-
-                {% if object.nationality != "日本" %}
-                <div class="col-3">
-                    <strong>在留カード番号：</strong>
-                </div>
-                <div class="col-9">
-                {{ object.residence_card }}
-                </div>
-                {% endif %}
-
-                <div class="col-3">
-                    <strong>健康保険番号：</strong>
-                </div>
-                <div class="col-9">
-                {{ object.health_insurance }}
-                </div>
-
-                <div class="col-3">
-                    <strong>社員番号：</strong>
-                </div>
-                <div class="col-9">
-                {{ object.user_id }}
-                </div>
-
-                <div class="col-3">
-                    <strong>部門：</strong>
-                </div>
-                <div class="col-9">
-                    {% if object.department_pro %}
-                    {{ object.department_pro }}
-                    {% endif %}
-                </div>
-
-                <div class="col-3">
-                    <strong>権限：</strong>
-                </div>
-                <div class="col-9">
-                    {% if object.id.is_staff %}
-                    管理者
-                    {% else %}
-                    一般社員
-                    {% endif %}
-                </div>
-
-                <div class="col-3">
-                    <strong>緊急連絡先：</strong>
-                </div>
-                <div class="col-9">
-                    <div class="cp_actab">
-                        <input id="tab-one" type="checkbox" name="tabs" checked/>
-                        <label for="tab-one">緊急連絡先１</label>
-                        <div class="cp_actab-content">
-                            <p>名前　　：{{ object.emergency_contact_1_name }}</p>
-                            <p>続柄　　：{{ object.emergency_contact_1_relationship }}</p>
-                            <p>電話番号：{{ object.emergency_contact_1_phone }}</p>
-                        </div>
-                    </div>
-
-                    {% if object.emergency_contact_2_name %}
-                    <div class="cp_actab">
-                        <input id="tab-two" type="checkbox" name="tabs" checked/>
-                        <label for="tab-two">緊急連絡先２</label>
-                        <div class="cp_actab-content">
-                            <p>名前　　：{{ object.emergency_contact_2_name }}</p>
-                            <p>続柄　　：{{ object.emergency_contact_2_relationship }}</p>
-                            <p>電話番号：{{ object.emergency_contact_2_phone }}</p>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if object.emergency_contact_3_name %}
-                    <div class="cp_actab">
-                        <input id="tab-three" type="checkbox" name="tabs" checked/>
-                        <label for="tab-three">緊急連絡先３</label>
-                        <div class="cp_actab-content">
-                            <p>名前　　：{{ object.emergency_contact_3_name }}</p>
-                            <p>続柄　　：{{ object.emergency_contact_3_relationship }}</p>
-                            <p>電話番号：{{ object.emergency_contact_3_phone }}</p>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="col-3">
-                    <strong>更新日時：</strong>
-                </div>
-                <div class="col-9">
-                {{ object.update_date|date:"Y/n/d H:i" }}
-                </div>
-                <br>
-                <br>
-                <a class="btn btn-primary" href=#>編集</a>&nbsp;
-                <a class="btn btn-primary" href=#>削除</a>&nbsp;
-                <a class="btn btn-primary" href=#>戻る</a>&nbsp;
             </div>
             <hr>
              {% else %}
                 <p>プロフィール：データ無し</p>
                 <br>
-                <a class="btn btn-primary" href=#>作成</a>
+                <a class="btn btn-primary" href=#>作成?</a>
              {% endif %}
         </div>
     </div>
