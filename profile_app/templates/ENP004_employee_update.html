@@ -12,8 +12,19 @@
                     <table class="table">
                         {{ form.as_table }}
                     </table>
-                    <button class="btn btn-primary" type="submit">更新</button>
-                    <a class="btn btn-secondary ml-2" href="{% url 'profile_app:employee' object.pk %}">キャンセル</a>
+                    <table>
+                        {% for line in inlines %}
+                            {{ line.as_table }}
+                        {% endfor %}
+                    </table>
+                    <table class="col-lg-2 form-check">
+                        {% for r in field %}
+                            {{ r }}
+                        {% endfor %}
+                    </table>
+                    <button class="btn btn-primary" type="submit">保存</button>
+                    <button class="btn btn-primary" type="button" onclick="location.href=#">削除</button>
+                    <a class="btn btn-secondary ml-2" href="{% url 'profile_app:employee' object.pk %}">戻る</a>
                 </form>
             </div>
         </div>

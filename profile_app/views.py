@@ -29,10 +29,15 @@ from accounts.forms import MySignupForm
 
 # ProfileInline
 from django.urls import reverse_lazy
-from extra_views import InlineFormSetFactory, CreateWithInlinesView, UpdateWithInlinesView
+from extra_views import InlineFormSetFactory, CreateWithInlinesView,UpdateWithInlinesView
 from django.views.generic import TemplateView
 from .models import Profile, Department
 
+# from extra_views import InlineFormSet, UpdateWithInlinesView
+from django.http.response import HttpResponse
+from django.shortcuts import render
+from . import forms
+from django.template.context_processors import csrf
 # Log用
 import logging
 logger = logging.getLogger(__name__)
@@ -88,17 +93,34 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
     
     def form_valid(self, form):
         # 元々のソース
-        form = form_save(self.request, 'プロフィール更新しました。')
+        form = form_save(self.request,form, 'プロフィール更新しました。')
+        email_cleaned =self.request.POST['email']
+        logger.debug("メールアドレス:{}".format(self.request.POST['email']))
+        customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
+        CustomUser.objects.filter(id=customeruser_id).update(email = email_cleaned)
+        # CustomUser.objects.filter(id=self.kwargs['pk']).update(email = email_cleaned)
+        # logger.debug("id:{}".format(self.kwargs['pk']))
+        gender_cleaned = self.request.POST['gender']
+        logger.debug("性別:{}".format(self.request.POST['gender']))
+        customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
+        CustomUser.objects.filter(id=customeruser_id).update(gender = gender_cleaned)
         return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.error(self.request, "更新が失敗しました。")
         return super().form_invalid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        self.form_class.fields['email'].initial = 'abbbccb'
+        return context
+    
+
 def form_save(request, form, messages_success):
     profile = form.save(commit=False)
 
-    profile.user_id = request.user
+    profile.user = request.user
     profile.save()
     messages.success(request, messages_success)
     return form
+
