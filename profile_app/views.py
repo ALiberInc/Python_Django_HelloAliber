@@ -89,7 +89,16 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
     
     def get_form_kwargs(self, *args, **kwargs):
         form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        
+        gender_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender
+        email_value = CustomUser.objects.get(id__exact=self.kwargs['pk']).email
+        form_kwargs['initial'] = {
+            'email' : email_value,
+            'gender' : gender_value
+        }
+        # form_class = ProfileEditForm(initial={'email':'1'})
         return form_kwargs
+
     
     def form_valid(self, form):
         # 元々のソース
@@ -98,27 +107,23 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         logger.debug("メールアドレス:{}".format(self.request.POST['email']))
         customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
         CustomUser.objects.filter(id=customeruser_id).update(email = email_cleaned)
-        # CustomUser.objects.filter(id=self.kwargs['pk']).update(email = email_cleaned)
-        # logger.debug("id:{}".format(self.kwargs['pk']))
-        gender_cleaned = self.request.POST['gender']
-        logger.debug("性別:{}".format(self.request.POST['gender']))
-        customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
-        CustomUser.objects.filter(id=customeruser_id).update(gender = gender_cleaned)
+        gender_cleaned = self.request.POST['gender']#formのデータ取得
+        logger.debug("gender:{}".format(gender_cleaned))
+        # gender_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender#DBの一列がらデータ探す
+        # logger.debug("GG:{}".format(gender_id))
+        # Profile.objects.filter(user_id=1).update(gender = gender_cleaned)#更新
+        gender_save= form.save(commit=False)
+        gender_save.gender = gender_cleaned
+
         return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.error(self.request, "更新が失敗しました。")
         return super().form_invalid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        self.form_class.fields['email'].initial = 'abbbccb'
-        return context
-    
+   
 
 def form_save(request, form, messages_success):
     profile = form.save(commit=False)
-
     profile.user = request.user
     profile.save()
     messages.success(request, messages_success)
