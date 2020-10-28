@@ -82,6 +82,8 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        #年齢算出：
         birth = Profile.objects.get(user_id=self.kwargs['pk']).birth # pkを指定してデータを絞り込む
         time0 = int("".join(str(birth).split("-")))
 
@@ -107,6 +109,7 @@ def EmployeeDeleteView(request, pk):
                 CustomUser.objects.filter(id=pk).update(is_active = 0) #CustomUserの削除
                 Profile.objects.filter(id_id=pk).update(delete = 1, update_date = timezone.now(),
                  update_id = request.user.id) #Profileの削除
+                messages.add_message(request, messages.SUCCESS, 'データを削除しました。')
         else:
             logger.info("管理者のみprofileを削除することができる")
             raise PermissionDenied # 権限なし

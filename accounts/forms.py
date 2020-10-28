@@ -3,7 +3,7 @@ from allauth.account.forms import ResetPasswordForm,\
     EmailAwarePasswordResetTokenGenerator
 
 from .models import CustomUser
-from profile_app.models import Profile
+from profile_app.models import Profile, Department
 import random, string
 import logging
 
@@ -116,6 +116,7 @@ class MySignupForm(BaseSignupForm):
     """社員新規form 元登録form"""
     # パスワード生成用（5桁ランダムテキスト）
     random_password = ""
+    department_pro = forms.ModelChoiceField(Department.objects, label='部門', initial=0,)
 
     def __init__(self, *args, **kwargs):
         super(MySignupForm, self).__init__(*args, **kwargs)
@@ -131,13 +132,11 @@ class MySignupForm(BaseSignupForm):
     ]
 
     def clean(self):
-        # super().clean()
         super(MySignupForm, self).clean()
 
         # `password` cannot be of type `SetPasswordField`, as we don't
         # have a `User` yet. So, let's populate a dummy user to be used
         # for password validaton.
-
         dummy_user = get_user_model()
         user_username(dummy_user, self.cleaned_data.get("username"))
         user_email(dummy_user, self.cleaned_data.get("email"))

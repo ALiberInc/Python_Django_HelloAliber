@@ -11,6 +11,8 @@
         <hr>
 
         {% if common_is_staff %}
+            <a class="btn btn-primary btn-sm" href="{% url 'account_signup' %}">社員新規</a>&nbsp;
+            <p></p>
             {% if member_list %}
             <table border="1" cellpadding="5" cellspacing="0">
                 <tr>
@@ -24,9 +26,9 @@
                 {% for member in member_list %}
                 <tr>
                     <td>{{ member.user_id }}</td>
-                    <td>{{ member.last_name }} {{ member.first_name }}</td>
+                    <td><a href="{% url 'profile_app:employee' pk=member.user_id %}">{{ member.last_name }} {{ member.first_name }}</a></td>
                     <td>{{ member.department_pro }}</td>
-                    <td>{% if member.birth %}
+                    <td>{% if member.last_name_k %}
                         登録済
                         {% else %}
                         未登録
@@ -37,7 +39,11 @@
                     </td>
                     <td>
                         <a class="btn btn-primary btn-sm" href="#">編集</a>
-                        <a class="btn btn-secondary" href="#">削除</a>
+                        <form method="post" action=
+                        "{% url 'profile_app:employee_delete' pk=member.id_id %}">{% csrf_token %}
+                            <button class="btn btn-secondary" type="submit" 
+                            onclick='return confirm("{{ member.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
