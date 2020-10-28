@@ -13,26 +13,26 @@
         {% if member_list %}
         <table border="1" cellpadding="5" cellspacing="0">
             <tr>
-                <th>番号</th>
+                <th>社員番号</th>
                 <th>名前</th>
                 <th>部門</th>
                 <th>状態</th>
-                <th>更新日付</th>
+                <th>更新日時</th>
                 <th>操作</th>
             </tr>
             {% for member in member_list %}
             <tr>
                 <td>{{ member.user_id }}</td>
                 <td>{{ member.last_name }} {{ member.first_name }}</td>
-                <td>{{ member.department }}</td>
+                <td>{{ member.department_pro }}</td>
                 <td>{% if member.birth %}
-                    登録済み
+                    登録済
                     {% else %}
                     未登録
                     {% endif %}
                 </td>
                 <td>
-                    {{ member.update_date|date:"Y年n月d日l H時i分s秒" }}
+                    {{ member.update_date|date:"Y/n/d H:i" }}
                 </td>
                 <td>
                     <a class="btn btn-primary btn-sm" href="#">編集</a>

@@ -12,3 +12,10 @@ footer {
     margin-top:6rem;
     margin-bottom:2em;
 }
+
+.errorlist {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    color: red;
+}

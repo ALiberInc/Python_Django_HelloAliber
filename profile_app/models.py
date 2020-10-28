@@ -1,7 +1,6 @@
 from django.db import models
 import datetime
 from datetime import timedelta
-# from HelloAliber.accounts.models import CustomUser
 from accounts.models import CustomUser
 
 
@@ -26,7 +25,7 @@ class Profile(models.Model):
     first_name_k = models.CharField(verbose_name='名（カタカナ）', max_length=30, blank=True)
     last_name = models.CharField(verbose_name='姓', max_length=15)
     first_name = models.CharField(verbose_name='名', max_length=15)
-    gender = models.BooleanField(verbose_name='性別', default=0)
+    gender = models.CharField(verbose_name='性別', default='0', max_length=15)
     birth = models.DateField(verbose_name='生年月日', default=datetime.datetime.today() - timedelta(days=365 * 28 + 7))
     nationality = models.CharField(verbose_name='国籍', max_length=30, blank=True)
     phone = models.CharField(verbose_name='携帯電話', max_length=20, blank=True)
@@ -35,8 +34,9 @@ class Profile(models.Model):
     address2 = models.CharField(verbose_name='住所2', max_length=128, blank=True)
     residence_card = models.CharField(verbose_name='在留カード番号', max_length=20, blank=True)
     health_insurance = models.CharField(verbose_name='健康保険番号', max_length=20, blank=True)
-    # department = models.ForeignKey(Department, verbose_name='部門', on_delete=models.SET(0), related_name='department')
-    department = models.CharField(verbose_name='部門', max_length=20)
+    department_pro = models.ForeignKey(Department, verbose_name='部門', on_delete=models.SET(0),
+                                       related_name='department_pro')
+    # department = models.CharField(verbose_name='部門', max_length=20)
     emergency_contact_1_name = models.CharField(verbose_name='緊急連絡先1_名前', max_length=30, blank=True)
     emergency_contact_1_relationship = models.CharField(verbose_name='緊急連絡先1_続柄', max_length=10, blank=True)
     emergency_contact_1_phone = models.CharField(verbose_name='緊急連絡先1_電話番号', max_length=20, blank=True)
@@ -57,4 +57,7 @@ class Profile(models.Model):
 
     # 　文字列でクラスを表示する
     def __str__(self):
+        return self.last_name
+    
+    def __unicode__(self):
         return self.last_name

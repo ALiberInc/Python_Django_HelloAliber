@@ -39,13 +39,19 @@
                 <ul class="navbar-nav ml-auto">
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'account_logout' %}">名前リンク</a>
+                        {% if common_last_name %}
+                            <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様 こんにちは！</a>
+                        {% endif %}
+                        <a class="nav-link" href="{% url 'account_logout' %}">ログアウト</a>
                     </li>
                     {% else %}
                     <li class="nav-item {% block active_login %}{% endblock %}">
                         <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
                     </li>
                     {% endif %}
+                    <FORM>
+                        <INPUT type="button" class="btn btn-primary btn-sm" value="戻る" onClick="history.back()">
+                    </FORM>
                 </ul>
             </div>
         </div>

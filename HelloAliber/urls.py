@@ -6,7 +6,8 @@ from . import settings_common, settings_dev
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('profile_app.urls')),
-    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('accounts.urls')),
+#    path('accounts/', include('allauth.urls')),
 ]
 
 if settings_dev.DEBUG:

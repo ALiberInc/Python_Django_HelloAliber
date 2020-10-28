@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'debug_toolbar',
+    'extra_views',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +55,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'profile_app.views.lastname',
             ],
         },
     },
@@ -88,13 +90,11 @@ AUTH_PASSWORD_VALIDATORS = [
     # {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 4, }
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    # { 'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    # {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
 # Internationalization
@@ -134,14 +134,17 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
-LOGIN_REDIRECT_URL = 'profile_app:employee'
+LOGIN_REDIRECT_URL = 'profile_app:index'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'account_login'
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
-DEFAULT_FROM_EMAIL = 'admin@example.com'
+DEFAULT_FROM_EMAIL = 'info@aliber.co.jp'
 
 ACCOUNT_FORMS = {
     'reset_password': 'accounts.forms.MyResetPasswordForm',
+    'signup': 'accounts.forms.MySignupForm',
+    # 'signup': 'profile_app.forms.MySignupForm',
 }
+ACCOUNT_ADAPTER = 'accounts.adapter.MyAccountAdapter'
 
 MEDIA_URL = '/media/'

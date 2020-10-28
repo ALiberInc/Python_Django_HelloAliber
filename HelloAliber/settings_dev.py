@@ -24,6 +24,10 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
         },
+        'accounts': {
+            'handlers': ['console', 'file_accounts'],
+            'level': 'DEBUG',
+        }
     },
     # ハンドラの設定
     'handlers': {
@@ -33,6 +37,13 @@ LOGGING = {
             'formatter': 'dev'
         },
         'file': {  # どこに出すかの設定に名前をつける `file`という名前をつけている
+            'level': 'INFO',  # INFO以上のログを取り扱うという意味
+            'class': 'logging.FileHandler',  # ログを出力するためのクラスを指定
+            'filename': os.path.join(BASE_DIR, 'HelloAliber_INFO.log', ),  # どこに出すか
+            'formatter': 'all',  # どの出力フォーマットで出すかを名前で指定
+            'encoding': 'utf-8',
+        },
+        'file_accounts': {  # どこに出すかの設定に名前をつける `file`という名前をつけている
             'level': 'INFO',  # INFO以上のログを取り扱うという意味
             'class': 'logging.FileHandler',  # ログを出力するためのクラスを指定
             'filename': os.path.join(BASE_DIR, 'HelloAliber_INFO.log', ),  # どこに出すか
