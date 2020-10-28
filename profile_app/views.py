@@ -34,10 +34,15 @@ from accounts.forms import MySignupForm
 
 # ProfileInline
 from django.urls import reverse_lazy
-from extra_views import InlineFormSetFactory, CreateWithInlinesView, UpdateWithInlinesView
+from extra_views import InlineFormSetFactory, CreateWithInlinesView,UpdateWithInlinesView
 from django.views.generic import TemplateView
 from .models import Profile, Department
 
+# from extra_views import InlineFormSet, UpdateWithInlinesView
+from django.http.response import HttpResponse
+from django.shortcuts import render
+from . import forms
+from django.template.context_processors import csrf
 # Log用
 import logging
 logger = logging.getLogger(__name__)
@@ -46,6 +51,7 @@ def lastname(request):
     """共通画面用user_id,lastname"""
     user_id = -1
     is_staff = False
+    
     try:
         logger.debug('ユーザー：{}'.format(request.user))
         data = Profile.objects.get(id_id__exact=request.user.id)
@@ -56,7 +62,6 @@ def lastname(request):
         data = 'データ無し'
     return {'common_last_name': data ,'user_id': user_id, 'common_is_staff': is_staff
             ,'date_today': datetime.date.today()}
-
 
 class IndexView(generic.TemplateView):
     """（仮）HP"""
@@ -116,4 +121,51 @@ def EmployeeDeleteView(request, pk):
 
     response = redirect('profile_app:employee_list')
     return response
+  
+
+class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
+    """社員編集"""
+    model = Profile
+    template_name = 'ENP004_employee_update.html'
+    form_class = ProfileEditForm
+    
+    def get_success_url(self):
+        return reverse_lazy('profile_app:employee', kwargs={'pk':self.kwargs['pk']})
+    
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        
+        gender_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender
+        email_value = CustomUser.objects.get(id__exact=self.kwargs['pk']).email
+        form_kwargs['initial'] = {
+            'email' : email_value,
+            'gender' : gender_value
+        }
+        return form_kwargs
+
+    
+    def form_valid(self, form):
+        form = form_save(self.request,form, 'プロフィール更新しました。')
+        email_cleaned =self.request.POST['email']
+        logger.debug("メールアドレス:{}".format(self.request.POST['email']))
+        customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
+        CustomUser.objects.filter(id=customeruser_id).update(email = email_cleaned)
+        gender_cleaned = self.request.POST['gender']#formのデータ取得
+        logger.debug("gender:{}".format(gender_cleaned))
+        gender_save= form.save(commit=False)
+        gender_save.gender = gender_cleaned
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "更新が失敗しました。")
+        return super().form_invalid(form)
+   
+
+def form_save(request, form, messages_success):
+    profile = form.save(commit=False)
+    profile.user = request.user
+    profile.save()
+    messages.success(request, messages_success)
+    return form
 

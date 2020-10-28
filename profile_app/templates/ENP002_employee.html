@@ -182,7 +182,7 @@
                         </div>
                         <br>
                         <br>
-                        <a class="btn btn-primary" href=#>編集</a>&nbsp;
+                        <a class="btn btn-primary" href="{% url 'profile_app:employee_update' object.pk %}">編集</a>&nbsp;
                         {% if common_is_staff %}
                             <form method="post" action=
                             "{% url 'profile_app:employee_delete' pk=object.id_id %}">{% csrf_token %}

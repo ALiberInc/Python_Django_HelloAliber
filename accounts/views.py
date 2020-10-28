@@ -7,6 +7,7 @@ from django.contrib import messages
 from accounts.forms import MySignupForm
 from accounts.models import CustomUser
 from profile_app.models import Profile, Department
+
 from profile_app.forms import ProfileCreateForm
 
 from django.views.generic.edit import FormView
@@ -47,55 +48,7 @@ class MyConfirmEmailView(ConfirmEmailView):
             return self.render_to_response(ctx)
         return redirect(redirect_url)
 
-
-# class MySignupView(SignupView):
-#     template_name = 'signup.html'
-#     form_class = MySignupForm
-
-#     def get_context_data(self, **kwargs):
-#        ret = super(MySignupView, self).get_context_data(**kwargs)
-#        return ret
-    
-#     def form_valid(self, form):
-#         super_return = super(MySignupView, self).form_valid(form)
-#         #self.user = form.save(self.request)
-
-#         #インスタンスの作成
-#         blank = ""
-#         logger.debug("ここの部門：{}".format(form.cleaned_data['department_pro']))
-#         new_profile = Profile.objects.create(
-#             id = CustomUser.objects.get(email = form.cleaned_data['email']),
-#             last_name_k = blank,
-#             first_name_k = blank,
-#             last_name = form.cleaned_data['last_name'],
-#             first_name = form.cleaned_data['first_name'],
-#             gender = 0,
-#             nationality = blank,
-#             phone = blank,
-#             postal_code = blank,
-#             address1 = blank,
-#             address2 = blank,
-#             residence_card = blank,
-#             health_insurance = blank,
-#             department_pro = Department.objects.get(department = form.cleaned_data['department_pro']),# from form
-#             emergency_contact_1_name = blank,
-#             emergency_contact_1_relationship = blank,
-#             emergency_contact_1_phone = blank,
-#             emergency_contact_2_name = blank,
-#             emergency_contact_2_relationship = blank,
-#             emergency_contact_2_phone = blank,
-#             emergency_contact_3_name = blank,
-#             emergency_contact_3_relationship = blank,
-#             emergency_contact_3_phone = blank,
-#             delete = 0,
-#             create_date = timezone.now(),
-#             create_id = 1,#self.request.userid
-#             update_date = timezone.now(),
-#             update_id = 1,)
-        
-#         return super_return
-
-
+      
 class MySignupView(CloseableSignupMixin, AjaxCapableProcessFormViewMixin, FormView):
     # allauth/account/view.SignupView 継承した親クラスを削除するため
     template_name = "account/signup." + app_settings.TEMPLATE_EXTENSION
