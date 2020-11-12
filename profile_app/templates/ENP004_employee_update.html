@@ -9,23 +9,53 @@
             <div class="my-div-style w-100">
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <table class="table">
+                    <!-- <table class="table">
                         {{ form.as_table }}
-                    </table>
-                    <table>
-                        {% for line in inlines %}
-                            {{ line.as_table }}
-                        {% endfor %}
-                    </table>
-                    <table class="col-lg-2 form-check">
-                        {% for r in field %}
-                            {{ r }}
-                        {% endfor %}
-                    </table>
+                    </table> -->
+                    <!-- 折り畳み展開 -->
+                    <span onclick="obj=document.getElementById('open1').style; obj.display=(obj.display=='none')?'block':'none';">
+                        <a style="cursor:pointer;">▼ 名前について：</a>
+                    </span>
+                    <ul>
+                    <!-- 折り畳まれる部分 -->
+                    <span id="open1" style="display: block; clear: both;">
+                        <li>**ここは折りたたまれる部分です**</li>
+                            <div class="field">
+                                {{ form.last_name_k.label_tag }}
+                                {{ form.last_name_k }}
+                                {{ form.last_name_k.errors }}
+                            </div>
+                            <div class="field">
+                                {{ form.first_name_k.label_tag }}
+                                {{ form.first_name_k }}
+                                {{ form.first_name_k.errors }}
+                            </div>
+                            <div class="field">
+                                {{ form.last_name.label_tag }}
+                                {{ form.last_name }}
+                                {{ form.last_name.errors }}
+                            </div>
+                            <div class="field">
+                                {{ form.first_name.label_tag }}
+                                {{ form.first_name }}
+                                {{ form.first_name.errors }}
+                            </div>
+
+                        <!-- <li><a href="#">折りたたまれる部分にリンク付けたい場合</a></li> -->
+                    </span>
+                    </ul>
+
+
+
+
                     <button class="btn btn-primary" type="submit">保存</button>
                     <button class="btn btn-primary" type="button" onclick="location.href=#">削除</button>
                     <a class="btn btn-secondary ml-2" href="{% url 'profile_app:employee' object.pk %}">戻る</a>
                 </form>
+
+
+
+
             </div>
         </div>
     </div>

@@ -73,7 +73,7 @@ class EmployeeListView(generic.ListView):
     model = Profile
     template_name = "ENP001_employee_list.html"
     context_object_name = 'member_list'
-    paginate_by = 6
+    paginate_by = 10
 
     def get_queryset(self):
         profiles = Profile.objects.filter(delete=0).order_by('user_id')
@@ -136,7 +136,8 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         form_kwargs = super().get_form_kwargs(*args, **kwargs)
         
         gender_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender
-        email_value = CustomUser.objects.get(id__exact=self.kwargs['pk']).email
+        id_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
+        email_value = CustomUser.objects.get(id__exact=id_value).email
         form_kwargs['initial'] = {
             'email' : email_value,
             'gender' : gender_value

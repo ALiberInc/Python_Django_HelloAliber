@@ -26,7 +26,7 @@ class Profile(models.Model):
     last_name = models.CharField(verbose_name='姓', max_length=15)
     first_name = models.CharField(verbose_name='名', max_length=15)
     gender = models.CharField(verbose_name='性別', default='0', max_length=15)
-    birth = models.DateField(verbose_name='生年月日', default=datetime.datetime.today() - timedelta(days=365 * 28 + 7))
+    birth = models.DateField(verbose_name='生年月日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
     nationality = models.CharField(verbose_name='国籍', max_length=30, blank=True)
     phone = models.CharField(verbose_name='携帯電話', max_length=20, blank=True)
     postal_code = models.CharField(verbose_name='郵便番号', max_length=15, blank=True)
