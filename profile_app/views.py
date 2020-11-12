@@ -74,7 +74,7 @@ class EmployeeListView(generic.ListView):
     template_name = "ENP001_employee_list.html"
     context_object_name = 'member_list'
     paginate_by = 10
-
+    
     def get_queryset(self):
         profiles = Profile.objects.filter(delete=0).order_by('user_id')
         return profiles    
