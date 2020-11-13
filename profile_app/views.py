@@ -170,3 +170,21 @@ def form_save(request, form, messages_success):
     messages.success(request, messages_success)
     return form
 
+class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
+    """社員編集"""
+    model = Profile
+    template_name = 'ENP004_employee_edit.html'
+    form_class = ProfileCreateForm
+    
+    def get_success_url(self):
+        return reverse_lazy('profile_app:Empolyee_detail', kwargs={'pk':self.kwargs['pk']})
+    
+
+    def form_valid(self, form):
+        # 元々のソース
+        form = form_save(self.request, 'プロフィール更新しました。')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "更新が失敗しました。")
+        return super().form_invalid(form)
