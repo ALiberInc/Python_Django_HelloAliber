@@ -40,6 +40,7 @@
                         </div>
         
                         {% if object.birth %}
+
                         <div class="col-3">
                             <strong>年齢：</strong>
                         </div>
@@ -92,7 +93,7 @@
                         {{ object.address2 }}
                         </div>
         
-                        {% if object.nationality != "日本" %}
+                        {% if object.nationality != "日本" %}                          
                         <div class="col-3">
                             <strong>在留カード番号：</strong>
                         </div>
@@ -129,48 +130,50 @@
                         </div>
                         <div class="col-9">
                             {% if object.id.is_staff %}
-                            管理者
+                                管理者
                             {% else %}
-                            一般社員
+                                一般社員
                             {% endif %}
                         </div>
-        
                         <div class="col-3">
                             <strong>緊急連絡先：</strong>
+                            
                         </div>
                         <div class="col-9">
-                            <div class="cp_actab">
-                                <input id="tab-one" type="checkbox" name="tabs" checked/>
-                                <label for="tab-one">緊急連絡先１</label>
-                                <div class="cp_actab-content">
-                                    <p>名前　　：{{ object.emergency_contact_1_name }}</p>
-                                    <p>続柄　　：{{ object.emergency_contact_1_relationship }}</p>
-                                    <p>電話番号：{{ object.emergency_contact_1_phone }}</p>
+                            <!-- <div class="cp_actab"> -->
+                                <div onclick="obj=document.getElementById('open1').style; obj.display=(obj.display=='none')?'block':'none';">
+                                    <lable style="cursor:pointer;">緊急連絡先１ ▼</lable>
                                 </div>
-                            </div>
-        
+            
+                                <!-- <input id="tab-one" type="checkbox" name="tabs" checked/> -->
+                                <!-- <label for="tab-one">緊急連絡先１</label> -->
+                                    <!-- 折り畳まれる部分 -->
+                                    <!-- <div style="line-height: 0.2;margin: 1px auto;margin: 1em;"> -->
+                                <div id="open1" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
+                                    <li>名前　　：{{ object.emergency_contact_1_name }}</li>
+                                    <li>続柄　　：{{ object.emergency_contact_1_relationship }}</li>
+                                    <li>電話番号：{{ object.emergency_contact_1_phone }}</li>
+                                </div>        
                             {% if object.emergency_contact_2_name %}
-                            <div class="cp_actab">
-                                <input id="tab-two" type="checkbox" name="tabs" checked/>
-                                <label for="tab-two">緊急連絡先２</label>
-                                <div class="cp_actab-content">
-                                    <p>名前　　：{{ object.emergency_contact_2_name }}</p>
-                                    <p>続柄　　：{{ object.emergency_contact_2_relationship }}</p>
-                                    <p>電話番号：{{ object.emergency_contact_2_phone }}</p>
+                                <div onclick="obj=document.getElementById('open2').style; obj.display=(obj.display=='none')?'block':'none';">
+                                    <lable style="cursor:pointer;">緊急連絡先２ ▼</lable>
                                 </div>
-                            </div>
+                                <div id="open2" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
+                                    <li>名前　　：{{ object.emergency_contact_2_name }}</li>
+                                    <li>続柄　　：{{ object.emergency_contact_2_relationship }}</li>
+                                    <li>電話番号：{{ object.emergency_contact_2_phone }}</li>
+                                </div>
                             {% endif %}
         
                             {% if object.emergency_contact_3_name %}
-                            <div class="cp_actab">
-                                <input id="tab-three" type="checkbox" name="tabs" checked/>
-                                <label for="tab-three">緊急連絡先３</label>
-                                <div class="cp_actab-content">
-                                    <p>名前　　：{{ object.emergency_contact_3_name }}</p>
-                                    <p>続柄　　：{{ object.emergency_contact_3_relationship }}</p>
-                                    <p>電話番号：{{ object.emergency_contact_3_phone }}</p>
+                                <div onclick="obj=document.getElementById('open3').style; obj.display=(obj.display=='none')?'block':'none';">
+                                    <lable style="cursor:pointer;">緊急連絡先３ ▼</lable>
                                 </div>
-                            </div>
+                                <div id="open2" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
+                                    <li>名前　　：{{ object.emergency_contact_3_name }}</li>
+                                    <li>続柄　　：{{ object.emergency_contact_3_relationship }}</li>
+                                    <li>電話番号：{{ object.emergency_contact_3_phone }}</li>
+                                </div>
                             {% endif %}
                         </div>
         
@@ -182,23 +185,21 @@
                         </div>
                         <br>
                         <br>
-                        <a class="btn btn-primary" href="{% url 'profile_app:employee_update' object.pk %}">編集</a>&nbsp;
+                        <a class="btn btn-primary" style="WIDTH: 62px; HEIGHT: 27px" href="{% url 'profile_app:employee_update' object.pk %}">編集</a>&nbsp;
                         {% if common_is_staff %}
-                            <form method="post" action=
+                            <form method="post" style="WIDTH: 62px; HEIGHT: 27px" action=
                             "{% url 'profile_app:employee_delete' pk=object.id_id %}">{% csrf_token %}
-                                <button class="btn btn-primary" type="submit" 
-                                onclick='return confirm("{{ object.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>&nbsp;
-                            </form>
-                            <a class="btn btn-primary" href="{% url 'profile_app:employee_list' %}">戻る</a>&nbsp;
-                            {% endif %}
-                {% endif %}
-            </div>
-            <hr>
-             {% else %}
-                <p>プロフィール：データ無し</p>
-                <br>
+                                <button class="btn btn-secondary" type="submit" 
+                                onclick='return confirm("{{ object.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
+                            </form>&nbsp;
+                            <a class="btn btn-primary" style="WIDTH: 62px; HEIGHT: 27px" href="{% url 'profile_app:employee_list' %}">戻る</a>&nbsp;
+                        {% endif %}
+                    </div>
+                {% endif %}<hr>
+            {% else %}
+                <p>表示データがありません。</p><br>
                 <a class="btn btn-primary" href=#>作成?</a>
-             {% endif %}
+            {% endif %}
         </div>
     </div>
 {% endblock %}

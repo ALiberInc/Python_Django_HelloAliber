@@ -38,8 +38,8 @@
                         {{ member.update_date|date:"Y/n/d H:i" }}
                     </td>
                     <td>
-                        <a class="btn btn-primary btn-sm" href="#">編集</a>
-                        <form method="post" action=
+                        <a class="btn btn-primary btn-sm" href="{% url 'profile_app:employee_update' member.user_id %}">編集</a>
+                        <form method="post" style="display: inline" action=
                         "{% url 'profile_app:employee_delete' pk=member.id_id %}">{% csrf_token %}
                             <button class="btn btn-secondary" type="submit" 
                             onclick='return confirm("{{ member.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
@@ -49,7 +49,7 @@
                 {% endfor %}
             </table>
             {% else %}
-            <p>プロフィール：データ無し</p>
+            <p>表示データがありません。</p>
             {% endif %}
 
             <hr>
