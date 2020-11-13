@@ -42,6 +42,9 @@ from django.template.context_processors import csrf
 import logging
 logger = logging.getLogger(__name__)
 
+import json
+import requests
+
 def lastname(request):
     """共通画面用user_id,lastname"""
     try:
@@ -91,30 +94,28 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         form_kwargs = super().get_form_kwargs(*args, **kwargs)
         
         gender_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender
-        email_value = CustomUser.objects.get(id__exact=self.kwargs['pk']).email
+        id_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
+        email_value = CustomUser.objects.get(id__exact=id_value).email
+        
         form_kwargs['initial'] = {
             'email' : email_value,
-            'gender' : gender_value
+            'gender' : gender_value,
         }
-        # form_class = ProfileEditForm(initial={'email':'1'})
         return form_kwargs
-
     
     def form_valid(self, form):
         # 元々のソース
         form = form_save(self.request,form, 'プロフィール更新しました。')
-        email_cleaned =self.request.POST['email']
-        logger.debug("メールアドレス:{}".format(self.request.POST['email']))
+        email_cleaned = self.request.POST['email']
+        # logger.debug("メールアドレス:{}".format(self.request.POST['email']))
         customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
         CustomUser.objects.filter(id=customeruser_id).update(email = email_cleaned)
         gender_cleaned = self.request.POST['gender']#formのデータ取得
-        logger.debug("gender:{}".format(gender_cleaned))
-        # gender_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender#DBの一列がらデータ探す
-        # logger.debug("GG:{}".format(gender_id))
-        # Profile.objects.filter(user_id=1).update(gender = gender_cleaned)#更新
-        gender_save= form.save(commit=False)
-        gender_save.gender = gender_cleaned
-
+        # logger.debug("gender:{}".format(gender_cleaned))
+        profile = form.save(commit=False)
+        profile.gender = gender_cleaned
+        
+        
         return super().form_valid(form)
 
     def form_invalid(self, form):
