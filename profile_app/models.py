@@ -19,14 +19,14 @@ class Department(models.Model):
 class Profile(models.Model):
     """社員情報モデル"""
 
-    user_id = models.SmallIntegerField(unique=True, primary_key=True)
+    user_id = models.AutoField(unique=True, primary_key=True)
     id = models.ForeignKey(CustomUser, verbose_name='ユーザーID', on_delete=models.PROTECT, related_name='customer_id')
     last_name_k = models.CharField(verbose_name='姓（カタカナ）', max_length=30, blank=True)
     first_name_k = models.CharField(verbose_name='名（カタカナ）', max_length=30, blank=True)
     last_name = models.CharField(verbose_name='姓', max_length=15)
     first_name = models.CharField(verbose_name='名', max_length=15)
     gender = models.CharField(verbose_name='性別', default='0', max_length=15)
-    birth = models.DateField(verbose_name='生年月日', default=datetime.datetime.today() - timedelta(days=365 * 28 + 7))
+    birth = models.DateField(verbose_name='生年月日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
     nationality = models.CharField(verbose_name='国籍', max_length=30, blank=True)
     phone = models.CharField(verbose_name='携帯電話', max_length=20, blank=True)
     postal_code = models.CharField(verbose_name='郵便番号', max_length=15, blank=True)
@@ -36,7 +36,6 @@ class Profile(models.Model):
     health_insurance = models.CharField(verbose_name='健康保険番号', max_length=20, blank=True)
     department_pro = models.ForeignKey(Department, verbose_name='部門', on_delete=models.SET(0),
                                        related_name='department_pro')
-    # department = models.CharField(verbose_name='部門', max_length=20)
     emergency_contact_1_name = models.CharField(verbose_name='緊急連絡先1_名前', max_length=30, blank=True)
     emergency_contact_1_relationship = models.CharField(verbose_name='緊急連絡先1_続柄', max_length=10, blank=True)
     emergency_contact_1_phone = models.CharField(verbose_name='緊急連絡先1_電話番号', max_length=20, blank=True)

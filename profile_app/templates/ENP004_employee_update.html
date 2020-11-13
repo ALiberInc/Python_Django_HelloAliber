@@ -12,13 +12,9 @@
             <div class="my-div-style w-100">
                 <form method="post" enctype="multipart/form-data" class="form">
                     {% csrf_token %}
-                    {% comment %} <table class="table">
-                        {{ form.as_table }}
-                    </table>  {% endcomment %}
                     {{ form.non_field_errors }}
                     
                     {% for field in form %}
-                        {% comment %} {{field.auto_id}}  {% endcomment %}
                         {% if "emergency" not in field.auto_id %}
                             <div class="field">
                                 <label class="my_class" for="{{ field.auto_id }}">{{ field.label }}</label>
@@ -153,8 +149,8 @@
                     </script>
 
                     <button class="btn btn-primary" type="submit">保存</button>
-                    <INPUT type="button"  class="btn btn-secondary ml-2" value="戻る" onClick="history.back()">
-                </form>
+                    <INPUT type="button"  class="btn btn-secondary ml-2" value="戻る" onClick="history.back()">                
+                  </form>
             </div>
         </div>
     </div>

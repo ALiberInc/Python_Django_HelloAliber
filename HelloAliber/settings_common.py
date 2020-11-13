@@ -144,6 +144,7 @@ ACCOUNT_FORMS = {
     'reset_password': 'accounts.forms.MyResetPasswordForm',
     'signup': 'accounts.forms.MySignupForm',
     # 'signup': 'profile_app.forms.MySignupForm',
+    'login': 'accounts.forms.MyLoginForm'
 }
 ACCOUNT_ADAPTER = 'accounts.adapter.MyAccountAdapter'
 
