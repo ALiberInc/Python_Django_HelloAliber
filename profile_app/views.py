@@ -139,7 +139,6 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         gender_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender
         id_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
         email_value = CustomUser.objects.get(id__exact=id_value).email
-        
         form_kwargs['initial'] = {
             'email' : email_value,
             'gender' : gender_value,
