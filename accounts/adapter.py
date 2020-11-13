@@ -5,8 +5,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from profile_app.models import Profile
 from django.core.exceptions import FieldDoesNotExist, ValidationError
 
-
-
 import logging
 logger = logging.getLogger(__name__)
 
@@ -19,7 +17,7 @@ class MyAccountAdapter(DefaultAccountAdapter):
             request,
             emailconfirmation)
         try:
-            logger.info("パスワードを表示する：{}".format(request.password))        
+            logger.debug("パスワードを表示する：{}".format(request.password))        
             ctx = {
                "user": emailconfirmation.email_address.user,
                "activate_url": activate_url,
@@ -61,8 +59,19 @@ class MyAccountAdapter(DefaultAccountAdapter):
             user.save()
         return user
 
-#def profile_first_name(user, *args):
-#    return MySetter(user, app_settings.USER_MODEL_EMAIL_FIELD, *args)
+    def get_login_redirect_url(self, request):
+        if request.user.is_staff:
+           logger.debug("{}は　管理者としてログインした".format(request.user.last_name))
+           return '/employee_list'
+        else:
+            logger.debug("{}は　一般社員としてログインした".format(request.user.last_name))
+            try:
+                user_id = Profile.objects.get(id_id__exact=request.user.id).user_id
+            except:
+                user_id = -1
+            path = "/employee/{user_id}/"
+            return path.format(user_id=user_id)
+
 
 """
 def MySetter(user, field, *args):

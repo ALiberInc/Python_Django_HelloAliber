@@ -10,73 +10,81 @@
     <div class="my-div-style w-100">
         <hr>
 
-        {% if member_list %}
-        <table border="1" cellpadding="5" cellspacing="0">
-            <tr>
-                <th>社員番号</th>
-                <th>名前</th>
-                <th>部門</th>
-                <th>状態</th>
-                <th>更新日時</th>
-                <th>操作</th>
-            </tr>
-            {% for member in member_list %}
-            <tr>
-                <td>{{ member.user_id }}</td>
-                <td>{{ member.last_name }} {{ member.first_name }}</td>
-                <td>{{ member.department_pro }}</td>
-                <td>{% if member.birth %}
-                    登録済
-                    {% else %}
-                    未登録
-                    {% endif %}
-                </td>
-                <td>
-                    {{ member.update_date|date:"Y/n/d H:i" }}
-                </td>
-                <td>
-                    <a class="btn btn-primary btn-sm" href="#">編集</a>
-                    <a class="btn btn-secondary" href="#">削除</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-        <p>プロフィール：データ無し</p>
-        {% endif %}
-
-        <hr>
-        <!-- ページネーション -->
-        {% if is_paginated %}
-        <ul class="pagination">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                    <span aria-hidden="true">&laquo;</span>
-                    <!-- << -->
-                </a>
-            </li>
-            {% endif %}
-            {% for page_num in page_obj.paginator.page_range %}
-            {% if page_obj.number == page_num %}
-            <li class="page-item active">
-                <a class="page-link" href="#">{{ page_num }}</a>
-            </li>
+        {% if common_is_staff %}
+            <a class="btn btn-primary btn-sm" href="{% url 'account_signup' %}">社員新規</a>&nbsp;
+            <p></p>
+            {% if member_list %}
+            <table border="1" cellpadding="5" cellspacing="0">
+                <tr>
+                    <th>社員番号</th>
+                    <th>名前</th>
+                    <th>部門</th>
+                    <th>状態</th>
+                    <th>更新日時</th>
+                    <th>操作</th>
+                </tr>
+                {% for member in member_list %}
+                <tr>
+                    <td>{{ member.user_id }}</td>
+                    <td><a href="{% url 'profile_app:employee' pk=member.user_id %}">{{ member.last_name }} {{ member.first_name }}</a></td>
+                    <td>{{ member.department_pro }}</td>
+                    <td>{% if member.last_name_k %}
+                        登録済
+                        {% else %}
+                        未登録
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ member.update_date|date:"Y/n/d H:i" }}
+                    </td>
+                    <td>
+                        <a class="btn btn-primary btn-sm" href="{% url 'profile_app:employee_update' member.user_id %}">編集</a>
+                        <form method="post" style="display: inline" action=
+                        "{% url 'profile_app:employee_delete' pk=member.id_id %}">{% csrf_token %}
+                            <button class="btn btn-secondary" type="submit" 
+                            onclick='return confirm("{{ member.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
             {% else %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-            </li>
+            <p>表示データがありません。</p>
             {% endif %}
-            {% endfor %}
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                    <span aria-hidden="true">&raquo;</span>
-                    <!-- >> -->
-                </a>
-            </li>
+
+            <hr>
+            <!-- ページネーション -->
+            {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% for page_num in page_obj.paginator.page_range %}
+                {% if page_obj.number == page_num %}
+                <li class="page-item active">
+                    <a class="page-link" href="#">{{ page_num }}</a>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
             {% endif %}
-        </ul>
+        {% else %}
+            不正な操作です
         {% endif %}
     </div>
 </div>

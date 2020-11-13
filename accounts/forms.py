@@ -3,7 +3,7 @@ from allauth.account.forms import ResetPasswordForm,\
     EmailAwarePasswordResetTokenGenerator
 
 from .models import CustomUser
-from profile_app.models import Profile
+from profile_app.models import Profile, Department
 import random, string
 import logging
 
@@ -34,6 +34,11 @@ from allauth.account.utils import (
 from allauth.account.forms import BaseSignupForm, SignupForm
 
 default_token_generator = EmailAwarePasswordResetTokenGenerator()
+
+# リライトLoginForm
+from allauth.account.forms import LoginForm
+from django.utils.translation import gettext, gettext_lazy as _, pgettext
+
 
 class MyResetPasswordForm(ResetPasswordForm):
     last_name = forms.CharField(label='姓', required=True, )
@@ -111,6 +116,7 @@ class MySignupForm(BaseSignupForm):
     """社員新規form 元登録form"""
     # パスワード生成用（5桁ランダムテキスト）
     random_password = ""
+    department_pro = forms.ModelChoiceField(Department.objects, label='部門', initial=0,)
 
     def __init__(self, *args, **kwargs):
         super(MySignupForm, self).__init__(*args, **kwargs)
@@ -126,18 +132,16 @@ class MySignupForm(BaseSignupForm):
     ]
 
     def clean(self):
-        # super().clean()
         super(MySignupForm, self).clean()
 
         # `password` cannot be of type `SetPasswordField`, as we don't
         # have a `User` yet. So, let's populate a dummy user to be used
         # for password validaton.
-
         dummy_user = get_user_model()
         user_username(dummy_user, self.cleaned_data.get("username"))
         user_email(dummy_user, self.cleaned_data.get("email"))
         password = self.cleaned_data.get('password1')
-        logger.info("新しいパスワード確認：{}".format(password))
+        logger.debug("新しいパスワード確認：{}".format(password))
         self.random_password = password
 
         if password:
@@ -165,3 +169,36 @@ class MySignupForm(BaseSignupForm):
         
         return user
 
+class MyLoginForm(LoginForm):
+    """元LoginFormの入力チェックとエラーメッセージを修正する"""
+    error_messages = {
+        'account_inactive':
+        _("This account is currently inactive."),
+
+        'email_password_mismatch':
+        ("メールアドレスまたはパスワードが間違っています"),
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(MyLoginForm, self).__init__(*args, **kwargs)
+        self.fields['login'].widget.attrs['maxlength'] = '30'
+        self.fields['password'].widget.attrs['maxlength'] = '30'
+
+    def clean_login(self):
+        email = self.data.get('login')
+        if email:
+            if len(email) > 30:
+                raise forms.ValidationError("30桁以内を入力してください。")
+        else:
+            raise forms.ValidationError("メールアドレスを入力してください。")
+        return self.cleaned_data["login"]
+
+    
+    def clean_password(self):
+        my_password = self.data.get('password')
+        if my_password:
+            if len(my_password) > 30:
+                raise forms.ValidationError("30桁以内を入力してください。")
+        else:
+            raise forms.ValidationError("パスワードを入力してください。")
+        return self.cleaned_data["password"]

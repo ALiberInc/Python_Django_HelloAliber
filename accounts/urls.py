@@ -2,6 +2,7 @@ from accounts.views import MySignupView
 from django.urls import path, include, re_path
 from allauth.account import views
 from . import views as my_views
+from profile_app import views as app_views
 
 urlpatterns = [
 #    path("signup/", views.signup, name="account_signup"),
@@ -13,7 +14,7 @@ urlpatterns = [
          name="account_change_password"),
     path("password/set/", views.password_set, name="account_set_password"),
     path("inactive/", views.account_inactive, name="account_inactive"),
-
+    
     # E-mail
     path("email/", views.email, name="account_email"),
     path("confirm-email/", views.email_verification_sent,
