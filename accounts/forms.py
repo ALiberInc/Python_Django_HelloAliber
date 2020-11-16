@@ -116,15 +116,20 @@ class MySignupForm(BaseSignupForm):
     """社員新規form 元登録form"""
     # パスワード生成用（5桁ランダムテキスト）
     random_password = ""
-    department_pro = forms.ModelChoiceField(Department.objects, label='部門', initial=0,)
+    department_pro = forms.ModelChoiceField(Department.objects, label='部門', initial=0)
 
     def __init__(self, *args, **kwargs):
         super(MySignupForm, self).__init__(*args, **kwargs)
         self.fields['password1'] = forms.CharField(label='password', initial=GetRandomStr(5), )
         self.fields['password1'].widget = forms.HiddenInput()
         self.fields['last_name'] = forms.CharField(label='姓', )
+        self.fields['last_name'].widget.attrs['pattern'] = '^[ぁ-んァ-ヶー一-龠]+$'
+        self.fields['last_name'].help_text = '全角漢字、仮名15桁以下を入力してください。'
         self.fields['first_name'] = forms.CharField(label="名", )
+        self.fields['first_name'].widget.attrs['pattern'] = '^[ぁ-んァ-ヶー一-龠]+$'
+        self.fields['first_name'].help_text = '全角漢字、仮名15桁以下を入力してください。'
         self.fields['email'].widget.attrs['placeholder'] = ''
+        self.fields['email'].widget.attrs['pattern'] = '^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$'
         if hasattr(self, 'field_order'):
             set_form_field_order(self, self.field_order)
 
