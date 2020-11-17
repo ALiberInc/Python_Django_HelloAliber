@@ -31,7 +31,7 @@ from allauth.account.utils import (
 )
 
 # リライトSignupForm
-from allauth.account.forms import BaseSignupForm, SignupForm
+from allauth.account.forms import BaseSignupForm
 
 default_token_generator = EmailAwarePasswordResetTokenGenerator()
 
@@ -163,7 +163,7 @@ class MySignupForm(BaseSignupForm):
 
     def save(self, request):
         request.password = self.random_password
-        request.last_name = self.data.get('last_name1')
+        request.last_name = self.data.get('last_name')
         adapter = get_adapter(request)
         user = adapter.new_user(request)
         adapter.save_user(request, user, self)
