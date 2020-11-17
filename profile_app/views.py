@@ -47,6 +47,7 @@ from django.template.context_processors import csrf
 import logging
 logger = logging.getLogger(__name__)
 
+
 def lastname(request):
     """共通画面用user_id,lastname"""
     user_id = -1
@@ -140,22 +141,22 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         email_value = CustomUser.objects.get(id__exact=id_value).email
         form_kwargs['initial'] = {
             'email' : email_value,
-            'gender' : gender_value
+            'gender' : gender_value,
         }
         return form_kwargs
-
     
     def form_valid(self, form):
         form = form_save(self.request,form, 'プロフィール更新しました。')
-        email_cleaned =self.request.POST['email']
-        logger.debug("メールアドレス:{}".format(self.request.POST['email']))
+        email_cleaned = self.request.POST['email']
+        # logger.debug("メールアドレス:{}".format(self.request.POST['email']))
         customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
         CustomUser.objects.filter(id=customeruser_id).update(email = email_cleaned)
         gender_cleaned = self.request.POST['gender']#formのデータ取得
-        logger.debug("gender:{}".format(gender_cleaned))
-        gender_save= form.save(commit=False)
-        gender_save.gender = gender_cleaned
-
+        # logger.debug("gender:{}".format(gender_cleaned))
+        profile = form.save(commit=False)
+        profile.gender = gender_cleaned
+        
+        
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -169,4 +170,3 @@ def form_save(request, form, messages_success):
     profile.save()
     messages.success(request, messages_success)
     return form
-
