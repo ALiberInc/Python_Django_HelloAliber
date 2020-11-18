@@ -47,7 +47,7 @@ class MyResetPasswordForm(ResetPasswordForm):
         super().__init__(*args, **kwargs)
         self.fields['email'].widget.attrs['maxlength'] = '30'
         self.fields['email'].error_messages = {
-            'required': 'emailを入力してください。',
+            'required': 'メールアドレスを入力してください。',
             'maxlength':'15桁以内を入力してください。'}
         self.fields['last_name'].widget.attrs['maxlength'] = '15'
         self.fields['last_name'].widget.attrs['placeholder'] = '田中'
@@ -161,7 +161,7 @@ class MySignupForm(BaseSignupForm):
         self.fields['email'].widget.attrs['placeholder'] = ''
         self.fields['email'].widget.attrs['maxlength'] = '30'
         self.fields['email'].error_messages = {
-            'required': '名を入力してください。',
+            'required': 'メールアドレスを入力してください。',
             'maxlength':'30桁以内を入力してください。'}
         if hasattr(self, 'field_order'):
             set_form_field_order(self, self.field_order)
