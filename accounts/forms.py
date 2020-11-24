@@ -184,6 +184,8 @@ class MySignupForm(BaseSignupForm):
 
     def clean_email(self):
         email = self.data.get('email')
+        if CustomUser.objects.filter(is_active = True).filter(email = email).count()>0:
+            raise forms.ValidationError("重複チェック")
         if len(email) > 30:
             raise forms.ValidationError("30桁以内を入力してください。")
         return self.cleaned_data["email"]
@@ -230,7 +232,7 @@ class MyLoginForm(LoginForm):
     """元LoginFormの入力チェックとエラーメッセージを修正する"""
     error_messages = {
         'account_inactive':
-        ("該当アカウント現在使われておりません。"),
+        ("該当アカウントは現在使用していません。"),
 
         'email_password_mismatch':
         ("メールアドレスまたはパスワードが間違っています。"),
