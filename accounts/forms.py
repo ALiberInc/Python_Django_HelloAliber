@@ -185,7 +185,7 @@ class MySignupForm(BaseSignupForm):
     def clean_email(self):
         email = self.data.get('email')
         if CustomUser.objects.filter(is_active = True).filter(email = email).count()>0:
-            raise forms.ValidationError("重複チェック")
+            raise forms.ValidationError("メールアドレスが既に存在しました。")
         if len(email) > 30:
             raise forms.ValidationError("30桁以内を入力してください。")
         return self.cleaned_data["email"]
