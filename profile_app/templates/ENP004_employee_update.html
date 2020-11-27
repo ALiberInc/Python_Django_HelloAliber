@@ -7,9 +7,6 @@
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 {% endblock %}
 {% block contents %}
-    <div class="container">
-        <div class="row">
-            <div class="my-div-style w-100">
                 {% if object %}
                     {% if not common_is_staff and object.user_id != user_id %}
                         <p>不正な操作です</p>
@@ -162,7 +159,4 @@
                         </form>
                     {% endif %}
                 {% endif %}
-            </div>
-        </div>
-    </div>
 {% endblock %}
