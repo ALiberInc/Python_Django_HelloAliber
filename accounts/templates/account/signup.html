@@ -4,17 +4,31 @@
 {% block active_signup %}active{% endblock %}
 {% block head %}
 <link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
+<!-- <link href="{% static 'css/HS.css' %}" rel="stylesheet"> -->
 {% endblock %}
 {% block contents %}
 <div class="container">
     <div class="row">
         <div class="my-div-style">
+            <br>
             <h1>社員新規</h1>
             {% if common_is_staff %}
                 <h5><span style="font-style: italic">New Member!～</span></h5>
-                <form method="post" action="{% url 'account_signup' %}">
+                <form method="post" action="{% url 'account_signup' %}" novalidate>
                     {% csrf_token %}
-                    {{ form.as_p }}
+                    {% for field in form %}
+                    <div class="field">
+                        {% if not field.is_hidden %}
+                        {{ field.label_tag }}
+                        {% endif %}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <br>
+                            <span style="color:gray;"><small>{{ field.help_text }}</small></span>
+                        {% endif %}
+                        {{ field.errors }}                        
+                    </div><br>
+                    {% endfor %}
                     <input type="hidden" name="{{ redirect_field_name }}" value="http://127.0.0.1:8000"/>
 
                     <button class="btn btn-primary" type="submit">登録情報を送信する</button>

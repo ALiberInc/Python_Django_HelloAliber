@@ -50,6 +50,7 @@ logger = logging.getLogger(__name__)
 
 def lastname(request):
     """共通画面用user_id,lastname"""
+    #指摘：セッションに保存する
     user_id = -1
     is_staff = False
     

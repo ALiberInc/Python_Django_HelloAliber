@@ -44,15 +44,10 @@ class MyAccountAdapter(DefaultAccountAdapter):
     
     def save_profile(self, request, user, form, commit=True):
         """プロフィールレコードをCreatする"""
-        #profile_last_name, profile_first_name#, profile_department
-        #pass
 
         data = form.cleaned_data
         first_name = data.get('first_name')
         last_name = data.get('last_name')
-        #profile_first_name(user, first_name)
-        #profile_last_name(user, last_name)
-        #profile_department(user, email)
         if commit:
             # Ability not to commit makes it easier to derive from
             # this adapter by adding
@@ -72,30 +67,3 @@ class MyAccountAdapter(DefaultAccountAdapter):
             path = "/employee/{user_id}/"
             return path.format(user_id=user_id)
 
-
-"""
-def MySetter(user, field, *args):
-    try:
-        field_meta = Profile._meta.get_field(field)
-        max_length = field_meta.max_length
-    except FieldDoesNotExist:
-        if not hasattr(user, field):
-            return
-        max_length = None
-    v = args[0]
-    if v:
-        v = v[0:max_length]
-        setattr(user, field, v)
-
-#####
-    def _setting(self, name, dflt):
-        from django.conf import settings
-        getter = getattr(settings,
-                         'ALLAUTH_SETTING_GETTER',
-                         lambda name, dflt: getattr(settings, name, dflt))
-        return getter(self.prefix + name, dflt)
-
-    @property
-    def USER_MODEL_EMAIL_FIELD(self):
-        return self._setting('USER_MODEL_EMAIL_FIELD', 'email')
-"""
