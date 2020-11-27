@@ -77,6 +77,7 @@ class MySignupView(CloseableSignupMixin, AjaxCapableProcessFormViewMixin, FormVi
         #インスタンスの作成
         blank = ""
         logger.debug("ここの部門：{}".format(form.cleaned_data['department_pro']))
+        logger.debug("hello : {}".format(CustomUser.objects.get(email = form.cleaned_data['email'])))
         new_profile = Profile.objects.create(
             id = CustomUser.objects.get(email = form.cleaned_data['email']),
             last_name_k = blank,

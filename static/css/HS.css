@@ -6,29 +6,34 @@
   box-sizing: border-box;
 }
 .field{
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 .my_class{
   display: inline-block;
   width:20%;
   border-left: solid 5px #1d83c7;
-  padding-left: 15px;
+  padding-left: 20px;
+}
+.gender_class{
+  list-style:none;
+  display: inline-block;
+  padding-inline-start: 0px;
+}
+.gender_class li{
+  display: inline-block;
+  padding: 10px;
 }
 .form input[type="text"], 
 .form input[type="number"],
 .form input[type="email"] {
-     padding: 10px;
-     width: 65%;
- }
- 
-.form textarea{
-   padding: 10px;
-   height: 100px;
-   font-size: 14px;
-   width: 65%;
- }
- 
+  padding: 10px;
+  width: 65%;
+}
 .form select{
-   height: 35px;
-   width: 65%;
- }
+  height: 35px;
+  width: 65%;
+}
+.pop{
+  list-style:none;
+  padding-inline-start: 210px;
+}
