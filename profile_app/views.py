@@ -142,6 +142,7 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         form_kwargs['initial'] = {
             'email' : email_value,
             'gender' : gender_value,
+            'id' : id_value,
         }
         return form_kwargs
     
