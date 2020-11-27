@@ -58,15 +58,15 @@
     </nav>
     {% block header %}{% endblock %}
 
-    {% if messages %}
     <div class="container">
         <div class="row">
             <div class="my-div-style w-100">
+                {% if messages %}
                 <ul class="messages" style="list-style: none;">
                     {% for message in messages %}
                     <li {% if message.tags %} class="{{ message.tags }}"
                         alert-dismissible fade.in
-                        {% endif %}>
+                        {% endif %} style="top: 10px;">
                         <button type="button" class="close" data-dismiss="alert" aria-label="閉じる">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -74,11 +74,11 @@
                     </li>
                     {% endfor %}
                 </ul>
+                {% endif %}
+                {% block contents %}{% endblock %}
             </div>
         </div>
     </div>
-    {% endif %}
-    {% block contents %}{% endblock %}
 
     <!-- Footer -->
     <footer class="py-5 bg-black">
