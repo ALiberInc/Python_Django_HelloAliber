@@ -53,12 +53,13 @@ def lastname(request):
     #指摘：セッションに保存する
     user_id = -1
     is_staff = False
-    
-    try:
+    try:        
         logger.debug('ユーザー：{}'.format(request.user))
-        data = Profile.objects.get(id_id__exact=request.user.id)
-        user_id = Profile.objects.get(id_id__exact=request.user.id).user_id
-        is_staff = request.user.is_staff
+        # data = Profile.objects.get(id_id__exact=request.user.id)
+        data = request.session['data']
+        # user_id = Profile.objects.get(id_id__exact=request.user.id).user_id
+        user_id = request.session['user_id']
+        is_staff = request.session['is_staff']
     except:
         logger.debug('profileにデータを登録していない')
         data = 'データ無し'
@@ -88,6 +89,7 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
     template_name = "ENP002_employee.html"
 
     def get_context_data(self, **kwargs):
+        logger.debug("Try test cookies:Test01={}".format(self.request.session['data']))
         context = super().get_context_data(**kwargs)
 
         #年齢算出：
@@ -179,7 +181,6 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         id_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
         email_value = CustomUser.objects.get(id__exact=id_value).email
         is_active_value = CustomUser.objects.get(id__exact=id_value).is_active
-        logger.debug("{}の味は気がする".format(is_active_value))
         form_kwargs['initial'] = {
             'email' : email_value,
             'gender' : gender_value,

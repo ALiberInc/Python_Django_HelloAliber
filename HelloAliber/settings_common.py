@@ -149,3 +149,6 @@ ACCOUNT_FORMS = {
 ACCOUNT_ADAPTER = 'accounts.adapter.MyAccountAdapter'
 
 MEDIA_URL = '/media/'
+
+#Djangoのキャッシュにセッションデータを保存する
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
