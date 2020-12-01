@@ -22,9 +22,14 @@ class ProfileEditForm(ModelForm):
         exclude = ("user", "created_at", "updated_at","user_id","delete","create_id","update_id","gender")
     email = forms.EmailField(initial='',label='メールアドレス', required=True,)
     gender_CHOICES=[('1','男性'),('0','女性'),]
-    gender = forms.CharField(label='性別', widget=forms.RadioSelect(choices=gender_CHOICES))
+    gender = forms.CharField(
+        label='性別', 
+        widget=forms.RadioSelect(choices=gender_CHOICES))
+    is_active = forms.CharField(
+        label='アクティブ', 
+        widget=forms.RadioSelect(choices=[('True','アクティブ'),('False','非アクティブ'),]))
 
-    field_order = ["last_name_k","first_name_k","last_name","first_name","gender","birth","email","nationality","phone","postal_code","address1","address2","residence_card","health_insurance","department_pro","emergency_contact_1_name","emergency_contact_1_relationship","emergency_contact_1_phone","emergency_contact_2_name","emergency_contact_2_relationship","emergency_contact_2_phone","emergency_contact_3_name","emergency_contact_3_relationship","emergency_contact_3_phone"]
+    field_order = ["last_name_k","first_name_k","last_name","first_name","gender","birth","email","nationality","phone","postal_code","address1","address2","residence_card","health_insurance","department_pro","emergency_contact_1_name","emergency_contact_1_relationship","emergency_contact_1_phone","emergency_contact_2_name","emergency_contact_2_relationship","emergency_contact_2_phone","emergency_contact_3_name","emergency_contact_3_relationship","emergency_contact_3_phone,is_active"]
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -59,7 +64,7 @@ class ProfileEditForm(ModelForm):
         self.fields['address2'].required = True
         self.fields['address2'].error_messages = {'required': self.fields['address2'].label+'を入力してください。'}
         self.fields['residence_card'].widget.attrs['pattern'] = '^[a-zA-Z0-9]+$'
-        self.fields['residence_card'].required = True
+        # self.fields['residence_card'].required = True
         self.fields['residence_card'].error_messages = {'required': self.fields['residence_card'].label+'を入力してください。'}
         self.fields['health_insurance'].widget.attrs['pattern'] = '^[a-zA-Z0-9]+$'
         self.fields['health_insurance'].required = True
@@ -94,7 +99,9 @@ class ProfileEditForm(ModelForm):
         
         if email and CustomUser.objects.filter(email=email).exclude(id=id).count():
             raise forms.ValidationError("メールアドレスが既に存在しました。")
-        return email
+        elif len(email) > 30:
+            raise forms.ValidationError("10桁以内を入力してください。")
+        return self.cleaned_data["email"]
 
     def clean_last_name_k(self):
         last_name_k = self.data.get('last_name_k')
@@ -119,12 +126,6 @@ class ProfileEditForm(ModelForm):
         if len(first_name) > 10:
             raise forms.ValidationError("10桁以内を入力してください。")
         return self.cleaned_data["first_name"]
-
-    def clean_email(self):
-        email = self.data.get('email')
-        if len(email) > 30:
-            raise forms.ValidationError("10桁以内を入力してください。")
-        return self.cleaned_data["email"]
 
     def clean_nationality(self):
         nationality = self.data.get('nationality')
@@ -185,3 +186,4 @@ class ProfileEditForm(ModelForm):
         if len(emergency_contact_1_phone) > 15:
             raise forms.ValidationError("10桁以内を入力してください。")
         return self.cleaned_data["emergency_contact_1_phone"]
+    

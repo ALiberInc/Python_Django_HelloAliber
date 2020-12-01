@@ -7,156 +7,163 @@
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 {% endblock %}
 {% block contents %}
-                {% if object %}
-                    {% if not common_is_staff and object.user_id != user_id %}
-                        <p>不正な操作です</p>
-                    {% else %}
-                        <form method="post" enctype="multipart/form-data" class="form"  novalidate>
-                            {% csrf_token %}
-                            {{ form.non_field_errors }}
+    {% if object %}
+        {% if not common_is_staff and object.user_id != user_id %}
+        <p>不正な操作です</p>
+        {% else %}
+        <form method="post" enctype="multipart/form-data" class="form"  novalidate>
+        {% csrf_token %}
                             
-                            {% for field in form %}
-                                {% if "emergency" not in field.auto_id %}
-                                    <div class="field">
-                                        {% if not field.is_hidden %}
-                                        <label class="my_class" for="{{ field.auto_id }}">{{ field.label }}</label>
-                                        {% endif %}
-                                        {{ field }}
-                                        {% if field.help_text %}
-                                        <span class="helptext">{{ field.help_text }}</span>
-                                        {% endif %}
-                                        {{ field.errors }}
-                                    
-                                        {% if field.auto_id == "id_postal_code" %}
-                                        <input id="search" type="button" value="検索" />
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                            
-                            <!-- 折り畳み展開 -->
-                            <div id="accordion">
-                                <label class="my_class">緊急連絡先：</label>
-                                <ul class="pop">
-                                <li>
-                                <p style="cursor:pointer;" id="emergency_1">▼ 緊急連絡先1：</p>
-                                <!-- 折り畳まれる部分 -->
-                                <div id="open1" class="inner">
-                                    <div class="field">
-                                        名前:
-                                        {{ form.emergency_contact_1_name }}
-                                        {{ form.emergency_contact_1_name.errors }}
-                                    </div>
-                                    <div class="field">
-                                        続柄:
-                                        {{ form.emergency_contact_1_relationship }}
-                                        {{ form.emergency_contact_1_relationship.errors }}
-                                    </div>
-                                    <div class="field">
-                                        電話番号:
-                                        {{ form.emergency_contact_1_phone }}
-                                        {{ form.emergency_contact_1_phone.errors }}
-                                    </div>         
-                                </div>
-                                </li>
-
-                                <!-- 折り畳み展開 -->
-                                <li>
-                                <p style="cursor:pointer;" id="emergency_2">▼ 緊急連絡先2：</p>
-                                <!-- 折り畳まれる部分 -->
-                                <div id="open2" class="inner">
-                                    <div class="field">
-                                        名前:
-                                        {{ form.emergency_contact_2_name }}
-                                        {{ form.emergency_contact_2_name.errors }}
-                                    </div>
-                                    <div class="field">
-                                        続柄:
-                                        {{ form.emergency_contact_2_relationship }}
-                                        {{ form.emergency_contact_2_relationship.errors }}
-                                    </div>
-                                    <div class="field">
-                                        電話番号:
-                                        {{ form.emergency_contact_2_phone }}
-                                        {{ form.emergency_contact_2_phone.errors }}
-                                    </div>         
-                                </div>
-                                </li>
-                            
-                                <!-- 折り畳み展開 -->
-                                <li>
-                                <p style="cursor:pointer;" id="emergency_3">▼ 緊急連絡先3：</p>
-                                <!-- 折り畳まれる部分 -->
-                                <div id="open3" class="inner">
-                                    <div class="field">
-                                        名前:
-                                        {{ form.emergency_contact_3_name }}
-                                        {{ form.emergency_contact_3_name.errors }}
-                                    </div>
-                                    <div class="field">
-                                        続柄:
-                                        {{ form.emergency_contact_3_relationship }}
-                                        {{ form.emergency_contact_3_relationship.errors }}
-                                    </div>
-                                    <div class="field">
-                                        電話番号:
-                                        {{ form.emergency_contact_3_phone }}
-                                        {{ form.emergency_contact_3_phone.errors }}
-                                    </div>         
-                                </div>
-                                </li>
-                                </ul>
-                            </div>    
-                            <br />
-                            <script>
-                            //画面初期表示
-                            //判断緊急連絡先２開くか閉じる
-                            //判断緊急連絡先２名前　blankかどうか
-                            //tureの場合開く
-                            //falseの場合閉じる
-                            //判断緊急連絡先３同じ
-                            $(function(){
-                                    
-                                const emergency_1 = $('#emergency_1').next()
-                                const emergency_2 = $('#emergency_2').next()
-                                const emergency_3 = $('#emergency_3').next()
-                                $('#open1').find('input').val()?emergency_1.slideDown():emergency_1.slideUp();
-                                $('#open2').find('input').val()?emergency_2.slideDown():emergency_2.slideUp();
-                                $('#open3').find('input').val()?emergency_3.slideDown():emergency_3.slideUp();
-                                //console.log('open1'+$('#open1').find('input').val())
-                                
-                                $('#accordion p').click(function(){
-                                    $(this).next().slideToggle();
-                                //$('#accordion p').not($(this)).next().slideUp();
-                                });                     
-
-                                // ［検索］ボタンクリックで郵便番号検索を実行
-                                $('#search').click(function() {
-                                    $.getJSON('http://zipcloud.ibsnet.co.jp/api/search?callback=?',
-                                    {
-                                        zipcode: $('#id_postal_code').val()
-                                    }
-                                    )
-                                    // 結果を取得する
-                                    .done(function(data) {
-                                    // 中身が空でなければ、その値を［住所］欄に反映
-                                        if (data.results) {
-                                            var result = data.results[0];
-                                            $('#id_address1').val(result.address1 + result.address2 + result.address3);
-                                        }
-                                        // 中身が空の場合は、エラーメッセージを反映
-                                        else {
-                                            $('#id_address1').val();
-                                            alert('該当する住所が存在しません。')
-                                        }
-                                    });
-                                });
-                            });
-                            </script>
-
-                            <button class="btn btn-primary" type="submit">保存</button>
-                            <INPUT type="button"  class="btn btn-secondary ml-2" value="戻る" onClick="history.back()">                
-                        </form>
-                    {% endif %}
+        {% for field in form %}
+            {% if "emergency" not in field.auto_id and "is_active" not in field.auto_id %}
+            <div class="field">
+                {% if not field.is_hidden %}
+                <label class="my_class" for="{{ field.auto_id }}">{{ field.label }}</label>
                 {% endif %}
+                {{ field }}
+                {% if field.help_text %}
+                <span class="helptext">{{ field.help_text }}</span>
+                {% endif %}
+                {{ field.errors }}
+                                    
+                {% if field.auto_id == "id_postal_code" %}
+                <input id="search" type="button" value="検索" />
+                {% endif %}
+            </div>
+            {% endif %}
+        {% endfor %}
+                            
+        <!-- 折り畳み展開 -->
+        <div id="accordion">
+        <label class="my_class">緊急連絡先：</label>
+            <ul class="pop">
+                <li>
+                    <p style="cursor:pointer;" id="emergency_1">▼ 緊急連絡先1：</p>
+                    <!-- 折り畳まれる部分 -->
+                    <div id="open1" class="inner">
+                        <div class="field">
+                            名前:
+                            {{ form.emergency_contact_1_name }}
+                            {{ form.emergency_contact_1_name.errors }}
+                        </div>
+                        <div class="field">
+                            続柄:
+                            {{ form.emergency_contact_1_relationship }}
+                            {{ form.emergency_contact_1_relationship.errors }}
+                        </div>
+                        <div class="field">
+                            電話番号:
+                            {{ form.emergency_contact_1_phone }}
+                            {{ form.emergency_contact_1_phone.errors }}
+                        </div>         
+                    </div>
+                </li>
+
+                <!-- 折り畳み展開 -->
+                <li>
+                    <p style="cursor:pointer;" id="emergency_2">▼ 緊急連絡先2：</p>
+                    <!-- 折り畳まれる部分 -->
+                    <div id="open2" class="inner">
+                        <div class="field">
+                            名前:
+                            {{ form.emergency_contact_2_name }}
+                            {{ form.emergency_contact_2_name.errors }}
+                        </div>
+                        <div class="field">
+                            続柄:
+                            {{ form.emergency_contact_2_relationship }}
+                            {{ form.emergency_contact_2_relationship.errors }}
+                        </div>
+                        <div class="field">
+                            電話番号:
+                            {{ form.emergency_contact_2_phone }}
+                            {{ form.emergency_contact_2_phone.errors }}
+                        </div>         
+                    </div>
+                </li>
+                            
+                <!-- 折り畳み展開 -->
+                <li>
+                    <p style="cursor:pointer;" id="emergency_3">▼ 緊急連絡先3：</p>
+                    <!-- 折り畳まれる部分 -->
+                    <div id="open3" class="inner">
+                        <div class="field">
+                            名前:
+                            {{ form.emergency_contact_3_name }}
+                            {{ form.emergency_contact_3_name.errors }}
+                        </div>
+                        <div class="field">
+                            続柄:
+                            {{ form.emergency_contact_3_relationship }}
+                            {{ form.emergency_contact_3_relationship.errors }}
+                        </div>
+                        <div class="field">
+                            電話番号:
+                            {{ form.emergency_contact_3_phone }}
+                            {{ form.emergency_contact_3_phone.errors }}
+                        </div>         
+                    </div>
+                </li>
+            </ul>
+        </div>    
+        <br />
+<script>
+//画面初期表示
+//判断緊急連絡先２開くか閉じる
+//判断緊急連絡先２名前　blankかどうか
+//tureの場合開く
+//falseの場合閉じる
+//判断緊急連絡先３同じ
+$(function(){
+    const emergency_1 = $('#emergency_1').next()
+    const emergency_2 = $('#emergency_2').next()
+    const emergency_3 = $('#emergency_3').next()
+    //$('#open1').find('input').val()?emergency_1.slideDown():emergency_1.slideUp();
+    emergency_1.slideDown();
+    $('#open2').find('input').val()?emergency_2.slideDown():emergency_2.slideUp();
+    $('#open3').find('input').val()?emergency_3.slideDown():emergency_3.slideUp();
+    $('#accordion p').click(function(){
+        $(this).next().slideToggle();
+    });
+    // ［検索］ボタンクリックで郵便番号検索を実行
+    $('#search').click(function() {
+        $.getJSON('http://zipcloud.ibsnet.co.jp/api/search?callback=?',
+        {
+            zipcode: $('#id_postal_code').val()
+        })
+        // 結果を取得する
+        .done(function(data) {
+            // 中身が空でなければ、その値を［住所］欄に反映
+            if (data.results) {
+                var result = data.results[0];
+                $('#id_address1').val(result.address1 + result.address2 + result.address3);
+            }
+            // 中身が空の場合は、エラーメッセージを反映
+            else {
+                $('#id_address1').val();
+                alert('該当する住所が存在しません。')
+            }
+        });
+    });
+});
+</script>
+
+        <!-- アクティブ -->
+        {% if common_is_staff and object.user_id != user_id %}
+        <div class="field">
+            <label class="my_class" for="{{ field.auto_id }}">
+                {{ form.is_active.label }}</label>
+            <ul class="gender_class">
+                {{ form.is_active }}
+            </ul>
+            {{ form.is_active.errors }}
+        </div>
+        {% endif %}
+
+        <button class="btn btn-primary" type="submit">保存</button>
+        <INPUT type="button"  class="btn btn-secondary ml-2" value="戻る" 
+        onClick="history.back()">
+        </form>
+        {% endif %}
+    {% endif %}
 {% endblock %}

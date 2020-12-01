@@ -40,7 +40,7 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         {% if common_last_name %}
-                            <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様 こんにちは！</a>
+                            <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様</a>
                         {% endif %}
                         <a class="nav-link" href="{% url 'account_logout' %}">ログアウト</a>
                     </li>
@@ -49,9 +49,6 @@
                         <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
                     </li>
                     {% endif %}
-                    <FORM>
-                        <INPUT type="button" class="btn btn-primary btn-sm" value="戻る" onClick="history.back()">
-                    </FORM>
                 </ul>
             </div>
         </div>
@@ -75,6 +72,8 @@
                     {% endfor %}
                 </ul>
                 {% endif %}
+
+                {{ form.non_field_errors }}
                 {% block contents %}{% endblock %}
             </div>
         </div>

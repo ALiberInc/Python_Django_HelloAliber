@@ -79,7 +79,7 @@ class EmployeeListView(generic.ListView):
     
     def get_queryset(self):
         profiles = Profile.objects.filter(delete=0).order_by('user_id')
-        return profiles    
+        return profiles
 
 
 class EmployeeView(generic.DetailView, LoginRequiredMixin):
@@ -113,9 +113,8 @@ def EmployeeDeleteView(request, pk):
                 messages.add_message(request, messages.ERROR, '自分のデータを削除できません。')
                 return redirect(request.META['HTTP_REFERER'])
             else:
-                CustomUser.objects.filter(id=pk).update(is_active = 0) #CustomUserの削除
-                Profile.objects.filter(id_id=pk).update(delete = 1, update_date = timezone.now(),
-                 update_id = request.user.id) #Profileの削除
+                Profile.objects.filter(id_id=pk).delete()
+                CustomUser.objects.filter(id=pk).delete() #CustomUserの削除
                 messages.add_message(request, messages.SUCCESS, 'データを削除しました。')
         else:
             logger.info("管理者のみprofileを削除することができる")
@@ -123,7 +122,46 @@ def EmployeeDeleteView(request, pk):
 
     response = redirect('profile_app:employee_list')
     return response
-  
+
+
+@require_POST
+def EmployeeSetActiveView(request, pk):
+    """社員一覧画面　「アクティブにする」ボタン"""
+    logger.debug("pk={}".format(pk))
+    employee = get_object_or_404(CustomUser, id=pk) #データが存在していることを確認する
+    profile = get_object_or_404(Profile, id_id=pk) #同上
+    if employee and profile:
+        CustomUser.objects.filter(id=pk).update(is_active = 1) #CustomUserアクティブ化
+        messages.add_message(request, messages.SUCCESS, '非クティブにしました。')
+    else:
+        logger.info("管理者のみアクティブにすることができる")
+        raise PermissionDenied # 権限なし
+
+    response = redirect('profile_app:employee_list')
+    return response
+
+
+@require_POST
+def EmployeeSetInActiveView(request, pk):
+    """社員一覧画面　「非アクティブにする」ボタン"""
+    logger.debug("pk={}".format(pk))
+    employee = get_object_or_404(CustomUser, id=pk) #データが存在していることを確認する
+    profile = get_object_or_404(Profile, id_id=pk) #同上
+    if employee and profile:
+        if request.user.id == pk:
+            logger.info("自分のデータを非アクティブにする！")
+            messages.add_message(request, messages.ERROR, '自分のデータを非アクティブにすることができません。')
+            return redirect(request.META['HTTP_REFERER'])
+        else:
+            CustomUser.objects.filter(id=pk).update(is_active = 0) #CustomUser非アクティブ化
+            messages.add_message(request, messages.SUCCESS, '非アクティブにしました。')
+    else:
+        logger.info("管理者のみ非アクティブにすることができる")
+        raise PermissionDenied # 権限なし
+
+    response = redirect('profile_app:employee_list')
+    return response
+
 
 class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
     """社員編集"""
@@ -140,10 +178,13 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         gender_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender
         id_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
         email_value = CustomUser.objects.get(id__exact=id_value).email
+        is_active_value = CustomUser.objects.get(id__exact=id_value).is_active
+        logger.debug("{}の味は気がする".format(is_active_value))
         form_kwargs['initial'] = {
             'email' : email_value,
             'gender' : gender_value,
             'id' : id_value,
+            'is_active' : is_active_value,
         }
         return form_kwargs
     
@@ -152,12 +193,14 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         email_cleaned = self.request.POST['email']
         # logger.debug("メールアドレス:{}".format(self.request.POST['email']))
         customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
-        CustomUser.objects.filter(id=customeruser_id).update(email = email_cleaned)
+        is_active_cleaned = self.request.POST['is_active']
+        CustomUser.objects.filter(id=customeruser_id).update(
+            email = email_cleaned,
+            is_active = is_active_cleaned,)
         gender_cleaned = self.request.POST['gender']#formのデータ取得
         # logger.debug("gender:{}".format(gender_cleaned))
         profile = form.save(commit=False)
         profile.gender = gender_cleaned
-        
         
         return super().form_valid(form)
 
