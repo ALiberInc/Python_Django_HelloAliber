@@ -192,8 +192,9 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
     def form_valid(self, form):
         form = form_save(self.request,form, 'プロフィール更新しました。')
         email_cleaned = self.request.POST['email']
-        # logger.debug("メールアドレス:{}".format(self.request.POST['email']))
+        logger.debug("メールアドレス:{}".format(self.request.POST['email']))
         customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
+        logger.debug("gender:{}".format(self.request.POST['is_active']))
         is_active_cleaned = self.request.POST['is_active']
         CustomUser.objects.filter(id=customeruser_id).update(
             email = email_cleaned,

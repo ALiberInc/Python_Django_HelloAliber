@@ -158,6 +158,8 @@ $(function(){
             </ul>
             {{ form.is_active.errors }}
         </div>
+        {% else %}
+        <input type="hidden" name="is_active" value="True">
         {% endif %}
 
         <button class="btn btn-primary" type="submit">保存</button>

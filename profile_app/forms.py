@@ -187,3 +187,7 @@ class ProfileEditForm(ModelForm):
             raise forms.ValidationError("10桁以内を入力してください。")
         return self.cleaned_data["emergency_contact_1_phone"]
     
+    # def clean_is_active(self):
+    #     is_active = self.data.get('is_active')
+    #     logger.debug('is_active get={}'.format(is_active))
+    #     return self.cleaned_data["is_active"]
