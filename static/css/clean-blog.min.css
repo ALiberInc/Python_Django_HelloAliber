@@ -65,3 +65,10 @@
 .cp_actab input[type=checkbox]:checked + label::after {
 	transform: rotate(315deg);
 }
+
+.row{
+	margin:0 auto;
+  border: 5px solid #1ca2e0;
+  padding: 70px;
+  box-sizing: border-box;
+}
