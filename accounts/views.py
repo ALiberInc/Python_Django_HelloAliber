@@ -1,4 +1,4 @@
-from allauth.account.views import ConfirmEmailView, SignupView
+from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account import app_settings
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -25,11 +25,31 @@ from allauth.account.utils import (
     url_str_to_user_pk,
 )
 
+from allauth.exceptions import ImmediateHttpResponse
 
 from django.utils import timezone
 
 import logging
 logger = logging.getLogger(__name__)
+
+class MyLoginView(LoginView):
+    def form_valid(self, form):
+        success_url = self.get_success_url()
+        try:
+            #session処理
+            username = form.cleaned_data['login']
+            logger.debug("user account={}".format(username))
+            user_id = CustomUser.objects.get(email__exact=username).id
+            is_staff = CustomUser.objects.get(email__exact=username).is_staff
+            data = Profile.objects.get(id_id__exact=user_id)
+            self.request.session['data'] = data
+            self.request.session['user_id'] = user_id
+            self.request.session['is_staff'] = is_staff
+
+            return form.login(self.request, redirect_url=success_url)
+        except ImmediateHttpResponse as e:
+            return e.response
+
 
 class MyConfirmEmailView(ConfirmEmailView):
     def post(self, *args, **kwargs):
