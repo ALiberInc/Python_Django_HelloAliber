@@ -410,6 +410,18 @@ footer .copyright {
   padding: 25px 35px;
 }
 
+.btn-setinactive {
+	background-color: #ffa53e;
+	border-color: #fc9c2f;
+  }
+  
+  .btn-setinactive:hover, .btn-setinactive:focus, .btn-setinactive:active {
+	color: rgb(0, 0, 0);
+	background-color: #ffcc92 !important;
+	border-color: #fc9c2f !important;
+  }
+
+
 /* 折り畳み用 */
 .cp_actab {
 	position: relative;

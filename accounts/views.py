@@ -41,8 +41,8 @@ class MyLoginView(LoginView):
             logger.debug("user account={}".format(username))
             user_id = CustomUser.objects.get(email__exact=username).id
             is_staff = CustomUser.objects.get(email__exact=username).is_staff
-            data = Profile.objects.get(id_id__exact=user_id)
-            self.request.session['data'] = data
+            last_name = Profile.objects.get(id_id__exact=user_id).last_name
+            self.request.session['last_name'] = last_name
             self.request.session['user_id'] = user_id
             self.request.session['is_staff'] = is_staff
 
@@ -122,11 +122,11 @@ class MySignupView(CloseableSignupMixin, AjaxCapableProcessFormViewMixin, FormVi
             emergency_contact_3_name = blank,
             emergency_contact_3_relationship = blank,
             emergency_contact_3_phone = blank,
-            delete = 0,
             create_date = timezone.now(),
             create_id = self.request.user.id,#ログインしているユーザーID
             update_date = timezone.now(),
-            update_id = self.request.user.id,)
+            update_id = self.request.user.id,
+            delete = 0,)
 
         # By assigning the User to a property on the view, we allow subclasses
         # of SignupView to access the newly created User instance

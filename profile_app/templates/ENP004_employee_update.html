@@ -16,6 +16,7 @@
                             
         {% for field in form %}
             {% if "emergency" not in field.auto_id and "is_active" not in field.auto_id %}
+            {% if field.auto_id != "id_department_pro" or common_is_staff %}
             <div class="field">
                 {% if not field.is_hidden %}
                 <label class="my_class" for="{{ field.auto_id }}">{{ field.label }}</label>
@@ -30,6 +31,7 @@
                 <input id="search" type="button" value="検索" />
                 {% endif %}
             </div>
+            {% endif %}
             {% endif %}
         {% endfor %}
                             
@@ -159,7 +161,8 @@ $(function(){
             {{ form.is_active.errors }}
         </div>
         {% else %}
-        <input type="hidden" name="is_active" value="True">
+        <!-- <input type="hidden" name="is_active" value="True"> -->
+        {{ form.is_active.as_hidden }}
         {% endif %}
 
         <button class="btn btn-primary" type="submit">保存</button>
