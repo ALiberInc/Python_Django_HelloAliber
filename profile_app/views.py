@@ -72,6 +72,7 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
     template_name = "ENP002_employee.html"
 
     def get_context_data(self, **kwargs):
+        logger.debug("Try test cookies:Test01={}".format(self.request.session['data']))
         context = super().get_context_data(**kwargs)
 
         #年齢算出：
