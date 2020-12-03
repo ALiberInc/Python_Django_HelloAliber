@@ -42,8 +42,9 @@
                         {% if common_last_name %}
                             <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様 こんにちは！</a>
                         {% endif %}
-                        <a class="nav-link" href="{% url 'account_logout' %}">ログアウト</a>
                     </li>
+                    <a class="btn-shadow" href="{% url 'account_logout' %}">ログアウト</a>
+                    
                     {% else %}
                     <li class="nav-item {% block active_login %}{% endblock %}">
                         <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
