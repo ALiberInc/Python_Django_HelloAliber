@@ -39,10 +39,12 @@ class MyLoginView(LoginView):
             #session処理
             username = form.cleaned_data['login']
             logger.debug("user account={}".format(username))
-            user_id = CustomUser.objects.get(email__exact=username).id
+            id_id = CustomUser.objects.get(email__exact=username).id
             is_staff = CustomUser.objects.get(email__exact=username).is_staff
-            last_name = Profile.objects.get(id_id__exact=user_id).last_name
+            last_name = Profile.objects.get(id_id__exact=id_id).last_name
+            user_id = Profile.objects.get(id_id__exact=id_id).user_id
             self.request.session['last_name'] = last_name
+            self.request.session['id_id'] = id_id
             self.request.session['user_id'] = user_id
             self.request.session['is_staff'] = is_staff
 

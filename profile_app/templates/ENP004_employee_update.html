@@ -31,6 +31,8 @@
                 <input id="search" type="button" value="検索" />
                 {% endif %}
             </div>
+            {% else %}
+            {{ form.department_pro.as_hidden }}
             {% endif %}
             {% endif %}
         {% endfor %}
@@ -161,7 +163,6 @@ $(function(){
             {{ form.is_active.errors }}
         </div>
         {% else %}
-        <!-- <input type="hidden" name="is_active" value="True"> -->
         {{ form.is_active.as_hidden }}
         {% endif %}
 
