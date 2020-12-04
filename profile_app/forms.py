@@ -56,6 +56,7 @@ class ProfileEditForm(ModelForm):
         self.fields['phone'].required = True
         self.fields['phone'].error_messages = {'required': self.fields['phone'].label+'を入力してください。'}
         self.fields['postal_code'].widget.attrs['pattern'] = '^[0-9]+$'
+        self.fields['postal_code'].required = True
         self.fields['postal_code'].error_messages = {'required': self.fields['postal_code'].label+'を入力してください。'}
         self.fields['address1'].widget.attrs['pattern'] = '^[ぁ-んァ-ヶー一-龠]+$'
         self.fields['address1'].required = True
@@ -186,8 +187,4 @@ class ProfileEditForm(ModelForm):
         if len(emergency_contact_1_phone) > 15:
             raise forms.ValidationError("10桁以内を入力してください。")
         return self.cleaned_data["emergency_contact_1_phone"]
-    
-    # def clean_is_active(self):
-    #     is_active = self.data.get('is_active')
-    #     logger.debug('is_active get={}'.format(is_active))
-    #     return self.cleaned_data["is_active"]
+        
