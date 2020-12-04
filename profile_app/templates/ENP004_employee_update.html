@@ -31,6 +31,8 @@
                 <input id="search" type="button" value="検索" />
                 {% endif %}
             </div>
+            {% else %}
+            {{ form.department_pro.as_hidden }}
             {% endif %}
             {% endif %}
         {% endfor %}
