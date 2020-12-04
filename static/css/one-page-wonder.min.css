@@ -9,9 +9,8 @@
   font-size: .8rem;
   font-weight: bold;
   padding: 5px 15px;
-  background: #668ad8;
+  background: #df0b15;
   color: #FFF;
-  border-bottom: solid 4px hsl(357, 95%, 50%);
   border-radius: 5px;
 }
 .btn-shadow:active {
