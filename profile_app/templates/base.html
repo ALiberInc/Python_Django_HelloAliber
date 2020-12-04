@@ -40,7 +40,7 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         {% if common_last_name %}
-                            <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様 こんにちは！</a>
+                            <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様</a>
                         {% endif %}
                     </li>
                     <a class="btn-shadow" href="{% url 'account_logout' %}">ログアウト</a>
@@ -50,24 +50,21 @@
                         <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
                     </li>
                     {% endif %}
-                    <FORM>
-                        <INPUT type="button" class="btn btn-primary btn-sm" value="戻る" onClick="history.back()">
-                    </FORM>
                 </ul>
             </div>
         </div>
     </nav>
     {% block header %}{% endblock %}
 
-    {% if messages %}
     <div class="container">
         <div class="row">
             <div class="my-div-style w-100">
+                {% if messages %}
                 <ul class="messages" style="list-style: none;">
                     {% for message in messages %}
                     <li {% if message.tags %} class="{{ message.tags }}"
                         alert-dismissible fade.in
-                        {% endif %}>
+                        {% endif %} style="top: 10px;">
                         <button type="button" class="close" data-dismiss="alert" aria-label="閉じる">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -75,11 +72,13 @@
                     </li>
                     {% endfor %}
                 </ul>
+                {% endif %}
+
+                {{ form.non_field_errors }}
+                {% block contents %}{% endblock %}
             </div>
         </div>
     </div>
-    {% endif %}
-    {% block contents %}{% endblock %}
 
     <!-- Footer -->
     <footer class="py-5 bg-black">

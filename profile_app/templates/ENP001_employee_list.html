@@ -6,53 +6,72 @@
 <link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
 {% endblock %}
 {% block contents %}
-<div class="container">
-    <div class="my-div-style w-100">
-        <hr>
+<hr>
+{% if common_is_staff %}
+<a class="btn btn-primary btn-sm" href="{% url 'account_signup' %}">社員新規</a>&nbsp;
+<p></p>
+{% if member_list %}
+<table border="1" cellpadding="5" cellspacing="0">
+<tr>
+    <th>社員番号</th>
+    <th>名前</th>
+    <th>部門</th>
+    <th>状態</th>
+    <th>更新日時</th>
+    <th>操作</th>
+    <th>削除</th>
+</tr>
+{% for member in member_list %}
+{% if not member.id.is_active %}
+<tr style="color:#FFFFFF;background:#777777;">
+{% else %}
+<tr>
+{% endif %}
+    <td>{{ member.user_id }}</td>
+    <td><a href="{% url 'profile_app:employee' pk=member.user_id %}">{{ member.last_name }} {{ member.first_name }}</a></td>
+    <td>{{ member.department_pro }}</td>
+    <td>
+        {% if member.last_name_k %}
+        登録済
+        {% else %}
+        未登録
+        {% endif %}
+    </td>
+    <td>
+        {{ member.update_date|date:"Y/n/d H:i" }}
+    </td>
+    <td>
+        <a class="btn btn-primary btn-sm" href="{% url 'profile_app:employee_update' member.user_id %}">編集</a>
 
-        {% if common_is_staff %}
-            <a class="btn btn-primary btn-sm" href="{% url 'account_signup' %}">社員新規</a>&nbsp;
-            <p></p>
-            {% if member_list %}
-            <table border="1" cellpadding="5" cellspacing="0">
-                <tr>
-                    <th>社員番号</th>
-                    <th>名前</th>
-                    <th>部門</th>
-                    <th>状態</th>
-                    <th>更新日時</th>
-                    <th>操作</th>
-                </tr>
-                {% for member in member_list %}
-                <tr>
-                    <td>{{ member.user_id }}</td>
-                    <td><a href="{% url 'profile_app:employee' pk=member.user_id %}">{{ member.last_name }} {{ member.first_name }}</a></td>
-                    <td>{{ member.department_pro }}</td>
-                    <td>{% if member.last_name_k %}
-                        登録済
-                        {% else %}
-                        未登録
-                        {% endif %}
-                    </td>
-                    <td>
-                        {{ member.update_date|date:"Y/n/d H:i" }}
-                    </td>
-                    <td>
-                        <a class="btn btn-primary btn-sm" href="{% url 'profile_app:employee_update' member.user_id %}">編集</a>
-                        <form method="post" style="display: inline" action=
-                        "{% url 'profile_app:employee_delete' pk=member.id_id %}">{% csrf_token %}
-                            <button class="btn btn-secondary" type="submit" 
-                            onclick='return confirm("{{ member.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-            {% else %}
-            <p>表示データがありません。</p>
-            {% endif %}
+        {% if not member.id.is_active %}
+        <form method="post" style="display: inline" action=
+        "{% url 'profile_app:employee_set_active' pk=member.id_id %}">{% csrf_token %}
+        <button class="btn btn-primary" type="submit" 
+        onclick='return confirm("{{ member.last_name }}をアクティブにしますが、よろしいですか？");'>アクティブにする</button>
+        </form>
+        {% else %}
+        <form method="post" style="display: inline" action=
+        "{% url 'profile_app:employee_set_inactive' pk=member.id_id %}">{% csrf_token %}
+        <button class="btn btn-primary" type="submit"
+        onclick='return confirm("{{ member.last_name }}を非アクティブにしますが、よろしいですか？");'>非アクティブにする</button>
+        </form>
+        {% endif %}
+    </td>
+    <td>
+        <form method="post" style="display: inline" action=
+        "{% url 'profile_app:employee_delete' pk=member.id_id %}">{% csrf_token %}
+        <button class="btn btn-secondary" type="submit" 
+        onclick='return confirm("{{ member.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
+        </form>
+    </td>
+</tr>
+{% endfor %}
+</table>
+{% else %}
+<p>表示データがありません。</p>
+{% endif %}
 
-            <hr>
+<hr>
             <!-- ページネーション -->
             {% if is_paginated %}
             <ul class="pagination">
@@ -86,6 +105,4 @@
         {% else %}
             不正な操作です
         {% endif %}
-    </div>
-</div>
 {% endblock %}

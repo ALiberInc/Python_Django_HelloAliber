@@ -6,20 +6,18 @@
     <link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
 {% endblock %}
 {% block contents %}
-    <div class="container">
-        <div class="my-div-style w-100">
-            <hr>
-            {% if object %}
-                {% if not common_is_staff and object.user_id != user_id %}
-                    <p>不正な操作です</p>
-                {% else %}
-                    <div class="row">
-                        <div class="col-3">
-                            <strong>名前（カタカナ）：</strong>
-                        </div>
-                        <div class="col-9">
-                        {{ object.last_name_k }}  {{ object.first_name_k }}
-                        </div>
+<hr>
+{% if object %}
+    {% if not common_is_staff and object.user_id != user_id %}
+    <p>不正な操作です</p>
+    {% else %}
+    <div class="row">
+        <div class="col-3">
+            <strong>名前（カタカナ）：</strong>
+        </div>
+            <div class="col-9">
+            {{ object.last_name_k }}  {{ object.first_name_k }}
+            </div>
         
                         <div class="col-3">
                             <strong>名前：</strong>
@@ -93,7 +91,7 @@
                         {{ object.address2 }}
                         </div>
         
-                        {% if object.nationality != "日本" %}                          
+                        {% if object.nationality != "日本" %}
                         <div class="col-3">
                             <strong>在留カード番号：</strong>
                         </div>
@@ -140,15 +138,10 @@
                             
                         </div>
                         <div class="col-9">
-                            <!-- <div class="cp_actab"> -->
                                 <div onclick="obj=document.getElementById('open1').style; obj.display=(obj.display=='none')?'block':'none';">
                                     <lable style="cursor:pointer;">緊急連絡先１ ▼</lable>
                                 </div>
             
-                                <!-- <input id="tab-one" type="checkbox" name="tabs" checked/> -->
-                                <!-- <label for="tab-one">緊急連絡先１</label> -->
-                                    <!-- 折り畳まれる部分 -->
-                                    <!-- <div style="line-height: 0.2;margin: 1px auto;margin: 1em;"> -->
                                 <div id="open1" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
                                     <li>名前　　：{{ object.emergency_contact_1_name }}</li>
                                     <li>続柄　　：{{ object.emergency_contact_1_relationship }}</li>
@@ -177,6 +170,21 @@
                             {% endif %}
                         </div>
         
+                        {% if common_is_staff %}
+                        <div class="col-3">
+                            <strong>アクティブ：</strong>
+                        </div>
+                        {% if object.id.is_active %}
+                        <div class="col-9">
+                            アクティブ
+                        {% else %}
+                        <div class="col-9" style="color:#FFFFFF;background:#777777;">
+                            非アクティブ
+                        {% endif %}
+                        </div>
+
+                        {% endif %}
+
                         <div class="col-3">
                             <strong>更新日時：</strong>
                         </div>
@@ -200,6 +208,4 @@
                 <p>表示データがありません。</p><br>
                 <a class="btn btn-primary" href=#>作成?</a>
             {% endif %}
-        </div>
-    </div>
 {% endblock %}
