@@ -52,7 +52,7 @@
         {% else %}
         <form method="post" style="display: inline" action=
         "{% url 'profile_app:employee_set_inactive' pk=member.id_id %}">{% csrf_token %}
-        <button class="btn btn-primary" type="submit"
+        <button class="btn btn-setinactive" type="submit"
         onclick='return confirm("{{ member.last_name }}を非アクティブにしますが、よろしいですか？");'>非アクティブにする</button>
         </form>
         {% endif %}
@@ -60,7 +60,7 @@
     <td>
         <form method="post" style="display: inline" action=
         "{% url 'profile_app:employee_delete' pk=member.id_id %}">{% csrf_token %}
-        <button class="btn btn-secondary" type="submit" 
+        <button class="btn btn-delete" type="submit" 
         onclick='return confirm("{{ member.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
         </form>
     </td>

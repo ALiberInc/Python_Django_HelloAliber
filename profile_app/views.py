@@ -1,10 +1,7 @@
 # リダイレクト、ビュー
 from django.urls import reverse_lazy
 from django.views import generic
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, resolve_url
+from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 
 # モデル
@@ -26,23 +23,11 @@ from django.shortcuts import get_object_or_404
 
 # timeについて
 import datetime
-from django.utils import timezone
-
-# EmployeeCreateView用（MySignUp）
-from allauth.account.views import SignupView
-from accounts.forms import MySignupForm
 
 # ProfileInline
 from django.urls import reverse_lazy
-from extra_views import InlineFormSetFactory, CreateWithInlinesView,UpdateWithInlinesView
-from django.views.generic import TemplateView
 from .models import Profile, Department
 
-# from extra_views import InlineFormSet, UpdateWithInlinesView
-from django.http.response import HttpResponse
-from django.shortcuts import render
-from . import forms
-from django.template.context_processors import csrf
 # Log用
 import logging
 logger = logging.getLogger(__name__)
@@ -55,15 +40,13 @@ def lastname(request):
     is_staff = False
     try:        
         logger.debug('ユーザー：{}'.format(request.user))
-        # data = Profile.objects.get(id_id__exact=request.user.id)
-        data = request.session['data']
-        # user_id = Profile.objects.get(id_id__exact=request.user.id).user_id
+        last_name = request.session['last_name']
         user_id = request.session['user_id']
         is_staff = request.session['is_staff']
     except:
         logger.debug('profileにデータを登録していない')
-        data = 'データ無し'
-    return {'common_last_name': data ,'user_id': user_id, 'common_is_staff': is_staff
+        last_name = 'データ無し'
+    return {'common_last_name': last_name ,'user_id': user_id, 'common_is_staff': is_staff
             ,'date_today': datetime.date.today()}
 
 class IndexView(generic.TemplateView):
@@ -89,7 +72,6 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
     template_name = "ENP002_employee.html"
 
     def get_context_data(self, **kwargs):
-        logger.debug("Try test cookies:Test01={}".format(self.request.session['data']))
         context = super().get_context_data(**kwargs)
 
         #年齢算出：
@@ -134,7 +116,7 @@ def EmployeeSetActiveView(request, pk):
     profile = get_object_or_404(Profile, id_id=pk) #同上
     if employee and profile:
         CustomUser.objects.filter(id=pk).update(is_active = 1) #CustomUserアクティブ化
-        messages.add_message(request, messages.SUCCESS, '非クティブにしました。')
+        messages.add_message(request, messages.SUCCESS, 'アクティブにしました。')
     else:
         logger.info("管理者のみアクティブにすることができる")
         raise PermissionDenied # 権限なし
@@ -156,7 +138,7 @@ def EmployeeSetInActiveView(request, pk):
             return redirect(request.META['HTTP_REFERER'])
         else:
             CustomUser.objects.filter(id=pk).update(is_active = 0) #CustomUser非アクティブ化
-            messages.add_message(request, messages.SUCCESS, '非アクティブにしました。')
+            messages.add_message(request, messages.ERROR, '非アクティブにしました。')
     else:
         logger.info("管理者のみ非アクティブにすることができる")
         raise PermissionDenied # 権限なし
@@ -200,7 +182,6 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
             email = email_cleaned,
             is_active = is_active_cleaned,)
         gender_cleaned = self.request.POST['gender']#formのデータ取得
-        # logger.debug("gender:{}".format(gender_cleaned))
         profile = form.save(commit=False)
         profile.gender = gender_cleaned
         
