@@ -3,209 +3,208 @@
 {% block title %}社員詳細{% endblock %}
 {% block active_profile %}active{% endblock %}
 {% block head %}
-    <link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
 {% endblock %}
 {% block contents %}
-<hr>
-{% if object %}
-    {% if not common_is_staff and object.user_id != user_id %}
-    <p>不正な操作です</p>
-    {% else %}
-    <div class="row">
-        <div class="col-3">
-            <strong>名前（カタカナ）：</strong>
-        </div>
+    {% if object %}
+        {% if not common_is_staff and object.user_id != user_id %}
+        <p>不正な操作です</p>
+        {% else %}
+        <div class="detail">
+        <form method="post" action="{% url 'profile_app:employee_delete' pk=object.id_id %}">{% csrf_token %}
+        <h1>社員詳細</h1>
+            <div class="col-3">
+                <strong>名前（カタカナ）</strong>
+            </div>
             <div class="col-9">
             {{ object.last_name_k }}  {{ object.first_name_k }}
             </div>
-        
-                        <div class="col-3">
-                            <strong>名前：</strong>
-                        </div>
-                        <div class="col-9">
-                        {{ object.last_name }}  {{ object.first_name }}
-                        </div>
-        
-                        <div class="col-3">
-                            <strong>性別：</strong>
-                        </div>
-                        <div class="col-9">
-                            {% if object.gender == "0" %}
-                                女性
-                            {% else %}
-                                男性
-                            {% endif %}
-                        </div>
-        
-                        {% if object.birth %}
-
-                        <div class="col-3">
-                            <strong>年齢：</strong>
-                        </div>
-                        <div class="col-9">
-                            {{ count_age }}歳
-                        </div>
-        
-                        <div class="col-3">
-                            <strong>生年月日：</strong>
-                        </div>
-                        <div class="col-9">
-                            {{ object.birth }}
-                        </div>
-                        {% endif %}
-        
-                        <div class="col-3">
-                            <strong>国籍：</strong>
-                        </div>
-                        <div class="col-9">
-                        {{ object.nationality }}
-                        </div>
-        
-                        <div class="col-3">
-                            <strong>メールアドレス：</strong>
-                        </div>
-                        <div class="col-9">
-                            {{ object.id.email }}
-                        </div>
-        
-                        <div class="col-3">
-                            <strong>携帯電話：</strong>
-                        </div>
-                        <div class="col-9">
-                        {{ object.phone }}
-                        </div>
-        
-                        <div class="col-3">
-                            <strong>郵便番号：</strong>
-                        </div>
-                        <div class="col-9">
-                        {{ object.postal_code }}
-                        </div>
-        
-                        <div class="col-3">
-                            <strong>住所：</strong>
-                        </div>
-                        <div class="col-9">
-                        {{ object.address1 }}
-                            <br>
-                        {{ object.address2 }}
-                        </div>
-        
-                        {% if object.nationality != "日本" %}
-                        <div class="col-3">
-                            <strong>在留カード番号：</strong>
-                        </div>
-                        <div class="col-9">
-                        {{ object.residence_card }}
-                        </div>
-                        {% endif %}
-        
-                        <div class="col-3">
-                            <strong>健康保険番号：</strong>
-                        </div>
-                        <div class="col-9">
-                        {{ object.health_insurance }}
-                        </div>
-        
-                        <div class="col-3">
-                            <strong>社員番号：</strong>
-                        </div>
-                        <div class="col-9">
-                        {{ object.user_id }}
-                        </div>
-        
-                        <div class="col-3">
-                            <strong>部門：</strong>
-                        </div>
-                        <div class="col-9">
-                            {% if object.department_pro %}
-                            {{ object.department_pro }}
-                            {% endif %}
-                        </div>
-        
-                        <div class="col-3">
-                            <strong>権限：</strong>
-                        </div>
-                        <div class="col-9">
-                            {% if object.id.is_staff %}
-                                管理者
-                            {% else %}
-                                一般社員
-                            {% endif %}
-                        </div>
-                        <div class="col-3">
-                            <strong>緊急連絡先：</strong>
-                            
-                        </div>
-                        <div class="col-9">
-                                <div onclick="obj=document.getElementById('open1').style; obj.display=(obj.display=='none')?'block':'none';">
-                                    <lable style="cursor:pointer;">緊急連絡先１ ▼</lable>
-                                </div>
             
-                                <div id="open1" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
-                                    <li>名前　　：{{ object.emergency_contact_1_name }}</li>
-                                    <li>続柄　　：{{ object.emergency_contact_1_relationship }}</li>
-                                    <li>電話番号：{{ object.emergency_contact_1_phone }}</li>
-                                </div>        
-                            {% if object.emergency_contact_2_name %}
-                                <div onclick="obj=document.getElementById('open2').style; obj.display=(obj.display=='none')?'block':'none';">
-                                    <lable style="cursor:pointer;">緊急連絡先２ ▼</lable>
-                                </div>
-                                <div id="open2" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
-                                    <li>名前　　：{{ object.emergency_contact_2_name }}</li>
-                                    <li>続柄　　：{{ object.emergency_contact_2_relationship }}</li>
-                                    <li>電話番号：{{ object.emergency_contact_2_phone }}</li>
-                                </div>
-                            {% endif %}
-        
-                            {% if object.emergency_contact_3_name %}
-                                <div onclick="obj=document.getElementById('open3').style; obj.display=(obj.display=='none')?'block':'none';">
-                                    <lable style="cursor:pointer;">緊急連絡先３ ▼</lable>
-                                </div>
-                                <div id="open2" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
-                                    <li>名前　　：{{ object.emergency_contact_3_name }}</li>
-                                    <li>続柄　　：{{ object.emergency_contact_3_relationship }}</li>
-                                    <li>電話番号：{{ object.emergency_contact_3_phone }}</li>
-                                </div>
-                            {% endif %}
-                        </div>
-        
-                        {% if common_is_staff %}
-                        <div class="col-3">
-                            <strong>アクティブ：</strong>
-                        </div>
-                        {% if object.id.is_active %}
-                        <div class="col-9">
-                            アクティブ
-                        {% else %}
-                        <div class="col-9" style="color:#FFFFFF;background:#777777;">
-                            非アクティブ
-                        {% endif %}
-                        </div>
+            <div class="col-3">
+                <strong>名前</strong>
+            </div>
+            <div class="col-9">
+            {{ object.last_name }}  {{ object.first_name }}
+            </div>
+            
+            <div class="col-3">
+                <strong>性別</strong>
+            </div>
+            <div class="col-9">
+                {% if object.gender == "0" %}
+                    女性
+                {% else %}
+                    男性
+                {% endif %}
+            </div>
+            
+            {% if object.birth %}
 
-                        {% endif %}
+            <div class="col-3">
+                <strong>年齢</strong>
+            </div>
+            <div class="col-9">
+                {{ count_age }}歳
+            </div>
 
-                        <div class="col-3">
-                            <strong>更新日時：</strong>
-                        </div>
-                        <div class="col-9">
-                        {{ object.update_date|date:"Y/n/d H:i" }}
-                        </div>
-                        <br>
-                        <br>
-                        <a class="btn btn-primary" style="WIDTH: 62px; HEIGHT: 27px" href="{% url 'profile_app:employee_update' object.pk %}">編集</a>&nbsp;
-                        {% if common_is_staff %}
-                            <form method="post" style="WIDTH: 62px; HEIGHT: 27px" action=
-                            "{% url 'profile_app:employee_delete' pk=object.id_id %}">{% csrf_token %}
-                                <button class="btn btn-secondary" type="submit" 
-                                onclick='return confirm("{{ object.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
-                            </form>&nbsp;
-                            <a class="btn btn-primary" style="WIDTH: 62px; HEIGHT: 27px" href="{% url 'profile_app:employee_list' %}">戻る</a>&nbsp;
-                        {% endif %}
-                    </div>
-                {% endif %}<hr>
-            {% else %}
-                <p>表示データがありません。</p><br>
-                <a class="btn btn-primary" href=#>作成?</a>
+            <div class="col-3">
+                <strong>生年月日</strong>
+            </div>
+            <div class="col-9">
+                {{ object.birth }}
+            </div>
             {% endif %}
+
+            <div class="col-3">
+                <strong>国籍</strong>
+            </div>
+            <div class="col-9">
+            {{ object.nationality }}
+            </div>
+
+            <div class="col-3">
+                <strong>メールアドレス</strong>
+            </div>
+            <div class="col-9">
+                {{ object.id.email }}
+            </div>
+
+            <div class="col-3">
+                <strong>携帯電話</strong>
+            </div>
+            <div class="col-9">
+            {{ object.phone }}
+            </div>
+
+            <div class="col-3">
+                <strong>郵便番号</strong>
+            </div>
+            <div class="col-9">
+            {{ object.postal_code }}
+            </div>
+
+            <div class="col-3">
+                <strong>住所</strong>
+            </div>
+            <div class="col-9">
+            {{ object.address1 }}
+                <br>
+            {{ object.address2 }}
+            </div>
+
+            {% if object.nationality != "日本" %}
+            <div class="col-3">
+                <strong>在留カード番号</strong>
+            </div>
+            <div class="col-9">
+            {{ object.residence_card }}
+            </div>
+            {% endif %}
+
+            <div class="col-3">
+                <strong>健康保険番号</strong>
+            </div>
+            <div class="col-9">
+            {{ object.health_insurance }}
+            </div>
+
+            <div class="col-3">
+                <strong>社員番号</strong>
+            </div>
+            <div class="col-9">
+            {{ object.user_id }}
+            </div>
+
+            <div class="col-3">
+                <strong>部門</strong>
+            </div>
+            <div class="col-9">
+                {% if object.department_pro %}
+                {{ object.department_pro }}
+                {% endif %}
+            </div>
+
+            <div class="col-3">
+                <strong>権限</strong>
+            </div>
+            <div class="col-9">
+                {% if object.id.is_staff %}
+                    管理者
+                {% else %}
+                    一般社員
+                {% endif %}
+            </div>
+            <div class="col-3">
+                <strong>緊急連絡先</strong>
+                
+            </div>
+            <div class="col-9">
+                    <div onclick="obj=document.getElementById('open1').style; obj.display=(obj.display=='none')?'block':'none';">
+                        <lable style="cursor:pointer;">緊急連絡先１ ▼</lable>
+                    </div>
+
+                    <div id="open1" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
+                        <li>名前　　：{{ object.emergency_contact_1_name }}</li>
+                        <li>続柄　　：{{ object.emergency_contact_1_relationship }}</li>
+                        <li>電話番号：{{ object.emergency_contact_1_phone }}</li>
+                    </div>        
+                {% if object.emergency_contact_2_name %}
+                    <div onclick="obj=document.getElementById('open2').style; obj.display=(obj.display=='none')?'block':'none';">
+                        <lable style="cursor:pointer;">緊急連絡先２ ▼</lable>
+                    </div>
+                    <div id="open2" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
+                        <li>名前　　：{{ object.emergency_contact_2_name }}</li>
+                        <li>続柄　　：{{ object.emergency_contact_2_relationship }}</li>
+                        <li>電話番号：{{ object.emergency_contact_2_phone }}</li>
+                    </div>
+                {% endif %}
+
+                {% if object.emergency_contact_3_name %}
+                    <div onclick="obj=document.getElementById('open3').style; obj.display=(obj.display=='none')?'block':'none';">
+                        <lable style="cursor:pointer;">緊急連絡先３ ▼</lable>
+                    </div>
+                    <div id="open2" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
+                        <li>名前　　：{{ object.emergency_contact_3_name }}</li>
+                        <li>続柄　　：{{ object.emergency_contact_3_relationship }}</li>
+                        <li>電話番号：{{ object.emergency_contact_3_phone }}</li>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if common_is_staff %}
+            <div class="col-3">
+                <strong>アクティブ</strong>
+            </div>
+            {% if object.id.is_active %}
+            <div class="col-9">
+                アクティブ
+            {% else %}
+            <div class="col-9" style="color:#FFFFFF;background:#777777;">
+                非アクティブ
+            {% endif %}
+            </div>
+
+            {% endif %}
+
+            <div class="col-3">
+                <strong>更新日時</strong>
+            </div>
+            <div class="col-9">
+            {{ object.update_date|date:"Y/n/d H:i" }}
+            </div>
+
+            <div class="button_all">
+                <button class="btn_save"  type="button" onclick="location.href='{% url 'profile_app:employee_update' object.pk %}'">編集</button>
+                {% if common_is_staff %}
+                        <button class="btn_delete" type="submit" onclick='return confirm("{{ object.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
+                    <button class="btn_back" type="button" onclick="location.href='{% url 'profile_app:employee_list' %}'">戻る</button>&nbsp;
+                {% endif %}
+            </div>
+        </div>
+        </form>
+        {% endif %}
+    {% else %}
+        <p>表示データがありません。</p><br>
+        <a class="btn btn-primary" href=#>作成?</a>
+    {% endif %}
 {% endblock %}
