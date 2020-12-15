@@ -19,3 +19,21 @@ footer {
     list-style-type: none;
     color: red;
 }
+
+/* .container img {
+    float: left;
+    margin: 0 10px 10px 0;
+    transition: opacity 1s ease 0s;
+} */
+
+.image{
+    width: 100px;
+    height: 50px;
+}
+
+.nav-link{
+    text-transform: uppercase;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .1rem;
+}

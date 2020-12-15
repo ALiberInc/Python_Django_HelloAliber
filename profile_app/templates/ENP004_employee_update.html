@@ -3,7 +3,7 @@
 {% block title %}社員編集{% endblock %}
 {% block active_profile_show %}active{% endblock %}
 {% block head %}
-<link href="{% static 'css/HS.css' %}" rel="stylesheet">
+<link href="{% static 'css/main.css' %}" rel="stylesheet">
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 {% endblock %}
 {% block contents %}
@@ -12,6 +12,7 @@
         <p>不正な操作です</p>
         {% else %}
         <form method="post" enctype="multipart/form-data" class="form"  novalidate>
+        <h1>社員編集</h1>
         {% csrf_token %}
                             
         {% for field in form %}
@@ -20,6 +21,9 @@
             <div class="field">
                 {% if not field.is_hidden %}
                 <label class="my_class" for="{{ field.auto_id }}">{{ field.label }}</label>
+                {% if field.auto_id != "id_residence_card" %}
+                <span class="necessary label-denger">必須</span>
+                {% endif %}
                 {% endif %}
                 {{ field }}
                 {% if field.help_text %}
@@ -28,7 +32,8 @@
                 {{ field.errors }}
                                     
                 {% if field.auto_id == "id_postal_code" %}
-                <input id="search" type="button" value="検索" />
+                <br>
+                <input class="btn_search" id="search" type="button" value="検索" />
                 {% endif %}
             </div>
             {% else %}
@@ -39,24 +44,24 @@
                             
         <!-- 折り畳み展開 -->
         <div id="accordion">
-        <label class="my_class">緊急連絡先：</label>
+        <label class="my_class">緊急連絡先</label>    
             <ul class="pop">
                 <li>
-                    <p style="cursor:pointer;" id="emergency_1">▼ 緊急連絡先1：</p>
+                <p style="cursor:pointer;" id="emergency_1">▼ 緊急連絡先1<span class="necessary label-denger">必須</span></p>                 
                     <!-- 折り畳まれる部分 -->
                     <div id="open1" class="inner">
                         <div class="field">
-                            名前:
+                            名前
                             {{ form.emergency_contact_1_name }}
                             {{ form.emergency_contact_1_name.errors }}
                         </div>
                         <div class="field">
-                            続柄:
+                            続柄
                             {{ form.emergency_contact_1_relationship }}
                             {{ form.emergency_contact_1_relationship.errors }}
                         </div>
                         <div class="field">
-                            電話番号:
+                            電話番号
                             {{ form.emergency_contact_1_phone }}
                             {{ form.emergency_contact_1_phone.errors }}
                         </div>         
@@ -65,21 +70,21 @@
 
                 <!-- 折り畳み展開 -->
                 <li>
-                    <p style="cursor:pointer;" id="emergency_2">▼ 緊急連絡先2：</p>
+                    <p style="cursor:pointer;" id="emergency_2">▼ 緊急連絡先2</p>
                     <!-- 折り畳まれる部分 -->
                     <div id="open2" class="inner">
                         <div class="field">
-                            名前:
+                            名前
                             {{ form.emergency_contact_2_name }}
                             {{ form.emergency_contact_2_name.errors }}
                         </div>
                         <div class="field">
-                            続柄:
+                            続柄
                             {{ form.emergency_contact_2_relationship }}
                             {{ form.emergency_contact_2_relationship.errors }}
                         </div>
                         <div class="field">
-                            電話番号:
+                            電話番号
                             {{ form.emergency_contact_2_phone }}
                             {{ form.emergency_contact_2_phone.errors }}
                         </div>         
@@ -88,21 +93,21 @@
                             
                 <!-- 折り畳み展開 -->
                 <li>
-                    <p style="cursor:pointer;" id="emergency_3">▼ 緊急連絡先3：</p>
+                    <p style="cursor:pointer;" id="emergency_3">▼ 緊急連絡先3</p>
                     <!-- 折り畳まれる部分 -->
                     <div id="open3" class="inner">
                         <div class="field">
-                            名前:
+                            名前
                             {{ form.emergency_contact_3_name }}
                             {{ form.emergency_contact_3_name.errors }}
                         </div>
                         <div class="field">
-                            続柄:
+                            続柄
                             {{ form.emergency_contact_3_relationship }}
                             {{ form.emergency_contact_3_relationship.errors }}
                         </div>
                         <div class="field">
-                            電話番号:
+                            電話番号
                             {{ form.emergency_contact_3_phone }}
                             {{ form.emergency_contact_3_phone.errors }}
                         </div>         
@@ -155,8 +160,8 @@ $(function(){
         <!-- アクティブ -->
         {% if common_is_staff and object.user_id != user_id %}
         <div class="field">
-            <label class="my_class" for="{{ field.auto_id }}">
-                {{ form.is_active.label }}</label>
+            <label class="my_class" for="{{ field.auto_id }}">{{ form.is_active.label }}</label>
+            <span class="necessary label-denger">必須</span>
             <ul class="gender_class">
                 {{ form.is_active }}
             </ul>
@@ -165,10 +170,11 @@ $(function(){
         {% else %}
         {{ form.is_active.as_hidden }}
         {% endif %}
-
-        <button class="btn btn-primary" type="submit">保存</button>
-        <INPUT type="button"  class="btn btn-secondary ml-2" value="戻る" 
-        onClick="history.back()">
+        <div class="button_all">
+            <button class="btn_save" type="submit">保存</button>
+            {% comment %} <button type="button"  class="btn_back" value="戻る" onClick="history.back()"></button> {% endcomment %}
+            <button class="btn_back" type="button" onclick="location.href='{% url 'profile_app:employee_list' %}'">戻る</button>
+        </div>
         </form>
         {% endif %}
     {% endif %}
