@@ -144,18 +144,18 @@
                     </div>
 
                     <div id="open1" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
-                        <li>名前　　：{{ object.emergency_contact_1_name }}</li>
-                        <li>続柄　　：{{ object.emergency_contact_1_relationship }}</li>
-                        <li>電話番号：{{ object.emergency_contact_1_phone }}</li>
+                        <li>名前　　{{ object.emergency_contact_1_name }}</li>
+                        <li>続柄　　{{ object.emergency_contact_1_relationship }}</li>
+                        <li>電話番号{{ object.emergency_contact_1_phone }}</li>
                     </div>        
                 {% if object.emergency_contact_2_name %}
                     <div onclick="obj=document.getElementById('open2').style; obj.display=(obj.display=='none')?'block':'none';">
                         <lable style="cursor:pointer;">緊急連絡先２ ▼</lable>
                     </div>
                     <div id="open2" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
-                        <li>名前　　：{{ object.emergency_contact_2_name }}</li>
-                        <li>続柄　　：{{ object.emergency_contact_2_relationship }}</li>
-                        <li>電話番号：{{ object.emergency_contact_2_phone }}</li>
+                        <li>名前　　{{ object.emergency_contact_2_name }}</li>
+                        <li>続柄　　{{ object.emergency_contact_2_relationship }}</li>
+                        <li>電話番号{{ object.emergency_contact_2_phone }}</li>
                     </div>
                 {% endif %}
 
@@ -164,9 +164,9 @@
                         <lable style="cursor:pointer;">緊急連絡先３ ▼</lable>
                     </div>
                     <div id="open2" style="display: block; clear: both;padding:1px auto; margin: 1px auto 1px; margin: 1em;">
-                        <li>名前　　：{{ object.emergency_contact_3_name }}</li>
-                        <li>続柄　　：{{ object.emergency_contact_3_relationship }}</li>
-                        <li>電話番号：{{ object.emergency_contact_3_phone }}</li>
+                        <li>名前　　{{ object.emergency_contact_3_name }}</li>
+                        <li>続柄　　{{ object.emergency_contact_3_relationship }}</li>
+                        <li>電話番号{{ object.emergency_contact_3_phone }}</li>
                     </div>
                 {% endif %}
             </div>

@@ -21,7 +21,9 @@
             <div class="field">
                 {% if not field.is_hidden %}
                 <label class="my_class" for="{{ field.auto_id }}">{{ field.label }}</label>
+                {% if field.auto_id != "id_residence_card" %}
                 <span class="necessary label-denger">必須</span>
+                {% endif %}
                 {% endif %}
                 {{ field }}
                 {% if field.help_text %}
@@ -42,25 +44,24 @@
                             
         <!-- 折り畳み展開 -->
         <div id="accordion">
-        <label class="my_class">緊急連絡先：</label>
-        <span class="necessary label-denger">必須</span>
+        <label class="my_class">緊急連絡先</label>    
             <ul class="pop">
                 <li>
-                    <p style="cursor:pointer;" id="emergency_1">▼ 緊急連絡先1：</p>
+                <p style="cursor:pointer;" id="emergency_1">▼ 緊急連絡先1<span class="necessary label-denger">必須</span></p>                 
                     <!-- 折り畳まれる部分 -->
                     <div id="open1" class="inner">
                         <div class="field">
-                            名前:
+                            名前
                             {{ form.emergency_contact_1_name }}
                             {{ form.emergency_contact_1_name.errors }}
                         </div>
                         <div class="field">
-                            続柄:
+                            続柄
                             {{ form.emergency_contact_1_relationship }}
                             {{ form.emergency_contact_1_relationship.errors }}
                         </div>
                         <div class="field">
-                            電話番号:
+                            電話番号
                             {{ form.emergency_contact_1_phone }}
                             {{ form.emergency_contact_1_phone.errors }}
                         </div>         
@@ -69,21 +70,21 @@
 
                 <!-- 折り畳み展開 -->
                 <li>
-                    <p style="cursor:pointer;" id="emergency_2">▼ 緊急連絡先2：</p>
+                    <p style="cursor:pointer;" id="emergency_2">▼ 緊急連絡先2</p>
                     <!-- 折り畳まれる部分 -->
                     <div id="open2" class="inner">
                         <div class="field">
-                            名前:
+                            名前
                             {{ form.emergency_contact_2_name }}
                             {{ form.emergency_contact_2_name.errors }}
                         </div>
                         <div class="field">
-                            続柄:
+                            続柄
                             {{ form.emergency_contact_2_relationship }}
                             {{ form.emergency_contact_2_relationship.errors }}
                         </div>
                         <div class="field">
-                            電話番号:
+                            電話番号
                             {{ form.emergency_contact_2_phone }}
                             {{ form.emergency_contact_2_phone.errors }}
                         </div>         
@@ -92,21 +93,21 @@
                             
                 <!-- 折り畳み展開 -->
                 <li>
-                    <p style="cursor:pointer;" id="emergency_3">▼ 緊急連絡先3：</p>
+                    <p style="cursor:pointer;" id="emergency_3">▼ 緊急連絡先3</p>
                     <!-- 折り畳まれる部分 -->
                     <div id="open3" class="inner">
                         <div class="field">
-                            名前:
+                            名前
                             {{ form.emergency_contact_3_name }}
                             {{ form.emergency_contact_3_name.errors }}
                         </div>
                         <div class="field">
-                            続柄:
+                            続柄
                             {{ form.emergency_contact_3_relationship }}
                             {{ form.emergency_contact_3_relationship.errors }}
                         </div>
                         <div class="field">
-                            電話番号:
+                            電話番号
                             {{ form.emergency_contact_3_phone }}
                             {{ form.emergency_contact_3_phone.errors }}
                         </div>         
@@ -159,8 +160,8 @@ $(function(){
         <!-- アクティブ -->
         {% if common_is_staff and object.user_id != user_id %}
         <div class="field">
-            <label class="my_class" for="{{ field.auto_id }}">
-                {{ form.is_active.label }}</label>
+            <label class="my_class" for="{{ field.auto_id }}">{{ form.is_active.label }}</label>
+            <span class="necessary label-denger">必須</span>
             <ul class="gender_class">
                 {{ form.is_active }}
             </ul>
