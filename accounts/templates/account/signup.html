@@ -3,19 +3,20 @@
 {% block title %}社員新規{% endblock %}
 {% block active_signup %}active{% endblock %}
 {% block head %}
-<link href="{% static 'css/HS.css' %}" rel="stylesheet">
+<link href="{% static 'css/main.css' %}" rel="stylesheet">
 {% endblock %}
 {% block contents %}
             <br>
-            <h1>社員新規</h1>
             {% if common_is_staff %}
-                <h5><span style="font-style: italic">New Member!～</span></h5>
+                {% comment %} <h5><span style="font-style: italic">New Member!～</span></h5> {% endcomment %}
                 <form method="post" action="{% url 'account_signup' %}" novalidate>
+                <h1>社員新規</h1>
                     {% csrf_token %}
                     {% for field in form %}
                     <div class="field">
                         {% if not field.is_hidden %}
-                        <label class="my_class" for="{{ field.auto_id }}">{{ field.label }}</label>
+                        <label class="signup_class" for="{{ field.auto_id }}">{{ field.label }}</label>
+                        <span class="necessary label-denger">必須</span>
                         {% endif %}
                         {{ field }}
                         {% if field.help_text %}
@@ -26,9 +27,11 @@
                     </div><br>
                     {% endfor %}
                     <input type="hidden" name="{{ redirect_field_name }}" value="http://localhost:8000"/>
+                    <div class="button_all">
+                        <button class="btn_send" type="submit">登録情報を送信する</button>
+                        <button class="btn_back" type="button" onclick="location.href='{% url 'account_login' %}'">戻る</button>
 
-                    <button class="btn btn-primary" type="submit">登録情報を送信する</button>
-                    <a class="btn btn-primary" href="{% url 'account_login' %}">戻る</a>
+                    </div>
                 </form>
             {% else %}
                 不正な操作です

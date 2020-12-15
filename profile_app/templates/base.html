@@ -30,7 +30,8 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'profile_app:index' %}">HOME PAGE</a>
+            <img class="image" src="{% static 'img/aliber_logo.png' %}">
+            {% comment %} <a class="navbar-brand" href="{% url 'profile_app:index' %}">ホームページ</a> {% endcomment %}
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
                     aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -42,11 +43,12 @@
                         {% if common_last_name %}
                             <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様</a>
                         {% endif %}
-                        <a class="nav-link" href="{% url 'account_logout' %}">ログアウト</a>
                     </li>
+                    <a class="nav-link" href="{% url 'account_logout' %}">ログアウト</a>
+                    
                     {% else %}
                     <li class="nav-item {% block active_login %}{% endblock %}">
-                        <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
+                        <a class="nav-link" href="{% url 'account_login' %}">ログイン</a>
                     </li>
                     {% endif %}
                 </ul>

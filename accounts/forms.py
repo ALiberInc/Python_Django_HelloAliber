@@ -148,13 +148,13 @@ class MySignupForm(BaseSignupForm):
         self.fields['password1'].widget = forms.HiddenInput()
         self.fields['last_name'] = forms.CharField(label='姓', )
         self.fields['last_name'].widget.attrs['maxlength'] = '15'
-        self.fields['last_name'].help_text = '15桁以下を入力してください。'
+        # self.fields['last_name'].help_text = '15桁以下を入力してください。'
         self.fields['last_name'].error_messages = {
             'required': '姓を入力してください。',
             'maxlength':'15桁以内を入力してください。'}
         self.fields['first_name'] = forms.CharField(label="名", )
         self.fields['first_name'].widget.attrs['maxlength'] = '15'
-        self.fields['first_name'].help_text = '15桁以下を入力してください。'
+        # self.fields['first_name'].help_text = '15桁以下を入力してください。'
         self.fields['first_name'].error_messages = {
             'required': '名を入力してください。',
             'maxlength':'15桁以内を入力してください。'}
