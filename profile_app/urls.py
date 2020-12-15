@@ -4,11 +4,12 @@ from . import views
 
 app_name = 'profile_app'
 urlpatterns = [
-    path('', views.IndexView.as_view(), name="index"),
+    # path('', views.IndexView.as_view(), name="index"),
     path('employee_list', views.EmployeeListView.as_view(), name="employee_list"),
     path('employee/<int:pk>/', views.EmployeeView.as_view(), name="employee"),
     path('employee_delete/<int:pk>/', views.EmployeeDeleteView, name="employee_delete"),
     path('employee_set_active/<int:pk>/', views.EmployeeSetActiveView, name="employee_set_active"),
     path('employee_set_inactive/<int:pk>/', views.EmployeeSetInActiveView, name="employee_set_inactive"),
     path('employee_update/<int:pk>/', views.EmployeeUpdateView.as_view(), name="employee_update"),
+    path('500test', views.Test500View.as_view(), name="test_500"),
 ]
