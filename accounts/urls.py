@@ -1,8 +1,6 @@
-from accounts.views import MySignupView
 from django.urls import path, include, re_path
 from allauth.account import views
 from . import views as my_views
-from profile_app import views as app_views
 
 urlpatterns = [
 #    path("signup/", views.signup, name="account_signup"),
