@@ -14,6 +14,7 @@
         <form method="post" enctype="multipart/form-data" class="form"  novalidate>
         <h1>社員編集</h1>
         {% csrf_token %}
+        {{ form.non_field_errors }}
                             
         {% for field in form %}
             {% if "emergency" not in field.auto_id and "is_active" not in field.auto_id %}
