@@ -86,7 +86,7 @@ class MyResetPasswordForm(ResetPasswordForm):
             self.users = filter_users_by_email(email, is_active=True)
             users = CustomUser.objects.filter(email__iexact=email, is_active=True).first()
             if email == None:
-                raise forms.ValidationError("")
+                raise forms.ValidationError("該当するアカウントが見つかりません。")
             if users:
                 if users.last_name != last_name or users.first_name != first_name:
                     raise forms.ValidationError("該当するアカウントが見つかりません。")
@@ -148,13 +148,11 @@ class MySignupForm(BaseSignupForm):
         self.fields['password1'].widget = forms.HiddenInput()
         self.fields['last_name'] = forms.CharField(label='姓', )
         self.fields['last_name'].widget.attrs['maxlength'] = '15'
-        # self.fields['last_name'].help_text = '15桁以下を入力してください。'
         self.fields['last_name'].error_messages = {
             'required': '姓を入力してください。',
             'maxlength':'15桁以内を入力してください。'}
         self.fields['first_name'] = forms.CharField(label="名", )
         self.fields['first_name'].widget.attrs['maxlength'] = '15'
-        # self.fields['first_name'].help_text = '15桁以下を入力してください。'
         self.fields['first_name'].error_messages = {
             'required': '名を入力してください。',
             'maxlength':'15桁以内を入力してください。'}
@@ -254,7 +252,6 @@ class MyLoginForm(LoginForm):
         if len(email) > 30:
             raise forms.ValidationError("30桁以内を入力してください。")
         return self.cleaned_data["login"]
-
     
     def clean_password(self):
         my_password = self.data.get('password')
@@ -262,3 +259,12 @@ class MyLoginForm(LoginForm):
             raise forms.ValidationError("30桁以内を入力してください。")
         return self.cleaned_data["password"]
     
+    def clean(self):
+        email = self.data.get('login')
+        my_password = self.data.get('password')
+        users = CustomUser.objects.filter(email__iexact=email).first()
+        if users:
+            if not users.is_active and my_password:
+                raise forms.ValidationError("該当アカウントは現在使用していません。")
+        return super(MyLoginForm, self).clean()
+
