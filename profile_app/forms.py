@@ -103,19 +103,19 @@ class ProfileEditForm(ModelForm):
         if email and CustomUser.objects.filter(email=email).exclude(id=id).count():
             raise forms.ValidationError("メールアドレスが既に存在しました。")
         elif len(email) > 30:
-            raise forms.ValidationError("10桁以内を入力してください。")
+            raise forms.ValidationError("30桁以内を入力してください。")
         return self.cleaned_data["email"]
 
     def clean_last_name_k(self):
         last_name_k = self.data.get('last_name_k')
-        if len(last_name_k) > 10:
-            raise forms.ValidationError("10桁以内を入力してください。")
+        if len(last_name_k) > 20:
+            raise forms.ValidationError("20桁以内を入力してください。")
         return self.cleaned_data["last_name_k"]
     
     def clean_first_name_k(self):
         first_name_k = self.data.get('first_name_k')
-        if len(first_name_k) > 10:
-            raise forms.ValidationError("10桁以内を入力してください。")
+        if len(first_name_k) > 20:
+            raise forms.ValidationError("20桁以内を入力してください。")
         return self.cleaned_data["first_name_k"]
 
     def clean_last_name(self):
@@ -133,13 +133,13 @@ class ProfileEditForm(ModelForm):
     def clean_nationality(self):
         nationality = self.data.get('nationality')
         if len(nationality) > 20:
-            raise forms.ValidationError("10桁以内を入力してください。")
+            raise forms.ValidationError("20桁以内を入力してください。")
         return self.cleaned_data["nationality"]
 
     def clean_phone(self):
         phone = self.data.get('phone')
         if len(phone) > 15:
-            raise forms.ValidationError("10桁以内を入力してください。")
+            raise forms.ValidationError("15桁以内を入力してください。")
         return self.cleaned_data["phone"]
 
     def clean_postal_code(self):
@@ -151,19 +151,19 @@ class ProfileEditForm(ModelForm):
     def clean_address1(self):
         address1 = self.data.get('address1')
         if len(address1) > 50:
-            raise forms.ValidationError("10桁以内を入力してください。")
+            raise forms.ValidationError("50桁以内を入力してください。")
         return self.cleaned_data["address1"]
 
     def clean_address2(self):
         address2 = self.data.get('address2')
         if len(address2) > 50:
-            raise forms.ValidationError("10桁以内を入力してください。")
+            raise forms.ValidationError("50桁以内を入力してください。")
         return self.cleaned_data["address2"]
 
     def clean_residence_card(self):
         residence_card = self.data.get('residence_card')
         if len(residence_card) > 15:
-            raise forms.ValidationError("10桁以内を入力してください。")
+            raise forms.ValidationError("15桁以内を入力してください。")
         return self.cleaned_data["residence_card"]
 
     def clean_health_insurance(self):
@@ -175,7 +175,7 @@ class ProfileEditForm(ModelForm):
     def clean_emergency_contact_1_name(self):
         emergency_contact_1_name = self.data.get('emergency_contact_1_name')
         if len(emergency_contact_1_name) > 20:
-            raise forms.ValidationError("10桁以内を入力してください。")
+            raise forms.ValidationError("20桁以内を入力してください。")
         return self.cleaned_data["emergency_contact_1_name"]
 
     def clean_emergency_contact_1_relationship(self):
@@ -187,6 +187,6 @@ class ProfileEditForm(ModelForm):
     def clean_emergency_contact_1_phone(self):
         emergency_contact_1_phone = self.data.get('emergency_contact_1_phone')
         if len(emergency_contact_1_phone) > 15:
-            raise forms.ValidationError("10桁以内を入力してください。")
+            raise forms.ValidationError("15桁以内を入力してください。")
         return self.cleaned_data["emergency_contact_1_phone"]
         

@@ -49,10 +49,6 @@ def lastname(request):
     return {'common_last_name': last_name ,'user_id': user_id, 'common_is_staff': is_staff
             ,'date_today': datetime.date.today()}
 
-class IndexView(generic.TemplateView):
-    """（仮）HP"""
-    template_name = "index.html"
-
 
 class EmployeeListView(generic.ListView):
     """社員一覧画面"""
@@ -80,7 +76,7 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
 
         time = str(datetime.date.today())
         now_time = int("".join(time.split("-")))
-        age = int(((now_time - time0) / 10000))+1
+        age = int(((now_time - time0) / 10000))
         context['count_age'] = age
         return context
 
@@ -191,6 +187,14 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         messages.error(self.request, "更新が失敗しました。")
         return super().form_invalid(form)
    
+
+class Test500View(generic.TemplateView):
+    def index(self):
+        try:
+            test500 = Profile.objects.get(id=-1)
+        except :
+            raise Exception
+
 
 def form_save(request, form, messages_success):
     profile = form.save(commit=False)
