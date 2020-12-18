@@ -76,7 +76,7 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
 
         time = str(datetime.date.today())
         now_time = int("".join(time.split("-")))
-        age = int(((now_time - time0) / 10000))+1
+        age = int(((now_time - time0) / 10000))
         context['count_age'] = age
         return context
 

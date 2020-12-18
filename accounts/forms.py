@@ -85,8 +85,8 @@ class MyResetPasswordForm(ResetPasswordForm):
             first_name = self.cleaned_data.get('first_name')
             self.users = filter_users_by_email(email, is_active=True)
             users = CustomUser.objects.filter(email__iexact=email, is_active=True).first()
-            if email == None:
-                raise forms.ValidationError("該当するアカウントが見つかりません。")
+            if email == None or last_name == None or first_name == None:
+                raise forms.ValidationError("")
             if users:
                 if users.last_name != last_name or users.first_name != first_name:
                     raise forms.ValidationError("該当するアカウントが見つかりません。")
