@@ -47,7 +47,7 @@
         <label class="my_class">緊急連絡先</label>    
             <ul class="pop">
                 <li>
-                <p style="cursor:pointer;" id="emergency_1">▼ 緊急連絡先1<span class="necessary label-denger">必須</span></p>                 
+                <p style="cursor:pointer;" id="emergency_1">▼ 緊急連絡先1&nbsp;<span class="necessary label-denger">必須</span></p>                 
                     <!-- 折り畳まれる部分 -->
                     <div id="open1" class="inner">
                         <div class="field">
@@ -172,7 +172,6 @@ $(function(){
         {% endif %}
         <div class="button_all">
             <button class="btn_save" type="submit">保存</button>
-            {% comment %} <button type="button"  class="btn_back" value="戻る" onClick="history.back()"></button> {% endcomment %}
             <button class="btn_back" type="button" onclick="location.href='{% url 'profile_app:employee_list' %}'">戻る</button>
         </div>
         </form>

@@ -77,17 +77,18 @@
 .my-div-style{
 	/* margin:0 auto; */
 	background: rgb(253, 253, 251);
-  border: 5px solid #1ca2e0;
-  padding: 60px;
+  /* border: 5px solid #1ca2e0; */
+  padding: 30px;
 	box-sizing: border-box;
-	/* background-image: url(css/画像/sea.jpg); */
+	border-radius: 6px;
+	box-shadow:15px 15px 0px rgba(0,0,0,.1);
 }
 
-hr {
+/* hr {
 	border-width: 5px;
 	border-color: #2E99A9;
 	margin: 40px 0;
-}
+} */
 
 .col-3{
 	vertical-align: middle;
@@ -122,9 +123,14 @@ a{
 table{
 	width:100%;
 }
+
 th{
 	color: rgb(0, 0, 0);
 	background: #f0b455;
+}
+
+td{
+	max-width: 20%;
 }
 td:link{
 	color: #87ce4d; 
