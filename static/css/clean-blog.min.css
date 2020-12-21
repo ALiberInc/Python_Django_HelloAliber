@@ -156,3 +156,34 @@ h1 {
   color:rgb(8, 8, 8);
   margin-bottom:24px;
 }
+/*社員新規完了画面ボタン*/
+.btn_back{
+	display: flex;
+  margin: auto;
+  padding:20px;
+  border-radius:6px;
+  border:0;
+  background:#7d898d;
+  font-size:1.2em;
+  color:rgb(248, 243, 243);
+}
+
+/*×ボタンを消す*/
+.close{
+	display: none;
+}
+
+.btn_send{
+	display: flex;
+  margin: auto;
+  padding:20px;
+  border-radius:6px;
+  border:0;
+  background:#239b51;
+  font-size:1.2em;
+  color:rgb(248, 243, 243);
+}
+
+h3{
+	text-align: center;
+}

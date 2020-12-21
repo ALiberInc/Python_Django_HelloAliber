@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}登録{% endblock %}
 
 {% block active_login %}active{% endblock %}
+
+{% block head %}
+<link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block contents %}
             <h1>登録</h1>
@@ -14,7 +18,7 @@
 
             <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
                 {% csrf_token %}
-                <button class="btn btn-primary" type="submit">ログイン</button>
+                <button class="btn_send" type="submit">ログイン</button>
             </form>
 
             {% else %}
