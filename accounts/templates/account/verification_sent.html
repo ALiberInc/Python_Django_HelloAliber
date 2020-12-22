@@ -3,12 +3,9 @@
 {% block title %}社員新規完了{% endblock %}
 
 {% block head %}
-<link href="{% static 'css/main.css' %}" rel="stylesheet">
+<link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block contents %}
-    <h1>社員新規完了</h1>
-    <p>送信完了</p>
-    <button class="btn_back" type="button" onclick="location.href='{% url 'profile_app:employee_list' %}'">戻る</button>&nbsp;
-
+    <button class="btn_back" type="button" onclick="location.href='{% url 'profile_app:employee_list' %}'">社員一覧に戻る</button>
 {% endblock %}
