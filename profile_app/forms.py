@@ -44,10 +44,8 @@ class ProfileEditForm(ModelForm):
         self.fields['postal_code'].required = True
         self.fields['address1'].required = True
         self.fields['address1'].widget.attrs['placeholder'] = '都道府県名、または市区町村名を入力してください'
-
         self.fields['address2'].required = True
         self.fields['address2'].widget.attrs['placeholder'] = '町域名を入力してください'
-        
         self.fields['health_insurance'].required = True
         self.fields['department_pro'].widget.attrs['maxlength'] = '10'
         self.fields['emergency_contact_1_name'].required = True
@@ -59,9 +57,8 @@ class ProfileEditForm(ModelForm):
         self.fields['emergency_contact_3_name'].widget.attrs['maxlength'] = '20'
         self.fields['emergency_contact_3_relationship'].widget.attrs['maxlength'] = '10'
         self.fields['emergency_contact_3_phone'].widget.attrs['maxlength'] = '15'
-        
         self.fields['is_active'].widget.attrs["class"] = "gender_class"
-		for field in self.fields.values():
+        for field in self.fields.values():
             if field.required:
                 field.error_messages = {'required': field.label+'を入力してください。'}
     
