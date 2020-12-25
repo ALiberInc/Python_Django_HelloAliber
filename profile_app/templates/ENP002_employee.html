@@ -8,7 +8,9 @@
 {% block contents %}
     {% if object %}
         {% if not common_is_staff and object.user_id != user_id %}
+        <div class="col-9">
         <p>不正な操作です</p>
+        </div>
         {% else %}
         <div class="detail">
         <form method="post" action="{% url 'profile_app:employee_delete' pk=object.id_id %}">{% csrf_token %}
