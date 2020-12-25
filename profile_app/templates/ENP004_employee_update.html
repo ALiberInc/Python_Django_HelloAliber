@@ -26,12 +26,18 @@
                     <span class="necessary label-denger">必須</span>
                     {% endif %}
                 {% endif %}
+             {% if field.auto_id == "id_gender" %}<br>
+                        {% for radio in form.gender %}
+                        <p class="gender_class">{{ radio.tag }}
+                        {{ radio.choice_label }}</p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                        {% endfor %} 
+                    {% else %}
                 {{ field }}
                 {% if field.help_text %}
                 <span class="helptext">{{ field.help_text }}</span>
                 {% endif %}
                 {{ field.errors }}
-                                    
+                {% endif %}                    
                 {% if field.auto_id == "id_postal_code" %}
                 <br>
                 <input class="btn_search" id="search" type="button" value="検索" />
@@ -42,7 +48,7 @@
             {% endif %}
             {% endif %}
         {% endfor %}
-                            
+                
         <!-- 折り畳み展開 -->
         <div id="accordion">
         <label class="my_class">緊急連絡先</label>    
@@ -162,10 +168,11 @@ $(function(){
         {% if common_is_staff and object.user_id != user_id %}
         <div class="field">
             <label class="my_class" for="{{ field.auto_id }}">{{ form.is_active.label }}</label>
-            <span class="necessary label-denger">必須</span>
-            <ul class="gender_class">
-                {{ form.is_active }}
-            </ul>
+            <span class="necessary label-denger">必須</span><br>
+            {% for radio in form.is_active %}
+                <p class="gender_class">{{ radio.tag }}
+                {{ radio.choice_label }}</p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            {% endfor %} 
             {{ form.is_active.errors }}
         </div>
         {% else %}
