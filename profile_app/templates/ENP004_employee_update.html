@@ -11,7 +11,7 @@
         {% if not common_is_staff and object.user_id != user_id %}
         <p>不正な操作です</p>
         {% else %}
-        <form method="post" enctype="multipart/form-data" class="form"  novalidate>
+        <form method="post" enctype="multipart/form-data" class="form" novalidate>
         <h1>社員編集</h1>
         {% csrf_token %}
         {{ form.non_field_errors }}
