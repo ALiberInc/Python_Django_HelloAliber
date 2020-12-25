@@ -62,10 +62,12 @@ class ProfileEditForm(ModelForm):
         self.fields['address1'].required = True
         self.fields['address1'].error_messages = {'required': self.fields['address1'].label+'を入力してください。'}
         self.fields['address1'].widget.attrs['placeholder'] = '都道府県名、または市区町村名を入力してください'
+        self.fields['address1'].widget.attrs['maxlength'] = '50'
         self.fields['address2'].widget.attrs['pattern'] = '^[ぁ-んァ-ヶー一-龠]+$'
         self.fields['address2'].required = True
         self.fields['address2'].error_messages = {'required': self.fields['address2'].label+'を入力してください。'}
         self.fields['address2'].widget.attrs['placeholder'] = '町域名を入力してください'
+        self.fields['address2'].widget.attrs['maxlength'] = '50'
         self.fields['residence_card'].widget.attrs['pattern'] = '^[a-zA-Z0-9]+$'
         # self.fields['residence_card'].required = True
         self.fields['residence_card'].error_messages = {'required': self.fields['residence_card'].label+'を入力してください。'}
@@ -94,6 +96,7 @@ class ProfileEditForm(ModelForm):
         self.fields['emergency_contact_3_relationship'].widget.attrs['pattern'] = '^[ぁ-んァ-ヶー一-龠]+$'
         self.fields['emergency_contact_3_phone'].widget.attrs['maxlength'] = '15'
         self.fields['emergency_contact_3_phone'].widget.attrs['pattern'] = '^[0-9]+$'
+        self.fields['is_active'].widget.attrs["class"] = "gender_class"
     
     def clean_email(self):      
         email = self.cleaned_data.get('email')

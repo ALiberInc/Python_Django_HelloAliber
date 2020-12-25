@@ -187,3 +187,8 @@ h1 {
 h3{
 	text-align: center;
 }
+
+/*社員新規完了ボタン位置*/
+.space{
+	margin-top: 50px;
+}

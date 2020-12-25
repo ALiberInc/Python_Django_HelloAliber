@@ -2,12 +2,13 @@
 body {
   background:#98d0f8;
 }
-form {
+
+.login_form {
   background:#fff;
   border-radius:6px;
   padding:20px;
   padding-top:30px;
-  width:500px;
+  width:50%;
   margin:50px auto;
   box-shadow:15px 15px 0px rgba(0,0,0,.1);
 }
@@ -44,7 +45,7 @@ input {
   border:0;
   padding:20px;
   border-radius:6px;
-  margin-bottom:10px;
+  margin-bottom:20px;
   border:1px solid #eee;
 }
 
@@ -100,7 +101,8 @@ select {
 }
 
 label{
-  font-size: x-large;
+  font-size: 20px;
+  margin-bottom: .2em;
 }
 
 /*共通画面ログアウト*/
@@ -113,35 +115,42 @@ label{
 }
 
 /*編集画面*/
-.gender_class li{
-  display: inline-block;
-  padding: 10px;
+.gender_class {
+  display: inline;
+  width: 30px;
+  margin-top: 20px;
+  margin-inline-end: 10px;
 }
+
+/* .gender_label{
+  display: inline-block;
+} */
+
 /* .gender_class ul {
 	margin: 0.5rem 0.5rem 2rem 0.5rem;
 	padding: 0.5rem 1rem;
 	list-style: none;
 } */
-.gender_class input[type="radio"]{
+/* .gender_class input[type="radio"]{
   display: inline-block;
   position: relative;
   background: #ec5d8d;
-  left: 72;
-  top: 30;
-}
+  left:-70;
+  top: 28;
+} */
 
-.gender_class label {
+/* .gender_class label {
 	line-height: 100%;
 	position: relative;
   margin: 0.1rem;
   margin-left:30px;
   cursor: pointer;
-}
+} */
 
 .btn_search{
   position:relative;
   text-align: center;
-  width: 30%;
+  width: 20%;
   margin: auto;
   padding:8px;
   border-radius:6px;
@@ -175,8 +184,8 @@ ul{
 
 .necessary {
   display: inline;
-  padding: .2em .6em .3em;
-  font-size: 100%;
+  padding: .3em .6em .2em;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1;
   background:red ;
@@ -206,14 +215,15 @@ hr {
   color:rgb(248, 243, 243);
 }
 
-.detail{
+/* .detail{
   flex-flow: column;
   background: #fff;
-  width: 500px;
+  width: 70%;
   border-radius:6px;
   margin:50px auto;
   box-shadow:15px 15px 0px rgba(0,0,0,.1);
-}
+} */
+
 .col-3{
   width:100%;
   background:#f5f5f5;
@@ -239,4 +249,18 @@ hr {
 /*全画面*/
 .button_all{
   text-align: center;
+}
+
+.close{
+  display: none;
+}
+
+form {
+  background:#fff;
+  border-radius:6px;
+  padding:20px;
+  padding-top:30px;
+  width:70%;
+  margin:50px auto;
+  box-shadow:15px 15px 0px rgba(0,0,0,.1);
 }
