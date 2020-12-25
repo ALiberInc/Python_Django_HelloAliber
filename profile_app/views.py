@@ -58,7 +58,7 @@ class EmployeeListView(generic.ListView):
     paginate_by = 10
     
     def get_queryset(self):
-        profiles = Profile.objects.filter(delete=0).order_by('user_id')
+        profiles = Profile.objects.order_by('user_id')
         return profiles
 
 
@@ -156,12 +156,15 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         form_kwargs = super().get_form_kwargs(*args, **kwargs)
         
         gender_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender
+        birth_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).birth
+        # birth_value_c = birth_value.replace
         id_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
         email_value = CustomUser.objects.get(id__exact=id_value).email
         is_active_value = CustomUser.objects.get(id__exact=id_value).is_active
         form_kwargs['initial'] = {
             'email' : email_value,
             'gender' : gender_value,
+            'birth' : birth_value,
             'id' : id_value,
             'is_active' : is_active_value,
         }
@@ -178,8 +181,10 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
             email = email_cleaned,
             is_active = is_active_cleaned,)
         gender_cleaned = self.request.POST['gender']#formのデータ取得
+        birth_cleande = self.request.POST['birth']
         profile = form.save(commit=False)
         profile.gender = gender_cleaned
+        profile.birth = birth_cleande
         
         return super().form_valid(form)
 
