@@ -8,8 +8,6 @@ from accounts.forms import MySignupForm
 from accounts.models import CustomUser
 from profile_app.models import Profile, Department
 
-from profile_app.forms import ProfileCreateForm
-
 from django.views.generic.edit import FormView
 from django.urls import reverse, reverse_lazy
 from allauth.account.views import CloseableSignupMixin, AjaxCapableProcessFormViewMixin, sensitive_post_parameters_m
