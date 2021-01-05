@@ -155,16 +155,18 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
     def get_form_kwargs(self, *args, **kwargs):
         form_kwargs = super().get_form_kwargs(*args, **kwargs)
         
+        # DBから読み込み
         gender_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender
         birth_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).birth
-        # birth_value_c = birth_value.replace
+        birth_value_c = birth_value.strftime("%Y%m%d")
         id_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
         email_value = CustomUser.objects.get(id__exact=id_value).email
         is_active_value = CustomUser.objects.get(id__exact=id_value).is_active
+        # Form初期値を設定する
         form_kwargs['initial'] = {
             'email' : email_value,
             'gender' : gender_value,
-            'birth' : birth_value,
+            'birth' : birth_value_c,
             'id' : id_value,
             'is_active' : is_active_value,
         }
@@ -172,19 +174,19 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
     
     def form_valid(self, form):
         form = form_save(self.request,form, 'プロフィール更新しました。')
+        # formのデータ取得
         email_cleaned = self.request.POST['email']
         logger.debug("メールアドレス:{}".format(self.request.POST['email']))
         customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
-        logger.debug("gender:{}".format(self.request.POST['is_active']))
         is_active_cleaned = self.request.POST['is_active']
         CustomUser.objects.filter(id=customeruser_id).update(
             email = email_cleaned,
             is_active = is_active_cleaned,)
-        gender_cleaned = self.request.POST['gender']#formのデータ取得
-        birth_cleande = self.request.POST['birth']
+        gender_cleaned = self.request.POST['gender']
+        birth_cleaned = datetime.datetime.strptime(self.request.POST['birth'], "%Y%m%d")
         profile = form.save(commit=False)
         profile.gender = gender_cleaned
-        profile.birth = birth_cleande
+        profile.birth = birth_cleaned
         
         return super().form_valid(form)
 
