@@ -61,7 +61,8 @@ class ProfileEditForm(ModelForm):
         self.fields['emergency_contact_3_phone'].widget.attrs['maxlength'] = '15'
         
         self.fields['is_active'].widget.attrs["class"] = "gender_class"
-		for field in self.fields.values():
+	    
+        for field in self.fields.values():
             if field.required:
                 field.error_messages = {'required': field.label+'を入力してください。'}
     

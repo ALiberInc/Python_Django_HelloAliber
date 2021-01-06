@@ -31,8 +31,8 @@
 
                     {% if field.auto_id == "id_gender" %}<br>
                         {% for radio in form.gender %}
-                        <p class="gender_class">{{ radio.tag }}
-                        {{ radio.choice_label }}</p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                        {{ radio.tag }}
+                        {{ radio.choice_label }}&emsp;
                         {% endfor %} 
                     {% else %}
                     {{ field }}
