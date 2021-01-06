@@ -25,8 +25,7 @@ class ProfileEditForm(ModelForm):
     is_active = forms.CharField(
         label='アクティブ', 
         widget=forms.RadioSelect(choices=[('True','アクティブ'),('False','非アクティブ'),]))
-    department_pro = forms.ModelChoiceField(Department.objects, label='部門', initial=0)
-
+    department_pro = forms.ModelChoiceField(Department.objects, label='部門', initial=0)    
     field_order = ["last_name_k","first_name_k","last_name","first_name","gender","birth","email","nationality","phone","postal_code","address1","address2","residence_card","health_insurance","department_pro","emergency_contact_1_name","emergency_contact_1_relationship","emergency_contact_1_phone","emergency_contact_2_name","emergency_contact_2_relationship","emergency_contact_2_phone","emergency_contact_3_name","emergency_contact_3_relationship","emergency_contact_3_phone,is_active"]
         
     def __init__(self, *args, **kwargs):
