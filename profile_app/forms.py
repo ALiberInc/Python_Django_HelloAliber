@@ -25,31 +25,44 @@ class ProfileEditForm(ModelForm):
     is_active = forms.CharField(
         label='アクティブ', 
         widget=forms.RadioSelect(choices=[('True','アクティブ'),('False','非アクティブ'),]))
-    department_pro = forms.ModelChoiceField(Department.objects, label='部門', initial=0)
-
-
+    department_pro = forms.ModelChoiceField(Department.objects, label='部門', initial=0)    
     field_order = ["last_name_k","first_name_k","last_name","first_name","gender","birth","email","nationality","phone","postal_code","address1","address2","residence_card","health_insurance","department_pro","emergency_contact_1_name","emergency_contact_1_relationship","emergency_contact_1_phone","emergency_contact_2_name","emergency_contact_2_relationship","emergency_contact_2_phone","emergency_contact_3_name","emergency_contact_3_relationship","emergency_contact_3_phone,is_active"]
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id'].widget = forms.HiddenInput()
         self.fields['last_name_k'].required = True
+        self.fields['last_name_k'].widget.attrs['maxlength'] = '20'
         self.fields['first_name_k'].required = True
+        self.fields['first_name_k'].widget.attrs['maxlength'] = '20'
+        self.fields['last_name'].widget.attrs['maxlength'] = '15'
+        self.fields['first_name'].widget.attrs['maxlength'] = '15'
         self.fields['gender'].widget.attrs["class"] = "gender_class"
         self.fields['birth'].widget.attrs['maxlength'] = '8'
         self.fields['birth'].widget.attrs['placeholder'] = 'yyyymmdd'
+        self.fields['email'].widget.attrs['maxlength'] = '30'
         self.fields['nationality'].required = True
+        self.fields['nationality'].widget.attrs['maxlength'] = '20'
         self.fields['phone'].required = True
+        self.fields['phone'].widget.attrs['maxlength'] = '15'
         self.fields['postal_code'].required = True
+        self.fields['postal_code'].widget.attrs['maxlength'] = '10'
         self.fields['address1'].required = True
         self.fields['address1'].widget.attrs['placeholder'] = '都道府県名、または市区町村名を入力してください'
+        self.fields['address1'].widget.attrs['maxlength'] = '50'
         self.fields['address2'].required = True
         self.fields['address2'].widget.attrs['placeholder'] = '町域名を入力してください'
+        self.fields['address2'].widget.attrs['maxlength'] = '50'
+        self.fields['residence_card'].widget.attrs['maxlength'] = '15'
         self.fields['health_insurance'].required = True
+        self.fields['health_insurance'].widget.attrs['maxlength'] = '10'
         self.fields['department_pro'].widget.attrs['maxlength'] = '10'
         self.fields['emergency_contact_1_name'].required = True
         self.fields['emergency_contact_1_relationship'].required = True
         self.fields['emergency_contact_1_phone'].required = True
+        self.fields['emergency_contact_1_name'].widget.attrs['maxlength'] = '20'
+        self.fields['emergency_contact_1_relationship'].widget.attrs['maxlength'] = '10'
+        self.fields['emergency_contact_1_phone'].widget.attrs['maxlength'] = '15'
         self.fields['emergency_contact_2_name'].widget.attrs['maxlength'] = '20'
         self.fields['emergency_contact_2_relationship'].widget.attrs['maxlength'] = '10'
         self.fields['emergency_contact_2_phone'].widget.attrs['maxlength'] = '15'
@@ -59,7 +72,7 @@ class ProfileEditForm(ModelForm):
         self.fields['is_active'].widget.attrs["class"] = "gender_class"
         for field in self.fields.values():
             if field.required:
-                field.error_messages = {'required': field.label+'を入力してください。'}
+                field.error_messages = {'required': '「'+field.label+'」を入力してください。'}
     
     def clean_email(self):      
         email = self.cleaned_data.get('email')
@@ -77,7 +90,7 @@ class ProfileEditForm(ModelForm):
         if len(last_name_k) > 20:
             raise forms.ValidationError("20桁以内を入力してください。")
         if not re.match(r"[ア-ン゛゜ァ-ォャ-ョー「」、]", last_name_k):
-            raise forms.ValidationError("姓（カタカナ）はカタカナだけを入力してください。")
+            raise forms.ValidationError("「姓（カタカナ）」はカタカナだけを入力してください。")
         return self.cleaned_data["last_name_k"]
     
     def clean_first_name_k(self):
@@ -85,7 +98,7 @@ class ProfileEditForm(ModelForm):
         if len(first_name_k) > 20:
             raise forms.ValidationError("20桁以内を入力してください。")
         if not re.match(r"[ア-ン゛゜ァ-ォャ-ョー「」、]", first_name_k):
-            raise forms.ValidationError("名（カタカナ）はカタカナだけを入力してください。")
+            raise forms.ValidationError("「名（カタカナ）」はカタカナだけを入力してください。")
         return self.cleaned_data["first_name_k"]
 
     def clean_last_name(self):
@@ -102,10 +115,10 @@ class ProfileEditForm(ModelForm):
 
     def clean_birth(self):
         birth = self.data.get('birth')
+        if not re.match(r"[0-9]", birth):
+            raise forms.ValidationError("「生年月日」は数字だけを入力してください")
         if len(birth) != 8:
             raise forms.ValidationError("8桁を入力してください。")
-        if not re.match(r"[0-9]", birth):
-            raise forms.ValidationError("「yyyymmdd」の形で入力してください。")
         return self.cleaned_data["birth"]
 
     def clean_nationality(self):
