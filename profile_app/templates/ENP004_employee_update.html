@@ -170,8 +170,8 @@ $(function(){
             <label class="my_class" for="{{ field.auto_id }}">{{ form.is_active.label }}</label>
             <span class="necessary label-denger">必須</span><br>
             {% for radio in form.is_active %}
-                <p class="gender_class">{{ radio.tag }}
-                {{ radio.choice_label }}</p>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                {{ radio.tag }}
+                {{ radio.choice_label }}
             {% endfor %} 
             {{ form.is_active.errors }}
         </div>
@@ -180,7 +180,7 @@ $(function(){
         {% endif %}
         <div class="button_all">
             <button class="btn_save" type="submit">保存</button>
-            <button class="btn_back" type="button" onclick="location.href='{% url 'profile_app:employee_list' %}'">戻る</button>
+            <button class="btn_back" type="button" onclick="location.href='{% url 'profile_app:employee' object.pk%}'">戻る</button>
         </div>
         </form>
         {% endif %}
