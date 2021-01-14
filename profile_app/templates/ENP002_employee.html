@@ -8,7 +8,7 @@
 {% block contents %}
     {% if object %}
         {% if not common_is_staff and object.user_id != user_id %}
-        <div class="col-9">
+        <div class="incorrect">
         <p>不正な操作です</p>
         </div>
         {% else %}

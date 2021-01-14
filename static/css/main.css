@@ -238,3 +238,14 @@ form {
   margin:50px auto;
   box-shadow:15px 15px 0px rgba(0,0,0,.1);
 }
+
+/*不正な操作*/
+.incorrect{
+  width:100%;
+  background:#f5f5f5;
+  border:0;
+  padding:20px;
+  border-radius:6px;
+  margin-bottom:10px;
+  max-width: 100%;
+}
