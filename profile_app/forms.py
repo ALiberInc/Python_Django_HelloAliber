@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from django.core.mail import EmailMessage
+from django.forms.forms import Form
 from .models import Profile, Department
 from accounts.models import CustomUser
 from django.forms import MultiWidget
@@ -10,13 +11,23 @@ import sys
 import requests
 import re
 
+# 210217 @ning about errormessage
+from django.core.exceptions import ValidationError
+def validate_lengh(value):
+    if len(value) >20 :
+        raise ValidationError(
+            "漢字で正しく入力してください。",
+            params={'value': value},
+        )
+
 logger = logging.getLogger(__name__)
 
 class ProfileEditForm(ModelForm):
     class Meta:
         model = Profile
         exclude = ("user", "created_at", "updated_at","user_id","delete","create_id","update_id","gender", "birth")
-    email = forms.EmailField(initial='',label='メールアドレス', required=True,)
+    # email = forms.EmailField(initial='',label='メールアドレス', required=True,)
+    email = forms.CharField(initial='',label='メールアドレス', required=True,)
     gender_CHOICES=[('1','男性'),('0','女性'),]
     gender = forms.CharField(
         label='性別', 
@@ -32,6 +43,11 @@ class ProfileEditForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['id'].widget = forms.HiddenInput()
         self.fields['last_name_k'].required = True
+        #20210217
+        #self.fields['last_name_k'].validators=[validate_lengh]
+        #'max_length': 'Your question is too long.'
+        #self.fields['last_name_k'].error_messages = {'max_length': 'Your question is too long.'}
+
         self.fields['last_name_k'].widget.attrs['maxlength'] = '20'
         self.fields['first_name_k'].required = True
         self.fields['first_name_k'].widget.attrs['maxlength'] = '20'
@@ -79,6 +95,8 @@ class ProfileEditForm(ModelForm):
         id = self.data.get('id')
         logger.debug("id={}".format(id))
         
+        if not re.match(r"^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$", email):
+            raise forms.ValidationError("「メールアドレス」を正しく入力してください。")
         if email and CustomUser.objects.filter(email=email).exclude(id=id).count():
             raise forms.ValidationError("メールアドレスが既に存在しました。")
         if len(email) > 30:
