@@ -23,7 +23,9 @@ urlpatterns = [
           name="account_confirm_email"),
 
     # password reset
-    path("password/reset/", views.password_reset,
+#     path("password/reset/", views.password_reset,
+#          name="account_reset_password"),
+     path("password/reset/", my_views.MyPasswordResetView.as_view(),
          name="account_reset_password"),
     path("password/reset/done/", views.password_reset_done,
          name="account_reset_password_done"),

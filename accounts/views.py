@@ -25,6 +25,8 @@ from django.utils import timezone
 import logging
 logger = logging.getLogger(__name__)
 
+from accounts.forms import MyResetPasswordForm
+
 class MyLoginView(LoginView):
     def form_valid(self, form):
         success_url = self.get_success_url()
@@ -154,3 +156,30 @@ class MySignupView(CloseableSignupMixin, AjaxCapableProcessFormViewMixin, FormVi
                     "redirect_field_value": redirect_field_value})
         return ret
 
+
+class MyPasswordResetView(AjaxCapableProcessFormViewMixin, FormView):
+    template_name = "account/password_reset." + app_settings.TEMPLATE_EXTENSION
+    form_class = MyResetPasswordForm
+    success_url = reverse_lazy("account_reset_password_done")
+    redirect_field_name = "next"
+
+    def get_form_class(self):
+        return get_form_class(app_settings.FORMS,
+                              'reset_password',
+                              self.form_class)
+
+    def form_valid(self, form):
+        form.save(self.request)
+        messages.success(self.request,'パスワードリセット用のメールを送信しました。')
+        return super(MyPasswordResetView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        ret = super(MyPasswordResetView, self).get_context_data(**kwargs)
+        login_url = passthrough_next_redirect_url(self.request,
+                                                  reverse("account_login"),
+                                                  self.redirect_field_name)
+        # NOTE: For backwards compatibility
+        ret['password_reset_form'] = ret.get('form')
+        # (end NOTE)
+        ret.update({"login_url": login_url})
+        return ret

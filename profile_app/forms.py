@@ -43,11 +43,6 @@ class ProfileEditForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['id'].widget = forms.HiddenInput()
         self.fields['last_name_k'].required = True
-        #20210217
-        #self.fields['last_name_k'].validators=[validate_lengh]
-        #'max_length': 'Your question is too long.'
-        #self.fields['last_name_k'].error_messages = {'max_length': 'Your question is too long.'}
-
         self.fields['last_name_k'].widget.attrs['maxlength'] = '20'
         self.fields['first_name_k'].required = True
         self.fields['first_name_k'].widget.attrs['maxlength'] = '20'
@@ -86,6 +81,7 @@ class ProfileEditForm(ModelForm):
         self.fields['emergency_contact_3_relationship'].widget.attrs['maxlength'] = '10'
         self.fields['emergency_contact_3_phone'].widget.attrs['maxlength'] = '15'
         self.fields['is_active'].widget.attrs["class"] = "gender_class"
+	    
         for field in self.fields.values():
             if field.required:
                 field.error_messages = {'required': '「'+field.label+'」を入力してください。'}
