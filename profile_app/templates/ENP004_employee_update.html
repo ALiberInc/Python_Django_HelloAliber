@@ -182,7 +182,7 @@ $(function(){
         {% endif %}
         <div class="button_all">
             <button class="btn_save" type="submit">保存</button>
-            <!-- セッションで前画面を判断する -->
+            <!-- セッションを使って前画面を判断する -->
             {% if request.session.update_pre_page == "employee_list" %}
             <button class="btn_back" type="button" onclick="location.href='{% url 'profile_app:employee_list' %}'">戻る</button> 
             {% else %}
