@@ -56,20 +56,21 @@ class EmployeeListView(generic.ListView):
     template_name = "ENP001_employee_list.html"
     context_object_name = 'member_list'
     paginate_by = 10
-    
+                         
     def get_queryset(self):
+        self.request.session['update_pre_page'] = "employee_list"#セッション保存
         profiles = Profile.objects.order_by('user_id')
-        return profiles
-
+        return profiles   
 
 class EmployeeView(generic.DetailView, LoginRequiredMixin):
     """社員詳細画面"""
     model = Profile
     template_name = "ENP002_employee.html"
-
+    
     def get_context_data(self, **kwargs):
+        self.request.session['update_pre_page'] = "employee"#セッション保存
         context = super().get_context_data(**kwargs)
-
+        
         #年齢算出：
         birth = Profile.objects.get(user_id=self.kwargs['pk']).birth # pkを指定してデータを絞り込む
         time0 = int("".join(str(birth).split("-")))
@@ -193,7 +194,7 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
     def form_invalid(self, form):
         messages.error(self.request, "更新が失敗しました。")
         return super().form_invalid(form)
-   
+
 
 class Test500View(generic.TemplateView):
     def index(self):

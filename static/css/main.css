@@ -119,33 +119,7 @@ label{
   display: inline;
   width: 30px;
   margin-top: 20px;
-  margin-inline-end: 10px;
 }
-
-/* .gender_label{
-  display: inline-block;
-} */
-
-/* .gender_class ul {
-	margin: 0.5rem 0.5rem 2rem 0.5rem;
-	padding: 0.5rem 1rem;
-	list-style: none;
-} */
-/* .gender_class input[type="radio"]{
-  display: inline-block;
-  position: relative;
-  background: #ec5d8d;
-  left:-70;
-  top: 28;
-} */
-
-/* .gender_class label {
-	line-height: 100%;
-	position: relative;
-  margin: 0.1rem;
-  margin-left:30px;
-  cursor: pointer;
-} */
 
 .btn_search{
   position:relative;
@@ -263,4 +237,15 @@ form {
   width:70%;
   margin:50px auto;
   box-shadow:15px 15px 0px rgba(0,0,0,.1);
+}
+
+/*不正な操作*/
+.incorrect{
+  width:100%;
+  background:#f5f5f5;
+  border:0;
+  padding:20px;
+  border-radius:6px;
+  margin-bottom:10px;
+  max-width: 100%;
 }
