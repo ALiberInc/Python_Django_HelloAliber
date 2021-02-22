@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 # モデル
 from .models import *
 from accounts.models import CustomUser
+from allauth.account.models import EmailAddress
 
 # form
 from .forms import *
@@ -178,16 +179,32 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         # formのデータ取得
         email_cleaned = self.request.POST['email']
         logger.debug("メールアドレス:{}".format(self.request.POST['email']))
+        first_name_cleaned = self.request.POST['first_name']
+        last_name_cleaned = self.request.POST['last_name']
+        # email取得して、@を基準に１回割りして、@前の部分をusernameにする
+        user_split = email_cleaned.split("@", 1)
         customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
         is_active_cleaned = self.request.POST['is_active']
+
+        # DB登録
+        # table CustomUser
         CustomUser.objects.filter(id=customeruser_id).update(
             email = email_cleaned,
-            is_active = is_active_cleaned,)
+            is_active = is_active_cleaned,
+            first_name = first_name_cleaned,
+            last_name = last_name_cleaned,
+            username = user_split[0],
+        )
+        # table EmailAddress
+        EmailAddress.objects.filter(id=customeruser_id).update(
+            email = email_cleaned,
+        ) 
         gender_cleaned = self.request.POST['gender']
         birth_cleaned = datetime.datetime.strptime(self.request.POST['birth'], "%Y%m%d")
         profile = form.save(commit=False)
         profile.gender = gender_cleaned
         profile.birth = birth_cleaned
+        profile.update_id = self.request.user.id#ログインしているユーザーID
         
         return super().form_valid(form)
 
