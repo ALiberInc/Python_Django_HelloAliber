@@ -14,13 +14,8 @@ from allauth.account.views import CloseableSignupMixin, AjaxCapableProcessFormVi
 from allauth.utils import get_form_class, get_request_param
 from allauth.account.utils import (
     complete_signup,
-    get_login_redirect_url,
     get_next_redirect_url,
-    logout_on_password_change,
     passthrough_next_redirect_url,
-    perform_login,
-    sync_user_email_addresses,
-    url_str_to_user_pk,
 )
 
 from allauth.exceptions import ImmediateHttpResponse
