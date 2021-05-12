@@ -3,13 +3,15 @@ import datetime
 from datetime import timedelta
 from accounts.models import CustomUser
 
+#210217 @ning errormessage
+from django.core.validators import MaxLengthValidator
 
 class Department(models.Model):
     """部門モデル"""
     dep_id = models.SmallIntegerField(primary_key=True, verbose_name='部門ID')
     department = models.CharField(verbose_name='部門', max_length=10)
 
-    class Mata:
+    class Meta:
         verbose_name_plural = 'Department'
 
     def __str__(self):
@@ -22,9 +24,11 @@ class Profile(models.Model):
     user_id = models.AutoField(unique=True, primary_key=True)
     id = models.ForeignKey(CustomUser, verbose_name='ユーザーID', on_delete=models.PROTECT, related_name='customer_id')
     last_name_k = models.CharField(verbose_name='姓（カタカナ）', max_length=30, blank=True)
+    #last_name_k = models.CharField(verbose_name='姓（カタカナ）', validators=[MaxLengthValidator(20,'Too long name here')], max_length=30, blank=True)
+    #last_name_k.validators[-1].message = 'Your question is too long.'
     first_name_k = models.CharField(verbose_name='名（カタカナ）', max_length=30, blank=True)
-    last_name = models.CharField(verbose_name='姓', max_length=15)
-    first_name = models.CharField(verbose_name='名', max_length=15)
+    last_name = models.CharField(verbose_name='姓', max_length=18)
+    first_name = models.CharField(verbose_name='名', max_length=18)
     gender = models.CharField(verbose_name='性別', default='0', max_length=15)
     birth = models.DateField(verbose_name='生年月日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
     nationality = models.CharField(verbose_name='国籍', max_length=30, blank=True)
@@ -52,7 +56,7 @@ class Profile(models.Model):
     update_date = models.DateTimeField(verbose_name='更新日時', auto_now=True)
     update_id = models.CharField(verbose_name='更新者', max_length=20)
 
-    class Mata:
+    class Meta:
         verbose_name_plural = 'Profile'
 
     # 　文字列でクラスを表示する

@@ -84,6 +84,7 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
 
 @require_POST
 def EmployeeDeleteView(request, pk):
+    """社員一覧画面　「非アクティブにする」ボタン"""
     logger.debug("pk={}".format(pk))
     employee = get_object_or_404(CustomUser, id=pk) #データが存在していることを確認する
     profile = get_object_or_404(Profile, id_id=pk) #同上
@@ -102,6 +103,7 @@ def EmployeeDeleteView(request, pk):
             logger.info("管理者のみprofileを削除することができる")
             raise PermissionDenied # 権限なし
 
+    #次画面（employee_list）に遷移する
     response = redirect('profile_app:employee_list')
     return response
 

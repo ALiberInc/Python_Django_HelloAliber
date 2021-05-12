@@ -1,0 +1,66 @@
+{% extends 'base.html'%}
+{% load static %}
+{% block title %}資産一覧{% endblock %}
+{% block active_asset %}active{% endblock %}
+{% block head %}
+<link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block contents %}
+<h1>資産一覧</h1>
+{% if common_is_staff %}
+<a class="btn btn-primary btn-sm" href="{% url 'asset_app:asset_create' %}">資産登録</a>&nbsp;
+<p></p>
+    {% if asset_list %}
+        <table border="1" cellpadding="5" cellspacing="0">
+          <tr>
+            <th>番号</th>
+            <th>品名(モデル名)</th>
+            <th>使用可能数／総数</th>
+            <th>詳細</th>
+          </tr>
+          {% for asset in asset_list %}
+          <tr>
+              <td>{{ asset.asset_id }}</td>
+              <td>{{ asset.product_name }}({{asset.model_name}})</td>
+              <td></td>
+              <td><a href="#">詳細</a></td>
+          </tr>          
+          {% endfor %}          
+        </table>
+    {% else %}
+    <p>表示データがありません。</p>
+    {% endif %}
+      <!-- ページネーション -->
+        {% if is_paginated %}
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+            {% for page_num in page_obj.paginator.page_range %}
+            {% if page_obj.number == page_num %}
+            <li class="page-item active">
+                <a class="page-link" href="#">{{ page_num }}</a>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        {% endif %}
+{% else %}
+  不正な操作です
+{% endif %}
+{% endblock %}
