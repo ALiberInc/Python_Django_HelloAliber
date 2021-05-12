@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'debug_toolbar',
     'extra_views',
+    'asset_app.apps.AssetAppConfig',
 ]
 
 MIDDLEWARE = [

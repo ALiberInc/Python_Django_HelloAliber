@@ -11,7 +11,7 @@ class Department(models.Model):
     dep_id = models.SmallIntegerField(primary_key=True, verbose_name='部門ID')
     department = models.CharField(verbose_name='部門', max_length=10)
 
-    class Mata:
+    class Meta:
         verbose_name_plural = 'Department'
 
     def __str__(self):
@@ -56,7 +56,7 @@ class Profile(models.Model):
     update_date = models.DateTimeField(verbose_name='更新日時', auto_now=True)
     update_id = models.CharField(verbose_name='更新者', max_length=20)
 
-    class Mata:
+    class Meta:
         verbose_name_plural = 'Profile'
 
     # 　文字列でクラスを表示する
