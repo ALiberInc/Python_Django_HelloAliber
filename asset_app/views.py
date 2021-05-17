@@ -155,10 +155,10 @@ class AssetCreateView(LoginRequiredMixin,generic.CreateView):
     model = Asset
     template_name = 'ASS002_asset_create.html'
     form_class = AssetCreateForm
-    success_url = reverse_lazy('asset_app:asset_create_done')
+    success_url = reverse_lazy('asset_app:asset_list')
 
     def form_valid(self,form):
-        messages.error(self.request,"品名の登録しました")
+        messages.success(self.request,"品名の登録しました")
         return super().form_valid(form)
 
     def form_invalid(self,form):
