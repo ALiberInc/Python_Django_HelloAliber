@@ -37,52 +37,6 @@ class ProductCreateView(LoginRequiredMixin,generic.CreateView):
     template_name = 'PRO002_product_create.html'
     form_class = ProductEditForm
     success_url = reverse_lazy('asset_app:product_list')
-    
-    # def post_form(request):
-    #     if request.method == "POST" and request.POST["product_name"] and request.POST["product_abbreviation"]:
-    #         Product = Product.objects.create(
-    #             product_name=request.POST["product_name"],
-    #             product_abbreviation=request.POST["product_abbreviation"]
-    #         )
-    #         Product.save()
-    #         return HttpResponse("保存完了")
-    #     else:
-    #         return HttpResponse("必須項目がPOSTされていません")
-    
-    # def productcreate(request):
-    #     if request.method == 'POST':
-    #         form = ProductCreateForm(request.POST)
-    #         if form.is_valid():
-    #             data_pro = form.save(commit=False)
-    #             data_pro.save()
-    #     else:
-    #         form = ProductCreateForm()
-    #     return render(request,'asset_app/product_list.html',{'form': form})
-
-    # def product_create(request):
-    #     form = ProductCreateForm(request.post or None)
-    #     if form.is_valid():
-    #         models.Product.objects.create(**form.cleaned_data)
-    #         return redirect('asset_app:product_list')
-
-    #     p = {
-    #         'form' : form,
-    #         'product_qs' : models.Procuct.objects.all().order_by('product_id')
-    #     }
-
-    #     return render(request,'asset_app/asset_create.html',p)
-
-    #def form_valid(self,form):
-        # if request.method == 'POST':
-        #     form = ProductCreateForm(request.POST)
-        #     if request.POST['id']:
-        #         try:
-        #         Product = Product.objects.get(pk=request.POST['product_id'])
-        #         form.instance = p
-        #         except Product.DoesNotExist:
-        #         pass
-        #messages.success(self.request,'品名を登録しました')
-        #return super().form_valid(form)
 
     def form_valid(self,form):
         messages.success(self.request,'品名を登録しました')
@@ -111,6 +65,8 @@ class ProductUpdateView(LoginRequiredMixin,generic.UpdateView):
         form_kwargs['initial'] = {
             'product_name' : product_name_value,
             'product_abbreviation' : product_abbreviation_value,
+            'product_name_old' : product_name_value,
+            'product_abbreviation_old' : product_abbreviation_value,
         }
         return form_kwargs
 
