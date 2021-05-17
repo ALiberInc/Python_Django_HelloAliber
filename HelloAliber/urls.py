@@ -3,10 +3,12 @@ from django.contrib.staticfiles.urls import static
 from django.urls import path, include
 from . import settings_common, settings_dev
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('profile_app.urls')),
     path('accounts/', include('accounts.urls')),
+    path('asset_app/',include('asset_app.urls')),
 #    path('accounts/', include('allauth.urls')),
 ]
 

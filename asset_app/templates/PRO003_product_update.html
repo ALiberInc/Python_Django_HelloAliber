@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}品名編集{% endblock %}
+{% block active_product %}active{% endblock %}
+{% block head %}
+<link href="{% static 'css/main.css' %}" rel="stylesheet">
+{% endblock %}
+{% block contents %}
+
+{% if not common_is_staff %}
+    <div class="incorrect">
+    <p>不正な操作です</p>
+    </div>
+{% else %}
+    <form method="post" enctype="multipart/form-data" class="form" novalidate>
+        {% csrf_token %}
+        <h1>品名編集</h1>        
+            {% for field in form %}
+                <div class="field">
+                    {% if not field.is_hidden %}
+                    <label class="login_class" for="{{ field.auto_id }}">{{ field.label }}</label>
+                    {% endif %}
+                    {{ field }}
+                    {% if field.help_text %}
+                    <span class="helptext">{{ field.help_text }}</span>
+                    {% endif %}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+        <div class="button_all">
+        <button class="btn_save" type="submit">登録</button>
+        <button class="btn_back" type="button" onclick="location.href='{% url 'asset_app:product_list' %}'">戻る</button>
+        </div>
+    </form>
+{% endif %}
+{% endblock %}

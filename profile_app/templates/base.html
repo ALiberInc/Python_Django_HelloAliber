@@ -40,10 +40,18 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         {% if common_last_name %}
-                            <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様</a>
+                            <li>
+                                <a class="nav-link" href="{% url 'profile_app:employee_list' %}">社員一覧</a>
+                                <a class="nav-link" href="{% url 'asset_app:asset_list' %}">資産一覧</a>
+                            </li>
+                            <li>
+                                <a class="nav-link" href="{% url 'asset_app:product_create' %}">部門管理</a>
+                                <a class="nav-link" href="{% url 'asset_app:product_list' %}">品名管理</a>
+                            </li>  
+                            
                         {% endif %}
-
                     </li>
+                    <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様</a>
                     <a class="nav-link" href="{% url 'account_logout' %}">ログアウト</a>
                     {% else %}
                     <li class="nav-item {% block active_login %}{% endblock %}">
