@@ -14,13 +14,14 @@ class ProductEditForm(forms.ModelForm):
         model = Product
         #exclude = ("created_date", "updated_date","delete","create_id","update_id",)
         fields = ("product_id", "product_name", "product_abbreviation" )
-    #product_name = forms.CharField(label="品名", required=True)
-    #product_abbreviation = forms.CharField(label="略称", required=True)
+    #0517寧 自身のデータと重複するので、更新できないについて修正
+    product_name_old = forms.CharField(label="品名_old", initial='',required=False)
+    product_abbreviation_old = forms.CharField(label="略称_old", initial='',required=False)
 
     def __init__(self, *args, **kwargs):
-        #id = kwargs.pop('product_id')
         super().__init__(*args, **kwargs)
-        #self.fields['id'] = forms.IntegerField(disabled = True,widget = forms.HiddenInput())
+        self.fields['product_name_old'].widget = forms.HiddenInput()
+        self.fields['product_abbreviation_old'].widget = forms.HiddenInput()
         self.fields['product_name'].widget.attrs['maxlength'] = '50'
         self.fields['product_name'].required = True
         self.fields['product_name'].widget.attrs['placeholder'] = '例:デスクトップ'
@@ -37,34 +38,28 @@ class ProductEditForm(forms.ModelForm):
         for field in self.fields.values():
             if field.required:
                 field.error_messages = {'required' : '「'+field.label+'」を入力してください。'}
-        # for field in self.fields.values():
-        #     if 'required' in field.error_messages:
-        #         field.error_messages['required'] = '「'+field.label+'」を入力してください。'
 
     def clean_product_name(self):
         product_name = self.cleaned_data.get('product_name')
-        #for k,v in six.iteritems(self.data):
-            #print(k,v)
+        product_name_old = self.data.get('product_name_old')
         id = self.data.get('product_id')
         if len(product_name) > 50:
             raise forms.ValidationError("50桁以内を入力してください。") 
-        #print(self.param.get("product_id"))      
-        #print(Product.objects.filter(product_name=product_name).exclude(product_id=id))
-        #print("adfa"+str(id))
-        #print(attr(self))
-        #print(attr(self.data))       
-        if product_name and Product.objects.filter(product_name=product_name).exclude(product_id=id).count():
+        
+        if product_name != product_name_old and Product.objects.filter(product_name=product_name).count():
             raise forms.ValidationError("品名が既に存在しました。")
         return self.cleaned_data["product_name"]
 
     def clean_product_abbreviation(self):
         product_abbreviation = self.cleaned_data.get('product_abbreviation')
+        product_abbreviation_old = self.data.get('product_abbreviation_old')
         id = self.data.get('product_id')
         if len(product_abbreviation) > 50:
             raise forms.ValidationError("50桁以内を入力してください。")
-        if product_abbreviation and Product.objects.filter(product_abbreviation=product_abbreviation).exclude(product_id=id).count():
+        if product_abbreviation != product_abbreviation_old and Product.objects.filter(product_abbreviation=product_abbreviation).count():
             raise forms.ValidationError("略称が既に存在しました。")
-        return self.cleaned_data["product_abbreviation"]        
+        return self.cleaned_data["product_abbreviation"]
+
     
 class AssetCreateForm(forms.ModelForm):
     class Meta:
