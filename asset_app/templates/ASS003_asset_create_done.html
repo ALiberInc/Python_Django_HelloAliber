@@ -8,5 +8,36 @@
 {% endblock %}
 
 {% block contents %}
-            <h1>資産登録完了</h1>
+{% if not common_is_staff %}
+    <div class="incorrect">
+    <p>不正な操作です</p>
+    </div>
+{% else %}
+    <form method="post" enctype="multipart/form-data" class="form" novalidate>
+        {% csrf_token %}
+        <h1>資産登録完了</h1>
+        {% comment %} <table  class="ui celled table table table-hover" >
+            <tr><td>品名</td><td>{{form.title.value}}</td></tr>
+            <tr><td>モデル名</td><td>{{form.user_name.value}}</td></tr>
+            <tr><td>入庫日</td><td>{{form.cleaned_data.category}}</td></tr>
+            <tr><td>資産番号/識別番号</td><td><pre>{{form.message.value}}</pre></td></tr>
+        </table> {% endcomment %}
+        <table class="table table-striped">
+          <thead>
+              <tr>
+                  <th>品名</th>
+                  <th>モデル名</th>
+                  <th>入庫日</th>
+                  <th>資産番号/識別番号</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  {% for key, value in contents.items%}
+                  <th>{{value}}</th>
+                  {% endfor %}
+              </tr>
+          
+          </tbody>
+        </table>
 {% endblock %}

@@ -11,4 +11,6 @@ urlpatterns = [
     path('product_delete/<int:pk>/',views.ProductDeleteView, name="product_delete"),
     path('asset_list',views.AssetListView.as_view(), name="asset_list"),
     path('asset_create',views.AssetCreateView.as_view(),name="asset_create"),
+    #path('asset_create_done/<int:pk>',views.create_done,name="asset_create_done"),
+    path('asset/<int:pk>/',views.AssetView.as_view(),name="asset"),
 ]
