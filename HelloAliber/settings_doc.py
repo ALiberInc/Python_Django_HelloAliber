@@ -2,7 +2,7 @@ from .settings_dev import *
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = int(os.environ.get('DEBUG', default=0))
-# DEBUG = False
+#DEBUG = False
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 DATABASES = {

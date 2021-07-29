@@ -11,7 +11,6 @@
 {% if common_is_staff %}
 <a class="btn btn-primary btn-sm" href="{% url 'asset_app:asset_create' %}">資産登録</a>&nbsp;
 <p></p>
-
     {% if asset_list %}   
         <table border="1" cellpadding="5" cellspacing="0">
           <tr>
@@ -32,7 +31,7 @@
                 <td>
                   {{ product.2 }} / {{ product.3 }}
                 </td>
-                <td><a href="#">詳細</a></td>
+                <td><a href="{% url 'asset_app:asset' product.0 %}">詳細</a></td>
               </tr>
                 {% for asset in asset_list %}
                   {% if product.0 == asset.0 %}
@@ -44,7 +43,7 @@
                       <td>
                         {{ asset.2 }} / {{ asset.3 }}
                       </td>
-                      <td><a href="#">詳細</a></td>
+                      <td><a href="{% url 'asset_app:asset' product.0 asset.1%}">詳細</a></td>
                     </tr>
                   {% endif %} 
                 {% endfor %}
@@ -55,9 +54,7 @@
     {% endif %}
 
     <script>
-        function 
-        hideAsset(targetId) {
-          console.log(targetId)
+        function hideAsset(targetId) {
           const id = ".asset"+targetId
           const targetDocument = $(id)
           if(targetDocument.css("display")=="none"){

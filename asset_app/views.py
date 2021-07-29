@@ -1,22 +1,30 @@
 from typing import Counter
+from django.db.models.expressions import Value
 from django.shortcuts import render
 from django.urls.conf import path
-from django.views import generic
+
 # Create your views here.
 from django.http import HttpResponse
+
+from profile_app.models import Department, Profile
 # モデル
 from .models import Product,Asset,Asset_History
-from django.urls import reverse_lazy
+
 # form
-from .forms import ProductEditForm,AssetCreateForm
+from .forms import ProductEditForm,AssetCreateForm,AssetHistoryCreateForm
 # ログインを要求する用
 from django.contrib.auth.mixins import LoginRequiredMixin
 # メッセージ用
 from django.contrib import messages
-# 削除機能用
+# リダイレクト、ビュー
+from django.views import generic
+from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
-from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
+# 404、500など
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+
 # Log用
 import logging
 logger = logging.getLogger(__name__)
@@ -31,7 +39,17 @@ import time
 from django.http import HttpResponseRedirect
 
 from django.urls import reverse
+from django.db.models import Max
+from urllib.parse import urlencode
 
+from datetime import datetime as dt
+
+from django.http import JsonResponse
+#const用
+from asset_app import consts
+
+#新しいimport方法
+#import asset_app.forms as asset_form
 def index(request):
     return HttpResponse("Hello.")
 
@@ -206,102 +224,328 @@ class AssetListView(generic.ListView):
         # 継承先のListViewのget_context_dataメソッドを実行し、それをcontext変数に代入しています。
         context = super(AssetListView, self).get_context_data(**kwargs)
         context.update({
-            'product_list': Product.objects.all(),
-            'asset_history_list' : Asset_History.objects.all(),
             'product_list' : product_list,
             'asset_list' : asset_list,
         })
         
         return context
-        
-    #     Assets = Asset.objects.order_by('asset_id')
-    #     #Assets = Asset.objects.select_related('Product').prefetch_related('Asset_History')
-    #     #Assets = Asset.objects.select_related('product_ass_id').all()
-    #     return Assets
 
 class AssetCreateView(LoginRequiredMixin,generic.CreateView):
     """資産登録画面"""
     model = Asset
     template_name = 'ASS002_asset_create.html'
     form_class = AssetCreateForm
-    success_url = reverse_lazy('asset_app:asset_list')      
+    #success_url = reverse_lazy('asset_app:asset_create_done')  
               
     def form_valid(self, form):
         """ 
         フォームを保存し、success_url を使用して 
         HttpResponseRedirect オブジェクトを返します
         """
-        self.create_asset_object(self.request, form)
-        return HttpResponseRedirect(self.get_success_url())
-    
+        # リダイレクト先のパスを取得する
+        redirect_url = reverse('asset_app:ASS003_asset_create_done')
+        parameter = self.create_asset_object(self.request, form)
+        # パラメータのdictをurlencodeする
+        parameters = urlencode(parameter)
+        # URLにパラメータを付与する
+        url = f'{redirect_url}?{parameters}'       
+        return redirect(url)
+
     def create_asset_object(self, request, form):
         """ オブジェクトを作成する機能 """        
 
         # DBから読み込み       
         product_abbreviation = Product.objects.get(product_name=form.cleaned_data['product_ass_id']).product_abbreviation
-
         #複数の入力フィールド値 取得
-        serial_number_list = request.POST.getlist("serial_number")
-        
-        #DBから読んで同じ文字列の数をcountする
-        count_serial_number = Asset.objects.filter(asset_id__icontains = "ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])).count()
-        
-        #DBにcount_serial_numberが0ではない場合は+１、
+        serial_number_list = request.POST.getlist("serial_number")      
+        #DBから同じ品物、日付の資産のnumの最大値を取得する
+        max_serial_number = Asset.objects.filter(asset_id__icontains = "ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])).aggregate(Max('num'))['num__max']       
+        #DBにmax_serial_numberが0ではない場合は+１、
         #0の場合は m=1
-        if count_serial_number != 0:                
-            m = count_serial_number+1
+        if max_serial_number is not None :                
+            m = max_serial_number+1
         else:
             m = 1
-
+        
+        #asset_id list
+        asset_id_list = []
+        #品名ID
+        product_id = Product.objects.get(product_name__exact = form.cleaned_data['product_ass_id']).product_id
+        #品名
+        product_name = Product.objects.get(product_name__exact = form.cleaned_data['product_ass_id']).product_name
+        #モデル名
+        model_name_t = form.cleaned_data['model_name']
+        #入庫日
+        purchase_date_t = form.cleaned_data['purchase_date']
+        
         #複数データ挿入   
         for serial_number in serial_number_list:
             self.object = Asset.objects.create(
                 asset_id = "ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])+"-"+str(m),
-                model_name = form.cleaned_data['model_name'],
+                model_name = model_name_t,
                 storing_date = timezone.now(),
-                purchase_date = form.cleaned_data['purchase_date'],
+                purchase_date = purchase_date_t,
                 serial_number = serial_number,
                 delete = 0,
                 create_date = timezone.now(),
                 create_id = self.request.user.id,
                 update_date = timezone.now(),
                 update_id = self.request.user.id,
-                product_ass_id_id = Product.objects.get(product_name__exact = form.cleaned_data['product_ass_id']).product_id,
-                #num = m,
+                product_ass_id_id = product_id,
+                num = m,
+            )
+            asset_id_list.append("ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])+"-"+str(m))            
+            
+            #データ挿入(asset_history)
+            self.object = Asset_History.objects.create(
+                asset_ash_id_id = "ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])+"-"+str(m),
+                status = 0,              
+                delete = 0,
+                create_date = timezone.now(),
+                create_id = self.request.user.id,
+                update_date = timezone.now(),
+                update_id = self.request.user.id,                
             )
             m = m + 1
-
-            #データ挿入(asset_history)  実装待ち
+        results = {
+            'product_name':product_name,
+            'model_name_t':model_name_t,
+            'purchase_date_t':purchase_date_t,
+            'asset_id_list':asset_id_list,
+            'serial_number_list':serial_number_list,
+            }    
+        return results
 
     def form_invalid(self,form):
-        messages.error(self.request,"品名の登録を失敗しました")
+        messages.error(self.request,"資産の登録を失敗しました")
         return super().form_invalid(form)
 
-# def get_absolute_url(self):
-#     return reverse("asset:create_done", kwargs={
-#         'product_ass_id': self.product_ass_id,
-#         'model_name': self.model_name,
-#         'storing_date': self.storing_date,
-#         'asset_id': self.asset_id,
-#         })
-
-# def create_done(request,**kwargs):
-#     contents = {}
-#     for key,value in kwargs.items():
-#         contents[key] = value
-#     return render(request,'asset_create_done.html',{
-#         'contents':contents,
-#     })
-
+def create_done_view(request):
+    #登録されたレコードの値を1つずつ取り出して辞書型変数contextに格納していきます。
+    context = {
+        'product_name' : request.GET.get('product_name'),
+        'model_name_t' : request.GET.get('model_name_t'),
+        'purchase_date_t' : dt.strptime(request.GET.get('purchase_date_t'),'%Y-%m-%d'),
+        'asset_id_list' : eval(request.GET.get('asset_id_list')),
+        'serial_number_list' : eval(request.GET.get('serial_number_list')),
+    }
+    # messagebox.showwarning('警告','生成した資産番号を必ずメモしてください')
+    return render(request,'ASS003_asset_create_done.html',context) 
 
 class AssetView(LoginRequiredMixin,generic.DetailView):
     """資産詳細画面"""
-    model = Asset
+    model = Asset_History
     template_name = "ASS004_asset.html"
+    context_object_name = 'asset_detail_list'
+    queryset = Asset_History.objects.select_related('asset_ash_id')
+
+    def get_detail_asset(asset_detail_sql):
+        """SQL文の実行"""
+        cur.execute(asset_detail_sql)
+        result = cur.fetchall()
+        return result
     
-    def get_context_data(self, **kwargs):
-        self.request.session['update_pre_page'] = "asset"#セッション保存
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self,**kwargs):
+        #詳細画面の初期表示のSQL文
+        asset_detail_sql = '''
+        SELECT
+            STS.PRODUCT_ASS_ID_ID
+            ,STS.ASSET_ASH_ID_ID
+            ,STS.SERIAL_NUMBER
+            ,STS.MODEL_NAME
+            ,STS.STORING_DATE
+            ,STS.PURCHASE_DATE
+            ,STS.VALUE
+            ,STS.LAST_NAME
+            ,STS.FIRST_NAME
+            ,STS.REPAIR_REASON
+            ,STS.PRODUCT_NAME
+        FROM(
+            SELECT
+                A.PRODUCT_ASS_ID_ID
+                ,A.SERIAL_NUMBER
+                ,A.MODEL_NAME
+                ,A.STORING_DATE
+                ,A.PURCHASE_DATE
+                ,ASH.ASSET_ASH_ID_ID
+                ,M.VALUE
+                ,PAP.LAST_NAME
+                ,PAP.FIRST_NAME
+                ,ASH.UPDATE_DATE
+                ,ASH.REPAIR_REASON
+                ,P.PRODUCT_NAME
+            FROM
+                ASSET_HISTORY ASH
+            INNER JOIN
+                ASSET A
+                ON A.ASSET_ID = ASH.ASSET_ASH_ID_ID
+            INNER JOIN
+                PRODUCT P
+                ON P.PRODUCT_ID = A.PRODUCT_ASS_ID_ID
+            LEFT JOIN
+                PROFILE_APP_PROFILE PAP
+                ON PAP.USER_ID = ASH.USER_ID
+            INNER JOIN
+                MASTER M
+                ON M.ID = ASH.STATUS
+                AND CODE_TYPE = 2
+            WHERE
+                ASH.UPDATE_DATE = (
+                    SELECT
+                        MAX(UPDATE_DATE)
+                    FROM
+                        ASSET_HISTORY AS AH
+                    WHERE
+                        ASH.ASSET_ASH_ID_ID = AH.ASSET_ASH_ID_ID
+                )
+        )STS
+        WHERE
+            STS.PRODUCT_ASS_ID_ID = :PARAM1 
+            :PARAM2
+        ORDER BY
+            STS.PRODUCT_ASS_ID_ID,STS.ASSET_ASH_ID_ID; '''
+
+        #１番目のパラメータ
+        #product_idは使わなく、ｐｋを利用する
+        pk = self.kwargs['pk']
+        try:
+            #２番目のパラメータが存在する場合
+            model_name = self.kwargs['model_name']
+            #二つのパラメータから遷移した場合のセッション保存
+            self.request.session['parameter_product'] = pk
+            self.request.session['parameter_model_name'] = model_name
+        except:
+            #２番目のパラメータが存在しない場合
+            model_name = None
+            #一つのパラメータから遷移した場合のセッション保存
+            self.request.session['parameter_product'] = pk
+            self.request.session['parameter_model_name'] = "" 
+
+
+        if model_name is not None:
+            #Sql文の動的条件（二つ）をリプレイスする
+            asset_detail_sql = asset_detail_sql.replace(":PARAM1", str(pk)).replace(":PARAM2", " and sts.model_name = '" + model_name+ "'")
+        else:
+            #Sql文の動的条件（一つ目）をリプレイスする、二つ目のパラメータを空にリプレイスする
+            asset_detail_sql = asset_detail_sql.replace(":PARAM1", str(pk)).replace(":PARAM2", "")
+            
+        # 継承先のListViewのget_context_dataメソッドを実行し、それをcontext変数に代入しています。
+        asset_detail_list = AssetView.get_detail_asset(asset_detail_sql)
+        context = super(AssetView, self).get_context_data(**kwargs)
+        context.update({
+            'asset_detail_list' : asset_detail_list,
+            'form' : AssetHistoryCreateForm,
+        })      
+        return context
+
+def ajax_get_department(request):
+    pk = request.GET.get('pk')
+    profile_list = []
+    # pkパラメータがない、もしくはpk=空文字列だった場合は全カテゴリを返しておく。
+    if pk:
+        # pkがあれば、そのpkでカテゴリを絞り込む
+        profile_list = Profile.objects.filter(department_pro=pk)
+
+        # [ {'name': '営業部', 'pk': '1'}, {...}, {...} ] という感じのリストになる。
+        profile_list = [{'pk': profile.pk, 'name': profile.last_name + ' ' +  profile.first_name} for profile in profile_list]
+
+    # JSONで返す。
+    return JsonResponse({'profileList': profile_list})
+
+def post(request):
+    """貸出ボタンクリックしてからのデータ保存方法"""
+
+    #指定された資産番号の取得
+    asset_id_hidden = request.POST.get("asset_id_hidden")
+    #フォームに入力された値を辞書で返す
+    profile = request.POST.get("profile")
+    repair_reason = ""
+    delete = 0
+    #貸出済ボタンのokボタンをクリックした時のstatusの値の設定
+    if 'lend' in request.POST:            
+        status_t = consts.STATUS_LEND_OUT
+    #返却済ボタンのokボタンをクリックしてた時のstatusの値の設定     
+    elif 'return' in request.POST:
+        status_t = consts.STATUS_RETURNED
+    #修理依頼済ボタンのokボタンをクリックした時のstatusと修理理由の値の設定
+    elif 'repair' in request.POST:
+        repair_reason = request.POST.get("repair_reason")
+        status_t = consts.STATUS_REPAIR_REQUESTED
+    #修理済ボタンをクリックした時のstatusとprofileの値の設定
+    elif 'btn_repair_done' in request.POST:
+        profile = request.user.id
+        status_t = consts.STATUS_REPAIRED
+    #削除ボタンをクリックした時のdelete,statusとprofileの値の設定
+    elif 'delete' in request.POST:
+        delete = 1
+        status_t = consts.STATUS_UNAVAILABLE
+        profile = request.user.id
+    else:
+        print('lend以外')
+        
+    #データ挿入(asset_history)
+    new_asset_history = Asset_History.objects.create(
+        status = status_t,
+        user_id = profile,
+        repair_reason = repair_reason,               
+        delete = delete,
+        create_date = timezone.now(),
+        create_id = request.user.id,
+        update_date = timezone.now(),
+        update_id = request.user.id,
+        asset_ash_id_id = asset_id_hidden,
+    )
+    return redirect('asset_app:asset_list')
+
+class AssetLifeCycleView(LoginRequiredMixin, generic.ListView):
+    """資産ライフサイクル画面"""
+    model = Asset_History
+    template_name = "ASS005_asset_lifecycle.html"
+    
+    def get_asset_lifecycle(asset_lifecycle_sql):
+        """SQL文の実行"""
+        cur.execute(asset_lifecycle_sql)
+        result = cur.fetchall()
+        return result
+    
+    def get_context_data(self,**kwargs):
+        #資産ライフサイクル画面の初期表示のSQL文
+        asset_lifecycle_sql = '''
+        SELECT
+            P.PRODUCT_NAME
+            ,A.MODEL_NAME
+            ,AH.ASSET_ASH_ID_ID
+            ,A.SERIAL_NUMBER
+            ,AH.UPDATE_DATE
+            ,M.VALUE
+            ,PAP.LAST_NAME
+            ,PAP.FIRST_NAME
+        FROM
+            ASSET_HISTORY AH
+        INNER JOIN
+            ASSET A
+            ON AH.ASSET_ASH_ID_ID = A.ASSET_ID
+        LEFT JOIN
+            PROFILE_APP_PROFILE PAP
+            ON PAP.USER_ID = AH.USER_ID
+        INNER JOIN
+            MASTER M
+            ON M.ID = AH.STATUS
+            AND CODE_TYPE = 2
+        INNER JOIN
+            PRODUCT P
+            ON A.PRODUCT_ASS_ID_ID = P.PRODUCT_ID
+        WHERE
+            AH.ASSET_ASH_ID_ID = ':parameter'
+        ORDER BY
+            AH.UPDATE_DATE DESC;'''
+        asset_id = self.kwargs['asset_id']
+        asset_lifecycle_sql = asset_lifecycle_sql.replace(":parameter", asset_id)
+        asset_lifecycle_list = AssetLifeCycleView.get_asset_lifecycle(asset_lifecycle_sql)
+        context = super(AssetLifeCycleView, self).get_context_data(**kwargs)
+        context.update({
+            'asset_lifecycle_list' : asset_lifecycle_list,
+        })      
         return context
 
 def form_save(request, form, messages_success):

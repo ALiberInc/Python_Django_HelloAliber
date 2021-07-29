@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load index %}
 {% block title %}資産登録完了{% endblock %}
 
 {% block head %}
@@ -16,28 +16,25 @@
     <form method="post" enctype="multipart/form-data" class="form" novalidate>
         {% csrf_token %}
         <h1>資産登録完了</h1>
-        {% comment %} <table  class="ui celled table table table-hover" >
-            <tr><td>品名</td><td>{{form.title.value}}</td></tr>
-            <tr><td>モデル名</td><td>{{form.user_name.value}}</td></tr>
-            <tr><td>入庫日</td><td>{{form.cleaned_data.category}}</td></tr>
-            <tr><td>資産番号/識別番号</td><td><pre>{{form.message.value}}</pre></td></tr>
-        </table> {% endcomment %}
-        <table class="table table-striped">
-          <thead>
-              <tr>
-                  <th>品名</th>
-                  <th>モデル名</th>
-                  <th>入庫日</th>
-                  <th>資産番号/識別番号</th>
-              </tr>
-          </thead>
-          <tbody>
-              <tr>
-                  {% for key, value in contents.items%}
-                  <th>{{value}}</th>
-                  {% endfor %}
-              </tr>
-          
-          </tbody>
+        <table  cellpadding="15" cellspacing="0"> 
+            <tr><td style = "font-size:25px;">品名</td></tr>
+            <tr><td>{{product_name}}</td></tr>
+            <tr><td style = "font-size:25px;">モデル名</td></tr>
+            <tr><td>{{model_name_t}}</td></tr>
+            <tr><td style = "font-size:25px;">入庫日</td></tr>
+            <tr><td>{{purchase_date_t|date:"Y/m/j" }}</td></tr>
+            <tr><td style = "font-size:25px;">資産番号/識別番号</td></tr>
+            <tr><td>{% for asset_id in asset_id_list %} 
+                {{asset_id}}／{{ serial_number_list|index:forloop.counter0 }}
+                <br>
+                {% endfor %}
+                </td>
+            </tr>
         </table>
+        <button class="btn_back" type="button" onclick="location.href='{% url 'asset_app:asset_list' %}'">資産一覧へ</button>
+    </form>
+{%endif%}
+<script>
+    window.alert("生成した資産番号を必ずメモしてください");
+</script>
 {% endblock %}

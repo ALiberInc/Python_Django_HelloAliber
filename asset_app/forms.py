@@ -1,9 +1,12 @@
 from django import forms
 from django.forms import ModelForm
 from django.core.mail import EmailMessage
+from django.forms import fields
 from django.forms.fields import DateField, IntegerField
 from django.forms.forms import Form
 from django.forms.widgets import DateInput
+
+from profile_app.models import Department, Profile
 from .models import Product,Asset,Asset_History
 from accounts.models import CustomUser
 from django.forms import MultiWidget
@@ -88,10 +91,10 @@ class AssetCreateForm(forms.ModelForm):
         #self.fields['product_ass_id'].
         self.fields['product_ass_id'].error_messages = {
             'required': '品名を選択してください。',
-            'maxlength':'100桁以内を入力してください。'}
-        self.fields['model_name'].widget.attrs['maxlength'] = '100'
+            'maxlength':'50桁以内を入力してください。'}
+        self.fields['model_name'].widget.attrs['maxlength'] = '50'
         self.fields['model_name'].required = True
-        self.fields['model_name'].widget.attrs['placeholder'] = 'HP'
+        #self.fields['model_name'].widget.attrs['placeholder'] = 'HP'
         self.fields['model_name'].error_messages = {
             'required': 'モデル名を入力してください。',
             'maxlength':'100桁以内を入力してください。'}
@@ -127,3 +130,21 @@ class AssetCreateForm(forms.ModelForm):
             raise forms.ValidationError("50桁以内を入力してください。") 
         return self.cleaned_data["serial_number"]
         
+class AssetHistoryCreateForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = '__all__'
+        
+    department = forms.ModelChoiceField(
+        label = '部門',
+        queryset = Department.objects,
+        required = False
+    )
+
+    profile = forms.ModelChoiceField(
+        label = '利用者',
+        queryset = Profile.objects.none(),
+        required = False 
+    )
+
+    field_order = ('department','profile')
