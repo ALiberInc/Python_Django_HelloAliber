@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import close_old_connections, models
 import datetime
 from datetime import timedelta
 from accounts.models import CustomUser
@@ -8,8 +8,8 @@ class Product(models.Model):
     """品名モデル"""
     
     product_id = models.AutoField(primary_key=True, verbose_name='品名ID')
-    product_name = models.CharField(verbose_name='品名', max_length=50, blank=True)
-    product_abbreviation = models.CharField(verbose_name='略称', max_length=50, blank=True)
+    product_name = models.CharField(verbose_name='品名', max_length=55, blank=True)
+    product_abbreviation = models.CharField(verbose_name='略称', max_length=55, blank=True)
     delete = models.SmallIntegerField(verbose_name='削除', default=0)
     create_date = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
     create_id = models.CharField(verbose_name='作成者', max_length=20)
@@ -27,11 +27,12 @@ class Asset(models.Model):
     """資産情報モデル"""
 
     asset_id = models.CharField(primary_key=True, verbose_name='資産番号', max_length=100)
-    product_ass_id = models.ForeignKey(Product, verbose_name='品名ID', on_delete= models.PROTECT,related_name= 'product_ass_id')
-    model_name = models.CharField(verbose_name='モデル名',max_length=50, blank=True)
+    num = models.IntegerField(verbose_name='NO',default=0)
+    product_ass_id = models.ForeignKey(Product, verbose_name='品名', on_delete= models.PROTECT,related_name= 'product_ass_id')
+    model_name = models.CharField(verbose_name='モデル名',max_length=55, blank=True)
     storing_date = models.DateField(verbose_name='入庫日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
     purchase_date = models.DateField(verbose_name='購入日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
-    serial_number = models.CharField(verbose_name='識別番号', max_length=50, blank=True)
+    serial_number = models.CharField(verbose_name='識別番号', max_length=120, blank=True)
     delete = models.SmallIntegerField(verbose_name='削除', default=0)
     create_date = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
     create_id = models.CharField(verbose_name='作成者', max_length=20)
@@ -60,8 +61,8 @@ class Asset_History(models.Model):
     asset_history_id = models.AutoField(primary_key=True, verbose_name='資産履歴番号')
     asset_ash_id = models.ForeignKey(Asset, verbose_name='資産番号', on_delete= models.PROTECT, related_name= 'asset_ash_id')
     status = models.IntegerField(choices= choice_area)
-    user_id = models.IntegerField(verbose_name='社員番号')
-    repair_reason = models.CharField(verbose_name='修理理由', max_length=200, blank=True)
+    user_id = models.IntegerField(verbose_name='社員番号', null=True)
+    repair_reason = models.CharField(verbose_name='修理理由', max_length=200, blank=True, null=True)
     delete = models.SmallIntegerField(verbose_name='削除', default=0)
     create_date = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
     create_id = models.CharField(verbose_name='作成者', max_length=20)

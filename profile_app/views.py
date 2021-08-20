@@ -84,7 +84,7 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
 
 @require_POST
 def EmployeeDeleteView(request, pk):
-    """社員一覧画面　「非アクティブにする」ボタン"""
+    """社員一覧画面　「削除」ボタン"""
     logger.debug("pk={}".format(pk))
     employee = get_object_or_404(CustomUser, id=pk) #データが存在していることを確認する
     profile = get_object_or_404(Profile, id_id=pk) #同上

@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}資産登録{% endblock %}
-{% block active_product %}active{% endblock %}
+{% block active_asset %}active{% endblock %}
 {% block head %}
 <link href="{% static 'css/main.css' %}" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 {% endblock %}
 {% block contents %}
 
@@ -12,25 +13,101 @@
     <p>不正な操作です</p>
     </div>
 {% else %}
-    <form method="post" enctype="multipart/form-data" class="form" novalidate>
+    <form method="post" enctype="multipart/form-data"  class="form" novalidate>
         {% csrf_token %}
-        <h1>資産登録</h1>
+        <h1>資産登録</h1>        
             {% for field in form %}
-                <div class="field">
-                    {% if not field.is_hidden %}
-                    <label class="login_class" for="{{ field.auto_id }}">{{ field.label }}</label>
-                    {% endif %}                   
-                    {{ field }}
-                    {% if field.help_text %}
-                    <span class="helptext">{{ field.help_text }}</span>
-                    {% endif %}
-                    {{ field.errors }}
-                </div>
+                {% if field.auto_id == "id_serial_number" %}
+                    <div class="field" id="sno">                  
+                        {% if not field.is_hidden %}
+                        <label class="login_class" for="{{ field.auto_id }}">{{ field.label }}</label>
+                        {% endif %}                   
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                        <div class = "demo">
+                            <input id="addRow" type="button" class="add" value="+" style="width:10%">
+                            <input type="button" value="-" class="remove" style="width:10%" disabled>
+                        </div>
+                {% else %}
+                    <div class="field">                 
+                        {% if not field.is_hidden %}
+                        <label class="login_class" for="{{ field.auto_id }}">{{ field.label }}</label>
+                        {% endif %}                   
+                        {{ field }}                            
+                        {% if field.help_text %}
+                        <span class="helptext">{{ field.help_text }}</span>
+                        {% endif %}
+                        {{ field.errors }}
+                    </div>
+                    
+                {% endif %}
             {% endfor %}
         <div class="button_all">
         <button class="btn_save" type="submit">登録</button>
         <button class="btn_back" type="button" onclick="location.href='{% url 'asset_app:asset_list' %}'">戻る</button>
         </div>
     </form>
+
 {% endif %}
+    <script>
+        var index = 2
+        function check_disable(){
+        const text_length =$('#sno').children("input").length
+        console.log(text_length)
+            if (text_length > 9){
+                $('.add').prop('disabled',true);
+            }else {
+                $('.add').prop('disabled',false);
+            }
+            if (text_length > 1){
+                $('.remove').prop('disabled',false);
+            }else {
+                $('.remove').prop('disabled',true);
+            }
+        }
+        $('.add').click(function(){          
+            var html = `<input type="text" name="serial_number" maxlength="100"  id="id_serial_number${index}" required  >`;
+            index++
+            $('#sno').append(html);
+            check_disable()
+        });
+        
+         $('.remove').click(function(){
+            
+            const length = $('#sno').children("input").length
+
+            const last_text = $('#sno').children("input")[length-1]
+
+            last_text.remove()
+            check_disable()
+        });
+
+        $(function(){
+            $(".btn_save").on("click", function(){
+                var v = $("input[name='serial_number']");
+                var list = []
+                    for(element of v){
+                        list.push(element.value)
+                    }               
+                sessionStorage.setItem('key', list.toString());
+                console.log(v)
+            });
+        })
+
+        $(function(){
+            var d = sessionStorage.getItem('key');         
+            if(d){
+                $('#id_serial_number').remove();
+                var list = d.split(",")
+                for(item of list){
+                    let html = `<input type="text" name="serial_number" maxlength="100"  id="id_serial_number${index}" required  value="${item}">`;
+                    index++
+                    $('#sno').append(html);
+                }
+            sessionStorage.removeItem('key');                
+            }
+        })
+
+    </script>
 {% endblock %}

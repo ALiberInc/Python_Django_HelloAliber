@@ -21,7 +21,7 @@
           </tr>
           {% for product in product_list %}
           <tr>
-              <td>{{ product.product_id }}</td>
+              <td>{{ forloop.counter}}</td>
               <td>{{ product.product_name }}</td>
               <td>{{ product.product_abbreviation }}</td>
               <td>

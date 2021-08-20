@@ -4,13 +4,14 @@
 {% block active_asset %}active{% endblock %}
 {% block head %}
 <link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 {% endblock %}
 {% block contents %}
 <h1>資産一覧</h1>
 {% if common_is_staff %}
 <a class="btn btn-primary btn-sm" href="{% url 'asset_app:asset_create' %}">資産登録</a>&nbsp;
 <p></p>
-    {% if asset_list %}
+    {% if asset_list %}   
         <table border="1" cellpadding="5" cellspacing="0">
           <tr>
             <th>番号</th>
@@ -18,20 +19,57 @@
             <th>使用可能数／総数</th>
             <th>詳細</th>
           </tr>
-          {% for asset in asset_list %}
-          <tr>
-              <td>{{ asset.asset_id }}</td>
-              <td>{{ asset.product_name }}({{asset.model_name}})</td>
-              <td></td>
-              <td><a href="#">詳細</a></td>
-          </tr>          
+      
+          {% for product in product_list %}
+              <tr onclick="hideAsset('{{product.0}}')">
+                <td>
+                  {{ forloop.counter }}
+                </td>
+                <td>
+                  {{ product.1 }}
+                </td>
+                <td>
+                  {{ product.2 }} / {{ product.3 }}
+                </td>
+                <td><a href="{% url 'asset_app:asset' product.0 %}">詳細</a></td>
+              </tr>
+                {% for asset in asset_list %}
+                  {% if product.0 == asset.0 %}
+                    <tr class="asset_all asset{{asset.0}}">
+                      <td>&nbsp;</td>
+                      <td>                    
+                        {{ asset.1 }}                                     
+                      </td>
+                      <td>
+                        {{ asset.2 }} / {{ asset.3 }}
+                      </td>
+                      <td><a href="{% url 'asset_app:asset' product.0 asset.1%}">詳細</a></td>
+                    </tr>
+                  {% endif %} 
+                {% endfor %}
           {% endfor %}          
         </table>
     {% else %}
     <p>表示データがありません。</p>
     {% endif %}
+
+    <script>
+        function hideAsset(targetId) {
+          const id = ".asset"+targetId
+          const targetDocument = $(id)
+          if(targetDocument.css("display")=="none"){
+              targetDocument.show()
+          }else{
+              targetDocument.hide();
+          }
+        }
+      $(function(){  
+        $(".asset_all").hide()
+      })
+    </script>
+
       <!-- ページネーション -->
-        {% if is_paginated %}
+        {% if is_paginated and page_obj.paginator.num_pages > 1 %}
         <ul class="pagination">
             {% if page_obj.has_previous %}
             <li class="page-item">

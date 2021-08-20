@@ -21,7 +21,62 @@
 
     <!-- My style -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/mystyle.css' %}">
-    {% block head %}{% endblock %}
+    <style>
+    ul{
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    }
+
+    a{
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    }
+    
+    .menu {
+    display: flex;
+    width: 90px;
+    }
+
+    .menu > li {
+    position: relative;
+    width: 75px;
+    }
+
+    .menu a {
+    display: block;
+    padding: 11px;
+    font-size: 13px;
+    color: #FFFFFF80;
+    line-height: 1;
+    text-align: center;
+    z-index: 1;
+    }
+
+    .management {
+    position: absolute;
+    left: 0;
+    top: 2em;
+    display: none;
+    width: 100%;
+    z-index: 3;
+    }
+
+    .management > li > a {
+    font-size: 13px;
+    color: #FFFFFF80;
+    line-height: 1.75;
+    background-color: #000000B3;
+    }
+    .management > li > a:hover {
+    background-color: #000000B3;
+    opacity: 1;
+    }
+    </style>
+    {% block head %}
+    
+    {% endblock %}
 </head>
 
 
@@ -42,14 +97,22 @@
                         {% if common_last_name %}
                             <li>
                                 <a class="nav-link" href="{% url 'profile_app:employee_list' %}">社員一覧</a>
-                                <a class="nav-link" href="{% url 'asset_app:asset_list' %}">資産一覧</a>
                             </li>
                             <li>
-                                <a class="nav-link" href="{% url 'asset_app:product_create' %}">部門管理</a>
-                                <a class="nav-link" href="{% url 'asset_app:product_list' %}">品名管理</a>
-                            </li>  
+                                <a class="nav-link" href="{% url 'asset_app:asset_list' %}">資産一覧</a>
+                            </li>
                             
-                        {% endif %}
+                            <ul class="menu">
+                                <li class="setting">
+                                    <a class="nav-link">設定</a>               
+                                    <ul class="management">
+                                        <li><a  href="{% url 'asset_app:product_create' %}">部門管理</a></li>
+                                        <li><a  href="{% url 'asset_app:product_list' %}">品名管理</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            
+                       {% endif %}
                     </li>
                     <a class="nav-link" href="{% url 'profile_app:employee' pk=user_id %}">{{ common_last_name }}様</a>
                     <a class="nav-link" href="{% url 'account_logout' %}">ログアウト</a>
@@ -97,7 +160,15 @@
     <!-- Bootstrap core JavaScript -->
     <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
+    
+    <!-- マウスオーバーによるslideToggle(表示／非表示)をjQueryでコントロールする -->
+    <script>
+    $(function(){
+    $(".setting").hover(function(){
+        $(this).children(".management").stop().slideToggle();
+    });
+    });
+    </script>
 </div>
 </body>
 </html>
