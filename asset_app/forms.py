@@ -11,7 +11,15 @@ from .models import Product,Asset,Asset_History
 from accounts.models import CustomUser
 from django.forms import MultiWidget
 import six
+import re
 
+from django.core.exceptions import ValidationError
+def validate_lengh(value):
+    if len(value) >50 :
+        raise ValidationError(
+            "漢字で正しく入力してください。",
+            params={'value': value},
+        )
 
 class ProductEditForm(forms.ModelForm):
     
@@ -48,12 +56,11 @@ class ProductEditForm(forms.ModelForm):
                 field.error_messages = {'required' : '「'+str(field.label)+'」を入力してください。'}
 
     def clean_product_name(self):
-        product_name = self.cleaned_data.get('product_name')
+        product_name = self.data.get('product_name')
         #product_name_old = self.data.get('product_name_old')
         id = self.data.get('product_id')
         if len(product_name) > 50:
-            raise forms.ValidationError("50桁以内を入力してください。") 
-        
+            raise forms.ValidationError("50桁以内を入力してください。")        
         # if product_name != product_name_old and Product.objects.filter(product_name=product_name).count():
         #     raise forms.ValidationError("品名が既に存在しました。")
         # return self.cleaned_data["product_name"]
@@ -62,14 +69,12 @@ class ProductEditForm(forms.ModelForm):
         return self.cleaned_data["product_name"]
 
     def clean_product_abbreviation(self):
-        product_abbreviation = self.cleaned_data.get('product_abbreviation')
-        #product_abbreviation_old = self.data.get('product_abbreviation_old')
+        product_abbreviation = self.data.get('product_abbreviation')
         id = self.data.get('product_id')
         if len(product_abbreviation) > 50:
             raise forms.ValidationError("50桁以内を入力してください。")
-        # if product_abbreviation != product_abbreviation_old and Product.objects.filter(product_abbreviation=product_abbreviation).count():
-        #     raise forms.ValidationError("略称が既に存在しました。")
-        # return self.cleaned_data["product_abbreviation"]
+        if not re.match(r"[a-zA-Z0-9_+-]", product_abbreviation):
+            raise forms.ValidationError("半角英数字及び「_」「-」を入力してください")
         if product_abbreviation and Product.objects.filter(product_abbreviation=product_abbreviation).exclude(product_id=id).count():
             raise forms.ValidationError("略称が既に存在しました。")
         return self.cleaned_data["product_abbreviation"]
@@ -80,10 +85,12 @@ class AssetCreateForm(forms.ModelForm):
         fields = ("product_ass_id","model_name","purchase_date","serial_number",)
     purchase_date = forms.DateField(label = '購入日',widget=forms.DateInput(attrs={'type': 'date'}))
     # field_order = ["product_ass_id","model_name","purchase_date","serial_number"]
-    
+    asset_id = IntegerField(initial=0)   
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['asset_id'].widget = forms.HiddenInput()
+        self.fields['asset_id'].required = False
         #self.fields['asset_id'] = forms.CharField(label='資産番号', initial="", )
         self.fields['product_ass_id'].widget.attrs['maxlength'] = '100'
         self.fields['product_ass_id'].required = True
@@ -112,24 +119,40 @@ class AssetCreateForm(forms.ModelForm):
                 field.error_messages = {'required' : '「'+str(field.label)+'」を入力してください。'}
 
     def clean_model_name(self):
-        model_name = self.cleaned_data.get('model_name')
-        id = self.data.get('asset_id')
+        model_name = self.data.get('model_name')
         if len(model_name) > 50:
             raise forms.ValidationError("50桁以内を入力してください。") 
         return self.cleaned_data["model_name"]
 
-    def clean_purchase_date(self):
-        purchase_date = self.cleaned_data.get('purchase_date')
-        id = self.data.get('asset_id')
-        return self.cleaned_data["purchase_date"]
+    # def clean_purchase_date(self):
+    #     purchase_date = self.data.get('purchase_date')
+    #     asset_id = self.data.get('asset_id')
+    #     return self.cleaned_data["purchase_date"]
 
     def clean_serial_number(self):
-        serial_number = self.cleaned_data.get('serial_number')
-        id = self.data.get('asset_id')
+        serial_number = self.data.get('serial_number')
+        print("これは"+serial_number)
+        asset_id = self.data.get('asset_id')
         if len(serial_number) > 100:
-            raise forms.ValidationError("50桁以内を入力してください。") 
+            raise forms.ValidationError("100桁以内を入力してください。")
+        if serial_number and Asset.objects.filter(serial_number=serial_number).exclude(asset_id=asset_id).count():
+            raise forms.ValidationError("識別番号が既に存在しました。")
         return self.cleaned_data["serial_number"]
-        
+
+    # def clean(self):
+    #     super().clean()
+    #     serial_number = self.cleaned_data['serial_number']
+    #     serial_number = self.data.get('serial_number')
+    #     if serial_number == serial_number:
+    #         raise forms.ValidationError("同じ識別番号を入力しないようにしてください。")
+    # def clean(self):
+    #     all_clean_data = super(AssetCreateForm,self).clean()
+    #     serial_number = all_clean_data['serial_number']
+    #     print(serial_number)
+    #     if serial_number == serial_number:
+    #         self.add_error('serial_number','同じ識別番号を入力しないようにしてください。')
+    #    return all_clean_data
+
 class AssetHistoryCreateForm(forms.ModelForm):
     class Meta:
         model = Department
@@ -148,3 +171,6 @@ class AssetHistoryCreateForm(forms.ModelForm):
     )
 
     field_order = ('department','profile')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

@@ -140,6 +140,13 @@
     .hide_area{
         background:#999999;
     }
+
+    /*ページネーション*/
+    .pagination{
+	justify-content: center;
+	padding: 16px 8px;
+	margin-top: 20px;
+    }
   </style>
 {% endblock %}
 {% block contents %}
@@ -149,9 +156,14 @@
 <form method="post" action="{% url 'asset_app:post' %}" enctype="multipart/form-data" class="asset_list_form" novalidate>
 {% csrf_token %}
 <h1>資産詳細</h1>
+{% if asset_detail_list %}
   <table border="1" cellpadding="8" cellspacing="0">
+    {% if request.session.parameter_model_name == "" %}
     <lable>品名</lable>&emsp;&emsp;&emsp;&emsp;&emsp;{{asset_detail_list.0.10}}<br>
-    {% comment %} <lable>モデル名</lable>&emsp;&emsp;&emsp;{{asset_detail_list.0.3}} {% endcomment %}
+    <lable>モデル名</lable>&emsp;&emsp;&emsp;{{asset_detail_list.0.3}}
+    {% else %}
+    <lable>品名</lable>&emsp;&emsp;&emsp;&emsp;&emsp;{{asset_detail_list.0.10}}<br>
+    {% endif %} 
   <br><br>
     <div class="check">
         <input class="checkbox" type="checkbox" id="check" onclick="hideToggle($('.hide_area'));" >
@@ -198,21 +210,25 @@
                 </td>
                 <td><button class="btn_history" type="button" onclick="location.href='{% url 'asset_app:asset_lifecycle' detail.1%}'">履歴</button></td>
                 <td style="max-width:200px">
-                {% if detail.6 != "修理依頼済" %}
-                    <button class="btn_repair" name = "btn_repair" type="button"  onclick="showOverlay('btn_repair', '{{detail.1}}');">修理</button> 
-                {% else %}                            
-                        <button class="btn_repair_done" type="submit"  name = "btn_repair_done" onclick="return checkparam('btn_repair_done','{{detail.1}}');">修理済</button>
-                        <div style="display:inline;" class="mouseover_box">
-                            <img class="question_mark" src="{% static 'img/question_mark.jpg' %}">
-                            <span class="mouseover">修理理由：{{detail.9}}</span>
-                        </div>
+                {% if detail.6 == "貸出済" %}
+                {% else %}
+                    {% if detail.6 != "修理依頼済" %}
+                        <button class="btn_repair" name = "btn_repair" type="button"  onclick="showOverlay('btn_repair', '{{detail.1}}');">修理</button> 
+                    {% else %}                            
+                            <button class="btn_repair_done" type="submit"  name = "btn_repair_done" onclick="return checkparam('btn_repair_done','{{detail.1}}');">修理済</button>
+                            <div style="display:inline;" class="mouseover_box">
+                                <img class="question_mark" src="{% static 'img/question_mark.jpg' %}">
+                                <span class="mouseover">修理理由：{{detail.9}}</span>
+                            </div>
+                    {% endif %}
                 {% endif %}
                 </td>
                 <td>
                 {% if detail.6 == "修理依頼済" %}
-                {%else%}
+                {% elif detail.6 == "貸出済" %}
+                {% else %}
                     <button class="btn-delete" name = "delete" type="submit" onclick="return checkparam('delete','{{detail.1}}');">削除</button>
-                {%endif%}
+                {% endif %}
                 </td>
             </tr>
             {% else %}
@@ -261,13 +277,47 @@
                 <button id="cancel" type="button">キャンセル</button>
         </div>
     </div>
-
+    {% else %}
+    <p>表示データがありません。</p>
+    {% endif %}
+    
+    <!-- ページネーション -->
+        {% if is_paginated and page_obj.paginator.num_pages > 1 %}
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+            {% for page_num in page_obj.paginator.page_range %}
+            {% if page_obj.number == page_num %}
+            <li class="page-item active">
+                <a class="page-link" href="#">{{ page_num }}</a>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        {% endif %}
 {% else %}
     <div class="incorrect">
     <p>不正な操作です</p>
     </div>
 {% endif %}
 </form>
+
 
 <script>
     <!-- パラメータを渡す必要があるため、貸出ボタンの動きを普通のJavascriptの関数で実現する-->
@@ -367,34 +417,5 @@
     }
 
     </script>
-    <!-- ページネーション -->
-        {% if is_paginated %}
-        <ul class="pagination">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            {% endif %}
-            {% for page_num in page_obj.paginator.page_range %}
-            {% if page_obj.number == page_num %}
-            <li class="page-item active">
-                <a class="page-link" href="#">{{ page_num }}</a>
-            </li>
-            {% else %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-            </li>
-            {% endif %}
-            {% endfor %}
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-            {% endif %}
-        </ul>
-        {% endif %}
+
 {% endblock %}

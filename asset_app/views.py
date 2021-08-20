@@ -48,6 +48,9 @@ from django.http import JsonResponse
 #const用
 from asset_app import consts
 
+# ページネーション用
+from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
+
 #新しいimport方法
 #import asset_app.forms as asset_form
 def index(request):
@@ -227,7 +230,18 @@ class AssetListView(generic.ListView):
             'product_list' : product_list,
             'asset_list' : asset_list,
         })
-        
+        # ページネーション
+        paginator = Paginator(product_list, self.paginate_by)
+        page = self.request.GET.get('page')
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+        context['page_obj'] = page_obj
+
+        context['product_list'] = paginator.page(context['page_obj'].number)      
         return context
 
 class AssetCreateView(LoginRequiredMixin,generic.CreateView):
@@ -278,7 +292,7 @@ class AssetCreateView(LoginRequiredMixin,generic.CreateView):
         #入庫日
         purchase_date_t = form.cleaned_data['purchase_date']
         
-        #複数データ挿入   
+        #複数データ挿入
         for serial_number in serial_number_list:
             self.object = Asset.objects.create(
                 asset_id = "ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])+"-"+str(m),
@@ -320,6 +334,20 @@ class AssetCreateView(LoginRequiredMixin,generic.CreateView):
         messages.error(self.request,"資産の登録を失敗しました")
         return super().form_invalid(form)
 
+#     def post(self,request):
+#         serial_number_list = self.request.POST.getlist("serial_number")
+#         my_validation = check_val(serial_number_list)
+#         return render(request,"ASS002_asset_create.html",my_validation)
+
+# def check_val(serial_number_list):
+#     my_validation = {}
+#     if len(serial_number_list) > 10:
+#         my_validation['error'] = "最大10個まで入力してください"
+#     else:
+#         my_validation['error'] =""
+#     print("数字"+len(serial_number_list))
+#     return my_validation
+
 def create_done_view(request):
     #登録されたレコードの値を1つずつ取り出して辞書型変数contextに格納していきます。
     context = {
@@ -332,12 +360,13 @@ def create_done_view(request):
     # messagebox.showwarning('警告','生成した資産番号を必ずメモしてください')
     return render(request,'ASS003_asset_create_done.html',context) 
 
-class AssetView(LoginRequiredMixin,generic.DetailView):
+class AssetView(LoginRequiredMixin,generic.ListView):
     """資産詳細画面"""
     model = Asset_History
     template_name = "ASS004_asset.html"
     context_object_name = 'asset_detail_list'
     queryset = Asset_History.objects.select_related('asset_ash_id')
+    paginate_by = 10
 
     def get_detail_asset(asset_detail_sql):
         """SQL文の実行"""
@@ -435,7 +464,20 @@ class AssetView(LoginRequiredMixin,generic.DetailView):
         context.update({
             'asset_detail_list' : asset_detail_list,
             'form' : AssetHistoryCreateForm,
-        })      
+        })
+
+        # ページネーション
+        paginator = Paginator(asset_detail_list, self.paginate_by)
+        page = self.request.GET.get('page')
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+        context['page_obj'] = page_obj
+
+        context['asset_detail_list'] = paginator.page(context['page_obj'].number)      
         return context
 
 def ajax_get_department(request):
@@ -501,6 +543,7 @@ class AssetLifeCycleView(LoginRequiredMixin, generic.ListView):
     """資産ライフサイクル画面"""
     model = Asset_History
     template_name = "ASS005_asset_lifecycle.html"
+    paginate_by = 10
     
     def get_asset_lifecycle(asset_lifecycle_sql):
         """SQL文の実行"""
@@ -545,7 +588,20 @@ class AssetLifeCycleView(LoginRequiredMixin, generic.ListView):
         context = super(AssetLifeCycleView, self).get_context_data(**kwargs)
         context.update({
             'asset_lifecycle_list' : asset_lifecycle_list,
-        })      
+        })
+        # ページネーション
+        paginator = Paginator(asset_lifecycle_list, self.paginate_by)
+        page = self.request.GET.get('page')
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+        context['page_obj'] = page_obj
+
+        context['asset_lifecycle_list'] = paginator.page(context['page_obj'].number)
+      
         return context
 
 def form_save(request, form, messages_success):

@@ -69,7 +69,7 @@
     </script>
 
       <!-- ページネーション -->
-        {% if is_paginated %}
+        {% if is_paginated and page_obj.paginator.num_pages > 1 %}
         <ul class="pagination">
             {% if page_obj.has_previous %}
             <li class="page-item">
