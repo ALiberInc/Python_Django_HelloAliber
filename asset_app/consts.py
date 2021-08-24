@@ -1,0 +1,14 @@
+
+"""ステータス"""
+#入庫済
+STATUS_RECEIVED = 0
+#返却済
+STATUS_RETURNED = 1
+#修理済
+STATUS_REPAIRED = 2
+#貸出済
+STATUS_LEND_OUT = 3
+#修理依頼済
+STATUS_REPAIR_REQUESTED = 4
+#使用不可
+STATUS_UNAVAILABLE = 5
