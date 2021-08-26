@@ -1,5 +1,5 @@
 # try:
-from .settings_common import *
+from .settings import *
 # except ImportError:
 #    pass
 

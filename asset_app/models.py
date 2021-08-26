@@ -23,6 +23,21 @@ class Product(models.Model):
     def __str__(self):
         return self.product_name
 
+class EProduct(models.Model):
+    """品名モデル"""
+    product_id = models.AutoField(primary_key=True)
+    product_name = models.CharField(max_length=50)
+    product_abbreviation = models.CharField(max_length=50)
+    delete = models.IntegerField()
+    create_date = models.DateTimeField()
+    create_id = models.IntegerField()
+    update_date = models.DateTimeField()
+    update_id = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'e_product'
+
 class Asset(models.Model):
     """資産情報モデル"""
 
@@ -45,6 +60,25 @@ class Asset(models.Model):
 
     def __str__(self):
         return self.asset_id
+
+class EAsset(models.Model):
+    """資産情報モデル"""
+    asset_id = models.CharField(primary_key=True, max_length=100)
+    num = models.IntegerField()
+    product_ass_id = models.IntegerField()
+    model_name = models.CharField(max_length=50)
+    storing_date = models.DateTimeField()
+    purchase_date = models.DateTimeField()
+    serial_number = models.CharField(max_length=50)
+    delete = models.IntegerField()
+    create_date = models.DateTimeField()
+    create_id = models.IntegerField()
+    update_date = models.DateTimeField()
+    update_id = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'e_asset'
 
 class Asset_History(models.Model):
     """資産ライフサイクルモデル"""
@@ -75,3 +109,21 @@ class Asset_History(models.Model):
 
     def __str__(self):
         return self.repair_reason
+
+class EAssetHistory(models.Model):
+    """資産ライフサイクルモデル"""
+    asset_history_id = models.AutoField(primary_key=True)
+    asset_ash_id = models.CharField(max_length=100)
+    status = models.IntegerField()
+    user_id = models.IntegerField(blank=True, null=True)
+    repair_reason = models.CharField(max_length=200, blank=True, null=True)
+    delete = models.IntegerField()
+    create_date = models.DateTimeField()
+    create_id = models.IntegerField()
+    update_date = models.DateTimeField()
+    update_id = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'e_asset_history'
+        
