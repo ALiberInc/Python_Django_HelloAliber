@@ -22,55 +22,55 @@
     <th>削除</th>
 </tr>
 {% for member in member_list %}
-{% if not member.id.is_active %}
+{% if not member.7 %}
 <tr style="color:#FFFFFF;background:#777777;">
 {% else %}
 <tr>
 {% endif %}
-    <td>{{ member.user_id }}</td>
-    <td><a href="{% url 'profile_app:employee' pk=member.user_id %}">{{ member.last_name }} {{ member.first_name }}</a></td>
-    <td>{{ member.department_pro }}</td>
+    <td>{{ member.0 }}</td>
+    <td><a href="{% url 'profile_app:employee' pk=member.0 %}">{{ member.1 }} {{ member.2 }}</a></td>
+    <td>{{ member.3 }}</td>
     <td>
-        {% if member.last_name_k %}
+        {% if member.4 != "" %}
         登録済
         {% else %}
         未登録
         {% endif %}
     </td>
     <td>
-        {{ member.update_date|date:"Y/n/d H:i" }}
+        {{ member.5|date:"Y/n/d H:i" }}
     </td>
     <td>
-        <a class="btn btn-primary btn-sm" href="{% url 'profile_app:employee_update' member.user_id %}">編集</a>
+        <a class="btn btn-primary btn-sm" href="{% url 'profile_app:employee_update' member.0 %}">編集</a>
 
-        {% if not member.id.is_active %}
+        {% if not member.7 %}
         <form method="post" style="display: inline" action=
-        "{% url 'profile_app:employee_set_active' pk=member.id_id %}">{% csrf_token %}
+        "{% url 'profile_app:employee_set_active' pk=member.8 %}">{% csrf_token %}
         <button class="btn btn-primary" type="submit" 
-        onclick='return confirm("{{ member.last_name }}をアクティブにしますが、よろしいですか？");'>アクティブにする</button>
+        onclick='return confirm("{{ member.1 }}をアクティブにしますが、よろしいですか？");'>アクティブにする</button>
         </form>
         {% else %}
         <form method="post" style="display: inline" action=
-        "{% url 'profile_app:employee_set_inactive' pk=member.id_id %}">{% csrf_token %}
+        "{% url 'profile_app:employee_set_inactive' pk=member.8 %}">{% csrf_token %}
         <button class="btn btn-setinactive" type="submit"
-        onclick='return confirm("{{ member.last_name }}を非アクティブにしますが、よろしいですか？");'>非アクティブにする</button>
+        onclick='return confirm("{{ member.1 }}を非アクティブにしますが、よろしいですか？");'>非アクティブにする</button>
         </form>
         {% endif %}
     </td>
     <td>
         <form method="post" style="display: inline" action=
-        "{% url 'profile_app:employee_delete' pk=member.id_id %}">{% csrf_token %}
+        "{% url 'profile_app:employee_delete' id=member.0 user_id=member.8 %}">{% csrf_token %}
         <button class="btn btn-delete" type="submit" 
-        onclick='return confirm("{{ member.last_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
+        onclick='return confirm("{{ member.1 }}のデータを削除しますが、よろしいですか？");'>削除</button>
         </form>
     </td>
 </tr>
+
 {% endfor %}
 </table>
 {% else %}
 <p>表示データがありません。</p>
 {% endif %}
-
             <!-- ページネーション -->
             {% if is_paginated %}
             <ul class="pagination">

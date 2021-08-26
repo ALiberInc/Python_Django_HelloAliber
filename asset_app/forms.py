@@ -6,7 +6,7 @@ from django.forms.fields import DateField, IntegerField
 from django.forms.forms import Form
 from django.forms.widgets import DateInput
 
-from profile_app.models import Department, Profile
+from profile_app.models import EDepartment, EProfile
 from .models import Product,Asset,Asset_History
 from accounts.models import CustomUser
 from django.forms import MultiWidget
@@ -155,18 +155,18 @@ class AssetCreateForm(forms.ModelForm):
 
 class AssetHistoryCreateForm(forms.ModelForm):
     class Meta:
-        model = Department
+        model = EDepartment
         fields = '__all__'
         
     department = forms.ModelChoiceField(
         label = '部門',
-        queryset = Department.objects,
+        queryset = EDepartment.objects,
         required = False
     )
 
     profile = forms.ModelChoiceField(
         label = '利用者',
-        queryset = Profile.objects.none(),
+        queryset = EProfile.objects.none(),
         required = False 
     )
 

@@ -6,7 +6,7 @@ from django.urls.conf import path
 # Create your views here.
 from django.http import HttpResponse
 
-from profile_app.models import Department, Profile
+from profile_app.models import EDepartment, EProfile
 # モデル
 from .models import Product,Asset,Asset_History
 
@@ -486,7 +486,7 @@ def ajax_get_department(request):
     # pkパラメータがない、もしくはpk=空文字列だった場合は全カテゴリを返しておく。
     if pk:
         # pkがあれば、そのpkでカテゴリを絞り込む
-        profile_list = Profile.objects.filter(department_pro=pk)
+        profile_list = EProfile.objects.filter(department_pro=pk)
 
         # [ {'name': '営業部', 'pk': '1'}, {...}, {...} ] という感じのリストになる。
         profile_list = [{'pk': profile.pk, 'name': profile.last_name + ' ' +  profile.first_name} for profile in profile_list]

@@ -1,9 +1,8 @@
 from __future__ import absolute_import
-from allauth.account.forms import ResetPasswordForm,\
-    EmailAwarePasswordResetTokenGenerator
+from allauth.account.forms import ResetPasswordForm,EmailAwarePasswordResetTokenGenerator
 
 from .models import CustomUser
-from profile_app.models import Profile, Department
+from profile_app.models import EProfile, EDepartment
 import random, string
 import logging
 
@@ -129,18 +128,16 @@ class MyResetPasswordForm(ResetPasswordForm):
                 context)
         return self.cleaned_data["email"]
 
-
 def GetRandomStr(num):
     # 英数字をすべて取得
     dat = string.digits + string.ascii_lowercase + string.ascii_uppercase
     return ''.join([random.choice(dat) for i in range(num)])
 
-
 class MySignupForm(BaseSignupForm):
     """社員新規form 元登録form"""
     # パスワード生成用（5桁ランダムテキスト）
     random_password = ""
-    department_pro = forms.ModelChoiceField(Department.objects, label='部門', initial=0)
+    department_pro = forms.ModelChoiceField(EDepartment.objects, label='部門', to_field_name='dep_id', initial=0)
 
     def __init__(self, *args, **kwargs):
         super(MySignupForm, self).__init__(*args, **kwargs)
