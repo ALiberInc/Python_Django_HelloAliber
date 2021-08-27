@@ -90,7 +90,7 @@ class EProfile(models.Model):
     """社員情報モデル"""
     id = models.AutoField(primary_key=True)
     user_id = models.IntegerField()
-    last_name_k = models.CharField(verbose_name='姓（カタカナ）', max_length=300)
+    last_name_k = models.CharField(verbose_name='姓（カタカナ）', max_length=30)
     first_name_k = models.CharField(verbose_name='名（カタカナ）', max_length=30)
     last_name = models.CharField(verbose_name='姓', max_length=18)
     first_name = models.CharField(verbose_name='名', max_length=18)
@@ -122,7 +122,7 @@ class EProfile(models.Model):
     class Meta:
         managed = False
         db_table = 'e_profile'
-    
+        
 class MList(models.Model):
     """マスターテーブル"""
     code_type = models.IntegerField(primary_key=True)
