@@ -75,7 +75,6 @@ class ProductCreateView(LoginRequiredMixin,generic.CreateView):
     template_name = 'PRO002_product_create.html'
     form_class = ProductEditForm
     success_url = reverse_lazy('asset_app:product_list')
- 
     def form_valid(self,form):
         """バリデーションがうまくいったとき"""
         messages.success(self.request,'品名を登録しました')

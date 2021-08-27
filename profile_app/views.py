@@ -100,13 +100,43 @@ class EmployeeView(generic.DetailView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         self.request.session['update_pre_page'] = "employee"#セッション保存
         context = super().get_context_data(**kwargs)
+        # データ追加（年齢、メールアドレス、部門、権限、アクティブ）
+        sql_select_profile = """
+            SELECT
+                p.birth
+                ,d.department
+                ,u.email
+                ,u.is_staff
+                ,u.is_active
+            FROM
+                e_profile p
+            INNER JOIN
+                accounts_customuser u
+            ON
+                p.user_id = u.id
+                AND p.id = {}
+                AND p.delete = 0
+            INNER JOIN
+                e_department d
+            ON
+                p.department_pro_id = d.dep_id
+                AND d.delete = 0
+        """.format(self.kwargs['pk'])
+        cur.execute(sql_select_profile)
+        profile = cur.fetchone()
+        c.close()
         #年齢算出：
-        birth = EProfile.objects.get(id=self.kwargs['pk']).birth # pkを指定してデータを絞り込む
+        birth = profile[0]
         logger.debug("birth:" + str(birth))
-        logger.debug(type(birth))
         age = int((datetime.datetime.now(JST)-birth).days/365.25)
-        logger.debug(age)
-        context['count_age'] = age
+        logger.debug(str(age) + "才")
+        context.update({
+            'c_count_age':age,
+            'c_department':profile[1],
+            'c_email':profile[2],
+            'c_is_staff':profile[3],
+            'c_is_active':profile[4],
+            })
         return context
 
 @require_POST
