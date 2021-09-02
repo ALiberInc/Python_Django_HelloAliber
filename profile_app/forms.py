@@ -11,6 +11,8 @@ import sys
 import requests
 import re
 
+from django.forms.fields import DateField, IntegerField
+
 # 210217 @ning about errormessage
 from django.core.exceptions import ValidationError
 def validate_lengh(value):
@@ -244,3 +246,37 @@ class ProfileEditForm(ModelForm):
         if emergency_contact_3_phone != "" and not re.match(r"[0-9]", emergency_contact_3_phone):
             raise forms.ValidationError("「電話番号」は数字だけを入力してください。")
         return self.cleaned_data["emergency_contact_3_phone"]
+
+class DepartmentEditForm(ModelForm):
+    class Meta:
+        model = Department
+        exclude = ("delete", "create_date", "create_id","update_date","update_id")
+    establish_date = forms.DateField(label = '設立日',widget=forms.DateInput(attrs={'type': 'date'}))
+    dep_id = IntegerField(initial=0)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['dep_id'].widget = forms.HiddenInput()
+        self.fields['dep_id'].required = False
+        self.fields['department'].widget.attrs['maxlength'] = '30'
+        self.fields['department'].required = True
+        self.fields['department'].widget.attrs['placeholder'] = '例:営業部'
+        self.fields['department'].error_messages = {
+            'required': '部門名を入力してください。',
+            'maxlength':'30桁以内を入力してください。'}
+        self.fields['establish_date'].required = True
+        self.fields['establish_date'].error_messages = {
+            'required': '設立日を入力してください。'}
+
+        for field in self.fields.values():
+            if field.required:
+                field.error_messages = {'required' : '「'+str(field.label)+'」を入力してください。'}
+        
+    def clean_department(self):
+        department = self.data.get('department')
+        id = self.data.get('dep_id')
+        if len(department) > 30:
+            raise forms.ValidationError("30桁以内を入力してください。")
+        if department and Department.objects.filter(department = department).exclude(dep_id=id).count():
+            raise forms.ValidationError("部門が既に存在しました。") 
+        return self.cleaned_data["department"]
