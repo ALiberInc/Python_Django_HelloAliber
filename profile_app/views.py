@@ -228,14 +228,16 @@ class DepartmentListView(generic.ListView):
     def get_queryset(self):
         """取得するオブジェクトの一覧を動的に変更する"""
         self.request.session['update_pre_page'] = 'department_list'#セッション保存
-        Products = Department.objects.filter(delete=0).order_by('dep_id')
-        return Products
+        departments = Department.objects.filter(delete=0).order_by('dep_id')
+        return departments
 
 @require_POST
 def DepartmentDeleteView(request, pk):
     """部門削除"""
     logger.debug("pk={}".format(pk))
-    department = get_object_or_404(Department, dep_id=pk) #データが存在していることを確認する
+    #データが存在していることを確認する
+    department = get_object_or_404(Department, dep_id=pk)
+    #該当部門に所属している社員の名数をcountする
     profile = Profile.objects.filter(department_pro_id=pk).count()
     if department :
         if profile > 0:
@@ -263,6 +265,14 @@ class DepartmentCreateView(LoginRequiredMixin,generic.CreateView):
         department = form.save(commit=False)
         department.create_id = self.request.user.id
         department.update_id = self.request.user.id
+        # formのデータ取得
+        department_cleaned = self.request.POST['department']
+        # update(delete=1)の部門
+        delete_department_update = Department.objects.filter(department__exact = department_cleaned).filter(delete=1).update(
+            delete = 0,
+            update_date = timezone.now(),
+            update_id = self.request.user.id,
+        )
         return super().form_valid(form)
 
     def form_invalid(self,form):
@@ -272,6 +282,7 @@ class DepartmentCreateView(LoginRequiredMixin,generic.CreateView):
 
 def validate_department(request):
     """重複チェック"""
+    #画面から入力した部門を取得する
     department = request.GET.get('department',None)
     response ={
         'exists_department':Department.objects.filter(department__iexact = department).filter(delete=0).exists()
@@ -280,6 +291,7 @@ def validate_department(request):
 
 def check_delete_department(request):
     """削除チェック"""
+    #画面から入力した部門を取得する
     department = request.GET.get('department',None)
     response ={
         'delete_department':Department.objects.filter(department__iexact = department).filter(delete=1).exists()

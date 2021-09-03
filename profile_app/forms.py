@@ -277,6 +277,6 @@ class DepartmentEditForm(ModelForm):
         id = self.data.get('dep_id')
         if len(department) > 30:
             raise forms.ValidationError("30桁以内を入力してください。")
-        if department and Department.objects.filter(department = department).exclude(dep_id=id).count():
+        if department and Department.objects.filter(department = department).filter(delete=0).exclude(dep_id=id).count():
             raise forms.ValidationError("部門が既に存在しました。") 
         return self.cleaned_data["department"]
