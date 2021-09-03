@@ -34,6 +34,8 @@ from django.http.response import JsonResponse
 # タイムゾーンを指定
 from django.utils import timezone
 
+from django.http import HttpResponseRedirect
+
 # Log用
 import logging
 logger = logging.getLogger(__name__)
@@ -259,25 +261,39 @@ class DepartmentCreateView(LoginRequiredMixin,generic.CreateView):
     form_class = DepartmentEditForm
     success_url = reverse_lazy('profile_app:department_list')
  
+    def get_success_url(self):
+        return reverse_lazy('profile_app:department_list')
+
     def form_valid(self,form):
         """バリデーションがうまくいったとき"""
         messages.success(self.request,'部門を登録しました')
         department = form.save(commit=False)
         department.create_id = self.request.user.id
-        department.update_id = self.request.user.id
+        department.update_id = self.request.user.id       
         # formのデータ取得
         department_cleaned = self.request.POST['department']
-        # update(delete=1)の部門
-        delete_department_update = Department.objects.filter(department__exact = department_cleaned).filter(delete=1).update(
+        # 削除された部門が存在するか確認
+        department_delete_exist = Department.objects.filter(department__exact = department_cleaned).filter(delete=1).exists()
+        
+        if department_delete_exist:
+            department_delete = Department.objects.filter(delete=1).filter(department__exact = department_cleaned)
+            # 部門IDを扱う
+            value = department_delete[0].dep_id
+            # update(delete=1)の部門
+            Department.objects.filter(department__exact = department_cleaned).filter(delete=1).update(
+            dep_id = value,
+            establish_date = self.request.POST['establish_date'],
             delete = 0,
             update_date = timezone.now(),
             update_id = self.request.user.id,
-        )
+            )
+            return HttpResponseRedirect(self.get_success_url())     
+            
         return super().form_valid(form)
 
     def form_invalid(self,form):
         """バリデーションがうまくいかなかったとき"""
-        messages.error(self.request,"部門の登録を失敗しました")
+        messages.error(self.request,"部門の登録が失敗しました")
         return super().form_invalid(form)
 
 def validate_department(request):
@@ -317,7 +333,7 @@ class DepartmentUpdateView(LoginRequiredMixin,generic.UpdateView):
         return super().form_valid(form)
 
     def form_invalid(self,form):
-        messages.error(self.request,"部門の登録を失敗しました")
+        messages.error(self.request,"部門の登録が失敗しました")
         return super().form_invalid(form)
 
 class Test500View(generic.TemplateView):
