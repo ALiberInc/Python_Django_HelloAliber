@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Profile
-from .models import Department
+from .models import EProfile, EDepartment
 
-admin.site.register(Profile)
-admin.site.register(Department)
+admin.site.register(EProfile)
+admin.site.register(EDepartment)
