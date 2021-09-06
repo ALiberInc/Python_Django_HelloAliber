@@ -392,6 +392,7 @@ def validate_department(request):
 
 def check_delete_department(request):
     """削除チェック"""
+    
     #画面から入力した部門を取得する
     department = request.GET.get('department',None)
     response ={
