@@ -1,5 +1,4 @@
 # リダイレクト、ビュー
-from django.http import response
 from django.urls import reverse_lazy
 from django.views import generic
 from django.shortcuts import redirect
@@ -30,15 +29,10 @@ from django.shortcuts import get_object_or_404
 import datetime
 JST = datetime.timezone(datetime.timedelta(hours=9), "JST")
 
-from django.http.response import JsonResponse
-# タイムゾーンを指定
-from django.utils import timezone
-
-from django.http import HttpResponseRedirect
-
 # Log用
 import logging
 logger = logging.getLogger(__name__)
+
 
 def lastname(request):
     """共通画面用user_id,lastname"""
@@ -305,6 +299,7 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         messages.error(self.request, "更新が失敗しました。")
         return super().form_invalid(form)
 
+
 class DepartmentListView(generic.ListView):
     """部門一覧画面"""
     model = Department
@@ -421,6 +416,7 @@ class DepartmentUpdateView(LoginRequiredMixin,generic.UpdateView):
     def form_invalid(self,form):
         messages.error(self.request,"部門の登録が失敗しました")
         return super().form_invalid(form)
+
 
 class Test500View(generic.TemplateView):
     def index(self):
