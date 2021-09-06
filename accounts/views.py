@@ -2,11 +2,15 @@ from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account import app_settings
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.utils import timezone
+
+from django.db import connection as c
+cur = c.cursor()
 
 # MySignupView用：
 from accounts.forms import MySignupForm
 from accounts.models import CustomUser
-from profile_app.models import Profile, Department
+from profile_app.models import EProfile,EDepartment
 
 from django.views.generic.edit import FormView
 from django.urls import reverse, reverse_lazy
@@ -17,10 +21,7 @@ from allauth.account.utils import (
     get_next_redirect_url,
     passthrough_next_redirect_url,
 )
-
 from allauth.exceptions import ImmediateHttpResponse
-
-from django.utils import timezone
 
 import logging
 logger = logging.getLogger(__name__)
@@ -34,19 +35,44 @@ class MyLoginView(LoginView):
             #session処理
             username = form.cleaned_data['login']
             logger.debug("user account={}".format(username))
-            id_id = CustomUser.objects.get(email__exact=username).id
+            sql_select_userinfo = """
+                SELECT
+                    u.id,
+                    u.is_staff,
+                    p.id,
+                    p.last_name
+                FROM
+                    accounts_customuser u
+                INNER JOIN
+                    e_profile p
+                ON
+                    u.id = p.user_id
+                    and u.email = '{}'
+                    and u.is_active = true
+                    and p.delete = 0
+                ;
+            """.format(username)
+            cur.execute(sql_select_userinfo)
+            result = cur.fetchone()
+            """@old
+            user_id = CustomUser.objects.get(email__exact=username).id
             is_staff = CustomUser.objects.get(email__exact=username).is_staff
-            last_name = Profile.objects.get(id_id__exact=id_id).last_name
-            user_id = Profile.objects.get(id_id__exact=id_id).user_id
+            id = EProfile.objects.get(user_id__exact=user_id).id
+            last_name = EProfile.objects.get(user_id__exact=user_id).last_name
             self.request.session['last_name'] = last_name
-            self.request.session['id_id'] = id_id
+            self.request.session['id'] = id
             self.request.session['user_id'] = user_id
             self.request.session['is_staff'] = is_staff
+            """
+            logger.debug("新しいセッション：" + str(result))
+            self.request.session['user_id'] = result[0]
+            self.request.session['is_staff'] = result[1]
+            self.request.session['id'] = result[2]
+            self.request.session['last_name'] = result[3]
 
             return form.login(self.request, redirect_url=success_url)
         except ImmediateHttpResponse as e:
             return e.response
-
 
 class MyConfirmEmailView(ConfirmEmailView):
     def post(self, *args, **kwargs):
@@ -64,8 +90,7 @@ class MyConfirmEmailView(ConfirmEmailView):
             ctx = self.get_context_data()
             return self.render_to_response(ctx)
         return redirect(redirect_url)
-
-      
+     
 class MySignupView(CloseableSignupMixin, AjaxCapableProcessFormViewMixin, FormView):
     # allauth/account/view.SignupView 継承した親クラスを削除するため
     template_name = "account/signup." + app_settings.TEMPLATE_EXTENSION
@@ -95,8 +120,8 @@ class MySignupView(CloseableSignupMixin, AjaxCapableProcessFormViewMixin, FormVi
         blank = ""
         logger.debug("ここの部門：{}".format(form.cleaned_data['department_pro']))
         logger.debug("hello : {}".format(CustomUser.objects.get(email = form.cleaned_data['email'])))
-        new_profile = Profile.objects.create(
-            id = CustomUser.objects.get(email = form.cleaned_data['email']),
+        new_profile = EProfile.objects.create(
+            user_id = CustomUser.objects.get(email = form.cleaned_data['email']).id,
             last_name_k = blank,
             first_name_k = blank,
             last_name = form.cleaned_data['last_name'],
@@ -109,7 +134,7 @@ class MySignupView(CloseableSignupMixin, AjaxCapableProcessFormViewMixin, FormVi
             address2 = blank,
             residence_card = blank,
             health_insurance = blank,
-            department_pro = Department.objects.get(department = form.cleaned_data['department_pro']),# from form
+            department_pro_id = EDepartment.objects.get(department = form.cleaned_data['department_pro']).dep_id,
             emergency_contact_1_name = blank,
             emergency_contact_1_relationship = blank,
             emergency_contact_1_phone = blank,

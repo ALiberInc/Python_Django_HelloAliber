@@ -2,13 +2,9 @@ from django import forms
 from django.forms import ModelForm
 from django.core.mail import EmailMessage
 from django.forms.forms import Form
-from .models import Profile, Department
+from .models import EProfile, EDepartment
 from accounts.models import CustomUser
-from django.forms import MultiWidget
 import logging
-import json
-import sys
-import requests
 import re
 
 # 210217 @ning about errormessage
@@ -24,8 +20,8 @@ logger = logging.getLogger(__name__)
 
 class ProfileEditForm(ModelForm):
     class Meta:
-        model = Profile
-        exclude = ("user", "created_at", "updated_at","user_id","delete","create_id","update_id","gender", "birth")
+        model = EProfile
+        exclude = ("user", "department_pro_id", "created_at", "updated_at","delete","create_id","update_id","gender", "birth")
     # email = forms.EmailField(initial='',label='メールアドレス', required=True,)
     email = forms.CharField(initial='',label='メールアドレス', required=True,)
     gender_CHOICES=[('1','男性'),('0','女性'),]
@@ -36,12 +32,12 @@ class ProfileEditForm(ModelForm):
     is_active = forms.CharField(
         label='アクティブ', 
         widget=forms.RadioSelect(choices=[('True','アクティブ'),('False','非アクティブ'),]))
-    department_pro = forms.ModelChoiceField(Department.objects, label='部門', initial=0)   
-    field_order = ["last_name_k","first_name_k","last_name","first_name","gender","birth","email","nationality","phone","postal_code","address1","address2","residence_card","health_insurance","department_pro","emergency_contact_1_name","emergency_contact_1_relationship","emergency_contact_1_phone","emergency_contact_2_name","emergency_contact_2_relationship","emergency_contact_2_phone","emergency_contact_3_name","emergency_contact_3_relationship","emergency_contact_3_phone,is_active"]
+    department_pro = forms.ModelChoiceField(EDepartment.objects, label='部門', initial=0)   
+    field_order = ["user_id","last_name_k","first_name_k","last_name","first_name","gender","birth","email","nationality","phone","postal_code","address1","address2","residence_card","health_insurance","department_pro","emergency_contact_1_name","emergency_contact_1_relationship","emergency_contact_1_phone","emergency_contact_2_name","emergency_contact_2_relationship","emergency_contact_2_phone","emergency_contact_3_name","emergency_contact_3_relationship","emergency_contact_3_phone,is_active"]
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id'].widget = forms.HiddenInput()
+        self.fields['user_id'].widget = forms.HiddenInput()
         self.fields['last_name_k'].required = True
         self.fields['last_name_k'].widget.attrs['maxlength'] = '20'
         self.fields['first_name_k'].required = True
@@ -88,12 +84,12 @@ class ProfileEditForm(ModelForm):
     
     def clean_email(self):      
         email = self.cleaned_data.get('email')
-        id = self.data.get('id')
-        logger.debug("id={}".format(id))
+        user_id = self.data.get('user_id')
+        logger.debug("id={}".format(user_id))
         
         if not re.match(r"^[a-zA-Z0-9_+-]+(.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$", email):
             raise forms.ValidationError("「メールアドレス」を正しく入力してください。")
-        if email and CustomUser.objects.filter(email=email).exclude(id=id).count():
+        if email and CustomUser.objects.filter(email=email).exclude(id=user_id).count():
             raise forms.ValidationError("メールアドレスが既に存在しました。")
         if len(email) > 30:
             raise forms.ValidationError("30桁以内を入力してください。")

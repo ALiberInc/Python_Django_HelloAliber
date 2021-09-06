@@ -13,7 +13,7 @@
         </div>
         {% else %}
         <div class="detail">
-        <form method="post" action="{% url 'profile_app:employee_delete' pk=object.id_id %}">{% csrf_token %}
+        <form method="post" action="{% url 'profile_app:employee_delete' id=object.pk user_id=object.user_id %}">{% csrf_token %}
         <h1>社員詳細</h1>
             <div class="col-3">
                 <strong>名前（カタカナ）</strong>
@@ -33,7 +33,7 @@
                 <strong>性別</strong>
             </div>
             <div class="col-9">
-                {% if object.gender == "0" %}
+                {% if object.gender == 0 %}
                     女性
                 {% else %}
                     男性
@@ -46,14 +46,14 @@
                 <strong>年齢</strong>
             </div>
             <div class="col-9">
-                {{ count_age }}歳
+                {{ c_count_age }}歳
             </div>
 
             <div class="col-3">
                 <strong>生年月日</strong>
             </div>
             <div class="col-9">
-                {{ object.birth }}
+                {{ object.birth|date:"Y年n月j日" }}
             </div>
             {% endif %}
 
@@ -68,7 +68,7 @@
                 <strong>メールアドレス</strong>
             </div>
             <div class="col-9">
-                {{ object.id.email }}
+                {{ c_email }}
             </div>
 
             <div class="col-3">
@@ -121,16 +121,14 @@
                 <strong>部門</strong>
             </div>
             <div class="col-9">
-                {% if object.department_pro %}
-                {{ object.department_pro }}
-                {% endif %}
+                {{ c_department }}
             </div>
 
             <div class="col-3">
                 <strong>権限</strong>
             </div>
             <div class="col-9">
-                {% if object.id.is_staff %}
+                {% if c_is_staff %}
                     管理者
                 {% else %}
                     一般社員
@@ -177,7 +175,7 @@
             <div class="col-3">
                 <strong>アクティブ</strong>
             </div>
-            {% if object.id.is_active %}
+            {% if c_is_active %}
             <div class="col-9">
                 アクティブ
             {% else %}
@@ -207,6 +205,6 @@
         {% endif %}
     {% else %}
         <p>表示データがありません。</p><br>
-        <a class="btn btn-primary" href=#>作成?</a>
+        <a class="btn btn-primary" href=#>作成</a>
     {% endif %}
 {% endblock %}

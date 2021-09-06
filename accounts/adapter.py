@@ -2,7 +2,7 @@ from django.conf import settings
 from allauth.account.adapter import DefaultAccountAdapter
 from accounts.forms import MySignupForm
 from django.contrib.sites.shortcuts import get_current_site
-from profile_app.models import Profile
+from profile_app.models import EProfile
 from django.core.exceptions import FieldDoesNotExist, ValidationError
 
 import logging
@@ -19,12 +19,12 @@ class MyAccountAdapter(DefaultAccountAdapter):
         try:
             logger.debug("パスワードを表示する：{}".format(request.password))        
             ctx = {
-               "user": emailconfirmation.email_address.user,
-               "activate_url": activate_url,
-              "current_site": current_site,
-              "key": emailconfirmation.key,
-              "last_name": request.last_name,
-             "password": request.password,
+                "user": emailconfirmation.email_address.user,
+                "activate_url": activate_url,
+                "current_site": current_site,
+                "key": emailconfirmation.key,
+                "last_name": request.last_name,
+                "password": request.password,
             }
         except AttributeError:
             ctx = {
@@ -61,8 +61,9 @@ class MyAccountAdapter(DefaultAccountAdapter):
         else:
             logger.debug("{}は　一般社員としてログインした".format(request.user.last_name))
             try:
-                user_id = Profile.objects.get(id_id__exact=request.user.id).user_id
-            except:
+                user_id = EProfile.objects.get(user_id__exact=request.user.id).pk
+            except Exception as e:
+                logger.debug(e)
                 user_id = -1
             path = "/employee/{user_id}/"
             return path.format(user_id=user_id)

@@ -6,7 +6,7 @@ from django.forms.fields import DateField, IntegerField
 from django.forms.forms import Form
 from django.forms.widgets import DateInput
 
-from profile_app.models import Department, Profile
+from profile_app.models import EDepartment, EProfile
 from .models import Product,Asset,Asset_History
 from accounts.models import CustomUser
 from django.forms import MultiWidget
@@ -27,16 +27,10 @@ class ProductEditForm(forms.ModelForm):
         model = Product
         #exclude = ("created_date", "updated_date","delete","create_id","update_id",)
         fields = ("product_id", "product_name", "product_abbreviation" )
-    #0517寧 自身のデータと重複するので、更新できないについて修正
-    #product_name_old = forms.CharField(label="品名_old", initial='',required=False)
-    #product_abbreviation_old = forms.CharField(label="略称_old", initial='',required=False)
     product_id = IntegerField(initial=0)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['product_id'].widget = forms.HiddenInput()
-        #self.fields['product_name_old'].widget = forms.HiddenInput()
-        #self.fields['product_abbreviation_old'].widget = forms.HiddenInput()
         self.fields['product_id'].required = False
         self.fields['product_name'].widget.attrs['maxlength'] = '50'
         self.fields['product_name'].required = True
@@ -57,25 +51,21 @@ class ProductEditForm(forms.ModelForm):
 
     def clean_product_name(self):
         product_name = self.data.get('product_name')
-        #product_name_old = self.data.get('product_name_old')
         id = self.data.get('product_id')
         if len(product_name) > 50:
             raise forms.ValidationError("50桁以内を入力してください。")        
-        # if product_name != product_name_old and Product.objects.filter(product_name=product_name).count():
-        #     raise forms.ValidationError("品名が既に存在しました。")
-        # return self.cleaned_data["product_name"]
         if product_name and Product.objects.filter(product_name=product_name).exclude(product_id=id).count():
             raise forms.ValidationError("品名が既に存在しました。")
         return self.cleaned_data["product_name"]
 
     def clean_product_abbreviation(self):
         product_abbreviation = self.data.get('product_abbreviation')
+        product_abbreviation_old = self.data.get('product_abbreviation_old')
         id = self.data.get('product_id')
         if len(product_abbreviation) > 50:
             raise forms.ValidationError("50桁以内を入力してください。")
         if not re.match(r"[a-zA-Z0-9_+-]", product_abbreviation):
             raise forms.ValidationError("半角英数字及び「_」「-」を入力してください")
-        if product_abbreviation and Product.objects.filter(product_abbreviation=product_abbreviation).exclude(product_id=id).count():
             raise forms.ValidationError("略称が既に存在しました。")
         return self.cleaned_data["product_abbreviation"]
     
@@ -155,18 +145,18 @@ class AssetCreateForm(forms.ModelForm):
 
 class AssetHistoryCreateForm(forms.ModelForm):
     class Meta:
-        model = Department
+        model = EDepartment
         fields = '__all__'
         
     department = forms.ModelChoiceField(
         label = '部門',
-        queryset = Department.objects,
+        queryset = EDepartment.objects,
         required = False
     )
 
     profile = forms.ModelChoiceField(
         label = '利用者',
-        queryset = Profile.objects.none(),
+        queryset = EProfile.objects.none(),
         required = False 
     )
 

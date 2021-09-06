@@ -4,8 +4,11 @@ from django.views import generic
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 
+from django.db import connection as c
+cur = c.cursor()
+
 # モデル
-from .models import *
+from .models import EProfile, EDepartment
 from accounts.models import CustomUser
 from allauth.account.models import EmailAddress
 
@@ -24,10 +27,7 @@ from django.shortcuts import get_object_or_404
 
 # timeについて
 import datetime
-
-# ProfileInline
-from django.urls import reverse_lazy
-from .models import Profile, Department
+JST = datetime.timezone(datetime.timedelta(hours=9), "JST")
 
 # Log用
 import logging
@@ -44,7 +44,8 @@ def lastname(request):
         last_name = request.session['last_name']
         user_id = request.session['user_id']
         is_staff = request.session['is_staff']
-    except:
+    except Exception as e:
+        logger.debug(e)
         logger.debug('profileにデータを登録していない')
         last_name = 'データ無し'
     return {'common_last_name': last_name ,'user_id': user_id, 'common_is_staff': is_staff
@@ -53,67 +54,137 @@ def lastname(request):
 
 class EmployeeListView(generic.ListView):
     """社員一覧画面"""
-    model = Profile
+    model = EProfile
     template_name = "ENP001_employee_list.html"
     context_object_name = 'member_list'
     paginate_by = 10
                          
     def get_queryset(self):
         self.request.session['update_pre_page'] = "employee_list"#セッション保存
-        profiles = Profile.objects.order_by('user_id')
-        return profiles   
+        sql_select_profiles = """
+            SELECT
+                p.id
+                ,p.last_name
+                ,p.first_name
+                ,d.department
+                ,p.last_name_k
+                ,p.update_date
+                ,u.is_staff
+                ,u.is_active
+                ,u.id
+            FROM
+                e_profile p
+            INNER JOIN
+                e_department d
+            ON
+                p.department_pro_id = d.dep_id
+                AND d.delete = 0
+            INNER JOIN
+                accounts_customuser u
+            ON
+                p.user_id = u.id
+            WHERE p.delete = 0
+            ORDER BY p.user_id
+            ;
+        """
+        cur.execute(sql_select_profiles)
+        result = cur.fetchall()
+        c.close()
+        return result   
 
 class EmployeeView(generic.DetailView, LoginRequiredMixin):
     """社員詳細画面"""
-    model = Profile
+    model = EProfile
     template_name = "ENP002_employee.html"
     
     def get_context_data(self, **kwargs):
         self.request.session['update_pre_page'] = "employee"#セッション保存
         context = super().get_context_data(**kwargs)
-        
+        # データ追加（年齢、メールアドレス、部門、権限、アクティブ）
+        sql_select_profile = """
+            SELECT
+                p.birth
+                ,d.department
+                ,u.email
+                ,u.is_staff
+                ,u.is_active
+            FROM
+                e_profile p
+            INNER JOIN
+                accounts_customuser u
+            ON
+                p.user_id = u.id
+                AND p.id = {}
+                AND p.delete = 0
+            INNER JOIN
+                e_department d
+            ON
+                p.department_pro_id = d.dep_id
+                AND d.delete = 0
+        """.format(self.kwargs['pk'])
+        cur.execute(sql_select_profile)
+        profile = cur.fetchone()
+        c.close()
         #年齢算出：
-        birth = Profile.objects.get(user_id=self.kwargs['pk']).birth # pkを指定してデータを絞り込む
-        time0 = int("".join(str(birth).split("-")))
-
-        time = str(datetime.date.today())
-        now_time = int("".join(time.split("-")))
-        age = int(((now_time - time0) / 10000))
-        context['count_age'] = age
+        birth = profile[0]
+        logger.debug("birth:" + str(birth))
+        age = int((datetime.datetime.now(JST)-birth).days/365.25)
+        logger.debug(str(age) + "才")
+        context.update({
+            'c_count_age':age,
+            'c_department':profile[1],
+            'c_email':profile[2],
+            'c_is_staff':profile[3],
+            'c_is_active':profile[4],
+            })
         return context
 
 @require_POST
-def EmployeeDeleteView(request, pk):
-    """社員一覧画面　「削除」ボタン"""
-    logger.debug("pk={}".format(pk))
-    employee = get_object_or_404(CustomUser, id=pk) #データが存在していることを確認する
-    profile = get_object_or_404(Profile, id_id=pk) #同上
-    if employee and profile:
-        logger.debug("ユーザーを削除している：　no.{} name.{}".format(pk, profile))
-        if request.user.is_staff: # 管理者権限を確認する
-            if request.user.id == pk:
+def EmployeeDeleteView(request, id, user_id):
+    """社員削除"""
+    try:
+        logger.debug("ユーザーを削除している：　id.{}, user_id.{}".format(id, user_id))
+        # 管理者権限を確認する
+        if request.user.is_staff:
+            # 自分のデータを削除チェック
+            if request.session['id'] == id:
                 logger.info("自分のデータを削除できません。")
                 messages.add_message(request, messages.ERROR, '自分のデータを削除できません。')
                 return redirect(request.META['HTTP_REFERER'])
             else:
-                Profile.objects.filter(id_id=pk).delete()
-                CustomUser.objects.filter(id=pk).delete() #CustomUserの削除
+                sql_delete_employee = """
+                    DELETE FROM e_profile	
+                    WHERE id={id}	
+                    ;
+                    DELETE FROM account_emailaddress	
+                    WHERE id={user_id}
+                    ;
+                    DELETE FROM accounts_customuser	
+                    WHERE id={user_id}
+                    ;
+                """.format(id=id, user_id=user_id)
+                cur.execute(sql_delete_employee)
+                c.close()
+                #EProfile.objects.filter(id=id).delete()
+                #CustomUser.objects.filter(id=user_id).delete() #CustomUserの削除
                 messages.add_message(request, messages.SUCCESS, 'データを削除しました。')
         else:
             logger.info("管理者のみprofileを削除することができる")
             raise PermissionDenied # 権限なし
-
-    #次画面（employee_list）に遷移する
-    response = redirect('profile_app:employee_list')
-    return response
-
+        #次画面（employee_list）に遷移する
+        response = redirect('profile_app:employee_list')
+        return response
+    except Exception as e:
+        logger.error(e)
+        response = redirect('profile_app:500')
+        return response
 
 @require_POST
 def EmployeeSetActiveView(request, pk):
     """社員一覧画面　「アクティブにする」ボタン"""
     logger.debug("pk={}".format(pk))
     employee = get_object_or_404(CustomUser, id=pk) #データが存在していることを確認する
-    profile = get_object_or_404(Profile, id_id=pk) #同上
+    profile = get_object_or_404(EProfile, user_id=pk) #同上
     if employee and profile:
         CustomUser.objects.filter(id=pk).update(is_active = 1) #CustomUserアクティブ化
         messages.add_message(request, messages.SUCCESS, 'アクティブにしました。')
@@ -124,13 +195,12 @@ def EmployeeSetActiveView(request, pk):
     response = redirect('profile_app:employee_list')
     return response
 
-
 @require_POST
 def EmployeeSetInActiveView(request, pk):
     """社員一覧画面　「非アクティブにする」ボタン"""
     logger.debug("pk={}".format(pk))
     employee = get_object_or_404(CustomUser, id=pk) #データが存在していることを確認する
-    profile = get_object_or_404(Profile, id_id=pk) #同上
+    profile = get_object_or_404(EProfile, user_id=pk) #同上
     if employee and profile:
         if request.user.id == pk:
             logger.info("自分のデータを非アクティブにする！")
@@ -146,10 +216,9 @@ def EmployeeSetInActiveView(request, pk):
     response = redirect('profile_app:employee_list')
     return response
 
-
 class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
     """社員編集"""
-    model = Profile
+    model = EProfile
     template_name = 'ENP004_employee_update.html'
     form_class = ProfileEditForm
     
@@ -160,19 +229,35 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         form_kwargs = super().get_form_kwargs(*args, **kwargs)
         
         # DBから読み込み
-        gender_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).gender
-        birth_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).birth
-        birth_value_c = birth_value.strftime("%Y%m%d")
-        id_value = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
-        email_value = CustomUser.objects.get(id__exact=id_value).email
-        is_active_value = CustomUser.objects.get(id__exact=id_value).is_active
-        # Form初期値を設定する
+        sql_select_user = """
+            SELECT
+                p.gender
+                ,p.birth
+                ,p.user_id
+                ,p.department_pro_id
+                ,u.email
+                ,u.is_active
+            FROM
+                e_profile p
+            INNER JOIN
+                accounts_customuser u
+            ON
+                u.id = p.user_id
+                AND p.id = {}
+                AND p.delete = 0
+            ;
+        """.format(self.kwargs['pk'])
+        cur.execute(sql_select_user)
+        profile = cur.fetchone()
+        c.close()
+        birth = profile[1].strftime("%Y%m%d")
         form_kwargs['initial'] = {
-            'email' : email_value,
-            'gender' : gender_value,
-            'birth' : birth_value_c,
-            'id' : id_value,
-            'is_active' : is_active_value,
+            'gender' : profile[0],
+            'birth' : birth,
+            'id' : profile[2],
+            'department_pro' : profile[3],
+            'email' : profile[4],
+            'is_active' : profile[5],
         }
         return form_kwargs
     
@@ -185,7 +270,7 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
         last_name_cleaned = self.request.POST['last_name']
         # email取得して、@を基準に１回割りして、@前の部分をusernameにする
         user_split = email_cleaned.split("@", 1)
-        customeruser_id = Profile.objects.get(user_id__exact=self.kwargs['pk']).id_id
+        customeruser_id = EProfile.objects.get(id__exact=self.kwargs['pk']).user_id
         is_active_cleaned = self.request.POST['is_active']
 
         # DB登録
@@ -218,7 +303,7 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
 class Test500View(generic.TemplateView):
     def index(self):
         try:
-            test500 = Profile.objects.get(id=-1)
+            test500 = EProfile.objects.get(id=-1)
         except :
             raise Exception
 
