@@ -23,25 +23,45 @@ class Product(models.Model):
     def __str__(self):
         return self.product_name
 
-class Asset(models.Model):
-    """資産情報モデル"""
+# class Asset(models.Model):
+#     """資産情報モデル"""
 
-    asset_id = models.CharField(primary_key=True, verbose_name='資産番号', max_length=100)
-    num = models.IntegerField(verbose_name='NO',default=0)
-    product_ass_id = models.ForeignKey(Product, verbose_name='品名', on_delete= models.PROTECT,related_name= 'product_ass_id')
-    model_name = models.CharField(verbose_name='モデル名',max_length=55, blank=True)
-    storing_date = models.DateField(verbose_name='入庫日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
-    purchase_date = models.DateField(verbose_name='購入日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
-    serial_number = models.CharField(verbose_name='識別番号', max_length=120, blank=True)
-    delete = models.SmallIntegerField(verbose_name='削除', default=0)
-    create_date = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
-    create_id = models.CharField(verbose_name='作成者', max_length=20)
-    update_date = models.DateTimeField(verbose_name='更新日時', auto_now=True)
-    update_id = models.CharField(verbose_name='更新者', max_length=20)
+#     asset_id = models.CharField(primary_key=True, verbose_name='資産番号', max_length=100)
+#     num = models.IntegerField(verbose_name='NO',default=0)
+#     product_ass_id = models.ForeignKey(Product, verbose_name='品名', on_delete= models.PROTECT,related_name= 'product_ass_id')
+#     model_name = models.CharField(verbose_name='モデル名',max_length=55, blank=True)
+#     storing_date = models.DateField(verbose_name='入庫日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
+#     purchase_date = models.DateField(verbose_name='購入日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
+#     serial_number = models.CharField(verbose_name='識別番号', max_length=120, blank=True)
+#     delete = models.SmallIntegerField(verbose_name='削除', default=0)
+#     create_date = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
+#     create_id = models.CharField(verbose_name='作成者', max_length=20)
+#     update_date = models.DateTimeField(verbose_name='更新日時', auto_now=True)
+#     update_id = models.CharField(verbose_name='更新者', max_length=20)
+
+#     class Meta:
+#         db_table = 'asset'
+#         verbose_name_plural = 'Asset'
+
+#     def __str__(self):
+#         return self.asset_id
+class EAsset(models.Model):
+    asset_id = models.CharField(primary_key=True, max_length=100)
+    num = models.IntegerField()
+    product_ass_id = models.IntegerField()
+    model_name = models.CharField(max_length=50)
+    storing_date = models.DateTimeField()
+    purchase_date = models.DateTimeField()
+    serial_number = models.CharField(max_length=50)
+    delete = models.IntegerField()
+    create_date = models.DateTimeField()
+    create_id = models.IntegerField()
+    update_date = models.DateTimeField()
+    update_id = models.IntegerField()
 
     class Meta:
-        db_table = 'asset'
-        verbose_name_plural = 'Asset'
+        managed = False
+        db_table = 'e_asset'
 
     def __str__(self):
         return self.asset_id
