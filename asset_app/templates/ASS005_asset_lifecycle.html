@@ -1,0 +1,99 @@
+{% extends 'base.html'%}
+{% load static %}
+{% block title %}資産ライフサイクル{% endblock %}
+{% block active_asset %}active{% endblock %}
+{% block head %}
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <style>
+    /*ページネーション*/
+    .pagination{
+	justify-content: center;
+	padding: 16px 8px;
+	margin-top: 20px;
+    }
+  </style>
+{% endblock %}
+{% block contents %}
+
+{% if common_is_staff %}
+    <form method="post"  enctype="multipart/form-data" class="form" novalidate>
+    {% csrf_token %}
+        <h1>資産ライフサイクル</h1>
+            {% if asset_lifecycle_list %}
+                <table cellpadding="20" cellspacing="0">
+                    <tr><td>品名</td><td>{{asset_lifecycle_list.0.0}}</td></tr>
+                    <tr><td>モデル名</td><td>{{asset_lifecycle_list.0.1}}</td></tr>
+                    <tr><td>資産番号</td><td>{{asset_lifecycle_list.0.2}}</td></tr>
+                    <tr><td>識別番号</td><td>{{asset_lifecycle_list.0.3}}</td></tr>
+                </table>
+                <table border="1" cellpadding="25" width="100%"cellspacing="0">
+                    <tr style="background-color:#FFCACA;">                  
+                        <td>日時</td>
+                        <td>ステータス</td>
+                        <td>責任者</td>
+                    </tr>
+                    {% for llfecycle in asset_lifecycle_list %}
+                    <tr>     
+                        <td>{{llfecycle.4|date:"Y/m/j H:i"}}</td>
+                        <td>{{llfecycle.5}}</td>
+                        <td>
+                        {% if llfecycle.6 == None %}
+                            <p>-</p>
+                        {% else %}
+                            {{llfecycle.6}}{{llfecycle.7}}
+                        {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %} 
+                </table>
+                
+        <!-- ページネーション -->
+        {% if is_paginated and page_obj.paginator.num_pages > 1 %}
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% for page_num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == page_num %}
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{ page_num }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                {% endif %}
+        {% else %}
+        <p>表示データがありません。</p>
+        {% endif %}
+
+        <br>
+                <div class="button_all">
+                    {% if request.session.parameter_model_name == "" %}
+                    <button class="btn_back" type="button" onclick="location.href='{% url 'asset_app:asset' request.session.parameter_product %}'">戻る</button>
+                    {% else %}
+                    <button class="btn_back" type="button" onclick="location.href='{% url 'asset_app:asset' request.session.parameter_product request.session.parameter_model_name %}'">戻る</button>
+                    {% endif %}
+                </div>
+    {% else %}
+        <div class="incorrect">
+        <p>不正な操作です</p>
+        </div>
+    {% endif %}
+    </form>
+{% endblock %}
