@@ -302,7 +302,7 @@ class EmployeeUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 class DepartmentListView(generic.ListView):
     """部門一覧画面"""
-    model = Department
+    model = EDepartment
     template_name = 'DEP001_department_list.html'
     context_object_name = 'department_list'
     paginate_by = 10
@@ -310,7 +310,7 @@ class DepartmentListView(generic.ListView):
     def get_queryset(self):
         """取得するオブジェクトの一覧を動的に変更する"""
         self.request.session['update_pre_page'] = 'department_list'#セッション保存
-        departments = Department.objects.filter(delete=0).order_by('dep_id')
+        departments = EDepartment.objects.filter(delete=0).order_by('dep_id')
         return departments
 
 @require_POST
@@ -318,9 +318,9 @@ def DepartmentDeleteView(request, pk):
     """部門削除"""
     logger.debug("pk={}".format(pk))
     #データが存在していることを確認する
-    department = get_object_or_404(Department, dep_id=pk)
+    department = get_object_or_404(EDepartment, dep_id=pk)
     #該当部門に所属している社員の名数をcountする
-    profile = Profile.objects.filter(department_pro_id=pk).count()
+    profile = EProfile.objects.filter(department_pro_id=pk).count()
     if department :
         if profile > 0:
             logger.info("部門のデータを削除できません。") 
@@ -328,7 +328,7 @@ def DepartmentDeleteView(request, pk):
             return redirect(request.META['HTTP_REFERER'])
         else:
             logger.info("これはelse")
-            Department.objects.filter(dep_id=pk).update(delete = 1)
+            EDepartment.objects.filter(dep_id=pk).update(delete = 1)
             messages.add_message(request, messages.SUCCESS, '部門を削除しました。')
 
     response = redirect('profile_app:department_list')
@@ -336,7 +336,7 @@ def DepartmentDeleteView(request, pk):
 
 class DepartmentCreateView(LoginRequiredMixin,generic.CreateView):
     """部門登録画面"""
-    model = Department
+    model = EDepartment
     template_name = 'DEP002_department_create.html'
     form_class = DepartmentEditForm
     success_url = reverse_lazy('profile_app:department_list')
@@ -353,14 +353,14 @@ class DepartmentCreateView(LoginRequiredMixin,generic.CreateView):
         # formのデータ取得
         department_cleaned = self.request.POST['department']
         # 削除された部門が存在するか確認
-        department_delete_exist = Department.objects.filter(department__exact = department_cleaned).filter(delete=1).exists()
+        department_delete_exist = EDepartment.objects.filter(department__exact = department_cleaned).filter(delete=1).exists()
         
         if department_delete_exist:
-            department_delete = Department.objects.filter(delete=1).filter(department__exact = department_cleaned)
+            department_delete = EDepartment.objects.filter(delete=1).filter(department__exact = department_cleaned)
             # 部門IDを扱う
             value = department_delete[0].dep_id
             # update(delete=1)の部門
-            Department.objects.filter(department__exact = department_cleaned).filter(delete=1).update(
+            EDepartment.objects.filter(department__exact = department_cleaned).filter(delete=1).update(
             dep_id = value,
             establish_date = self.request.POST['establish_date'],
             delete = 0,
@@ -381,7 +381,7 @@ def validate_department(request):
     #画面から入力した部門を取得する
     department = request.GET.get('department',None)
     response ={
-        'exists_department':Department.objects.filter(department__iexact = department).filter(delete=0).exists()
+        'exists_department':EDepartment.objects.filter(department__iexact = department).filter(delete=0).exists()
     }
     return JsonResponse(response)
 
@@ -391,13 +391,13 @@ def check_delete_department(request):
     #画面から入力した部門を取得する
     department = request.GET.get('department',None)
     response ={
-        'delete_department':Department.objects.filter(department__iexact = department).filter(delete=1).exists()
+        'delete_department':EDepartment.objects.filter(department__iexact = department).filter(delete=1).exists()
     }
     return JsonResponse(response)
 
 class DepartmentUpdateView(LoginRequiredMixin,generic.UpdateView):
     """部門編集画面"""
-    model = Department
+    model = EDepartment
     template_name = 'DEP003_department_update.html'
     form_class = DepartmentEditForm
 
