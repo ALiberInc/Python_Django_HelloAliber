@@ -7,8 +7,6 @@ from accounts.models import CustomUser
 import logging
 import re
 
-from django.forms.fields import DateField, IntegerField
-
 # 210217 @ning about errormessage
 from django.core.exceptions import ValidationError
 def validate_lengh(value):

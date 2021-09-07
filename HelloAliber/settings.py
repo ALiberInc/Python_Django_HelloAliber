@@ -91,7 +91,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'hello_aliber_db',
         'USER': 'postgres',
-        'PASSWORD':'0000',
+        'PASSWORD': '0000',
         'HOST': '127.0.0.1',
         'PORT': '5432',
         'TEST': {'CHARSET': 'utf8', },
@@ -116,12 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 
 LANGUAGE_CODE = 'ja'
-LOCALE_PATHS = (
-    os.path.join(BASE_DIR, 'locale'),
-)
-print("プリントローカルパス：" + str(LOCALE_PATHS))
-
-TIME_ZONE = 'Asia/Tokyo'
+TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True

@@ -7,18 +7,11 @@ from datetime import timedelta
 
 """old
 class Department(models.Model):
-    """部門モデル"""
-    dep_id = models.AutoField(primary_key=True, verbose_name='部門ID')
-    department = models.CharField(verbose_name='部門', max_length=35)
-    establish_date = models.DateField(verbose_name='設立日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
-    delete = models.SmallIntegerField(verbose_name='削除', default=0)
-    create_date = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
-    create_id = models.CharField(verbose_name='作成者', max_length=20)
-    update_date = models.DateTimeField(verbose_name='更新日時', auto_now=True)
-    update_id = models.CharField(verbose_name='更新者', max_length=20)
+    #部門モデル
+    dep_id = models.SmallIntegerField(primary_key=True, verbose_name='部門ID')
+    department = models.CharField(verbose_name='部門', max_length=10)
 
     class Meta:
-        db_table = 'profile_app_department'
         verbose_name_plural = 'Department'
 
     def __str__(self):
@@ -64,8 +57,7 @@ class Profile(models.Model):
     address2 = models.CharField(verbose_name='住所2', max_length=128, blank=True)
     residence_card = models.CharField(verbose_name='在留カード番号', max_length=20, blank=True)
     health_insurance = models.CharField(verbose_name='健康保険番号', max_length=20, blank=True)
-    department_pro = models.ForeignKey(Department, verbose_name='部門', on_delete=models.SET(0),
-                                       related_name='department_pro')
+    department_pro = models.ForeignKey(Department, verbose_name='部門', on_delete=models.SET(0),related_name='department_pro')
     emergency_contact_1_name = models.CharField(verbose_name='緊急連絡先1_名前', max_length=30, blank=True)
     emergency_contact_1_relationship = models.CharField(verbose_name='緊急連絡先1_続柄', max_length=10, blank=True)
     emergency_contact_1_phone = models.CharField(verbose_name='緊急連絡先1_電話番号', max_length=20, blank=True)
