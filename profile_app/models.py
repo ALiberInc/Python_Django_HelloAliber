@@ -21,13 +21,13 @@ class Department(models.Model):
 class EDepartment(models.Model):
     """部門モデル"""
     dep_id = models.AutoField(primary_key=True)
-    department = models.CharField(max_length=10)
-    establish_date = models.DateTimeField()
-    delete = models.IntegerField()
-    create_date = models.DateTimeField()
-    create_id = models.IntegerField()
-    update_date = models.DateTimeField()
-    update_id = models.IntegerField()
+    department = models.CharField(verbose_name='部門', max_length=35)
+    establish_date = models.DateTimeField(verbose_name='設立日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
+    delete = models.IntegerField(verbose_name='削除', default=0)
+    create_date = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
+    create_id = models.IntegerField(verbose_name='作成者')
+    update_date = models.DateTimeField(verbose_name='更新日時', auto_now=True)
+    update_id = models.IntegerField(verbose_name='更新者')
 
     class Meta:
         managed = False

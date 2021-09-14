@@ -8,7 +8,7 @@ from django.http import HttpResponse
 
 from profile_app.models import EDepartment, EProfile
 # モデル
-from .models import Product,Asset,Asset_History
+from .models import EProduct,EAsset,EAssetHistory
 
 # form
 from .forms import ProductEditForm,AssetCreateForm,AssetHistoryCreateForm
@@ -58,7 +58,7 @@ def index(request):
 
 class ProductListView(generic.ListView):
     """品名一覧画面"""
-    model = Product
+    model = EProduct
     template_name = 'PRO001_product_list.html'
     context_object_name = 'product_list'
     paginate_by = 10
@@ -66,18 +66,47 @@ class ProductListView(generic.ListView):
     def get_queryset(self):
         """取得するオブジェクトの一覧を動的に変更する"""
         self.request.session['update_pre_page'] = 'product_list'#セッション保存
-        Products = Product.objects.order_by('product_id')
+        Products = EProduct.objects.filter(delete=0).order_by('product_id')
         return Products
 
 class ProductCreateView(LoginRequiredMixin,generic.CreateView):
     """品名登録画面"""
-    model = Product
+    model = EProduct
     template_name = 'PRO002_product_create.html'
     form_class = ProductEditForm
-    success_url = reverse_lazy('asset_app:product_list')
+    #success_url = reverse_lazy('asset_app:product_list')
+    
+    def get_success_url(self):
+        return reverse_lazy('asset_app:product_list')
+
     def form_valid(self,form):
         """バリデーションがうまくいったとき"""
         messages.success(self.request,'品名を登録しました')
+        product = form.save(commit=False)
+        product.create_id = self.request.user.id
+        product.update_id = self.request.user.id
+
+        # formのデータ取得
+        product_name_cleaned = self.request.POST['product_name']
+        product_abbreviation_cleaned = self.request.POST['product_abbreviation']
+        # 削除された部門が存在するか確認
+        product_name_delete_exist = EProduct.objects.filter(product_name__exact = product_name_cleaned).filter(delete=1).exists()
+        product_abbreviation_exist = EProduct.objects.filter(product_abbreviation__exact = product_abbreviation_cleaned).filter(delete=1).exists()
+        
+        if product_name_delete_exist and product_abbreviation_exist:
+            product_name_delete = EProduct.objects.filter(delete=1).filter(product_name__exact = product_name_cleaned)
+            # product_abbreviation_delete = EProduct.objects.filter(delete=1).filter(product_abbreviation__exact = product_abbreviation_cleaned)
+            # 部門IDを扱う
+            new_product_id = product_name_delete[0].product_id
+            # update(delete=1)の部門
+            EProduct.objects.filter(product_name__exact = product_name_cleaned).filter(product_abbreviation__exact = product_abbreviation_cleaned).filter(delete=1).update(
+            product_id = new_product_id,
+            delete = 0,
+            update_date = timezone.now(),
+            update_id = self.request.user.id,
+            )
+            return HttpResponseRedirect(self.get_success_url()) 
+        
         return super().form_valid(form)
 
     def form_invalid(self,form):
@@ -85,9 +114,45 @@ class ProductCreateView(LoginRequiredMixin,generic.CreateView):
         messages.error(self.request,"品名の登録を失敗しました")
         return super().form_invalid(form)
 
+def duplicate_product(request):
+    """品名重複チェック"""
+    #画面から入力した品名を取得する
+    product_name = request.GET.get('product_name',None)
+    response ={
+        'exists_product_name':EProduct.objects.filter(product_name__iexact = product_name).filter(delete=0).exists()
+    }
+    return JsonResponse(response)
+
+def duplicate_product_abbreviation(request):
+    """略称重複チェック"""
+    #画面から入力した略称を取得する
+    product_abbreviation = request.GET.get('product_abbreviation',None)
+    response ={
+        'exists_product_abbreviation':EProduct.objects.filter(product_abbreviation__iexact = product_abbreviation).filter(delete=0).exists()
+    }
+    return JsonResponse(response)
+
+def check_delete_product(request):
+    """品名削除チェック"""
+    #画面から入力した部門を取得する
+    product_name = request.GET.get('product_name',None)
+    response ={
+        'delete_product_name':EProduct.objects.filter(product_name__iexact = product_name).filter(delete=1).exists()
+    }
+    return JsonResponse(response)
+
+def check_delete_product_abbreviation(request):
+    """略称削除チェック"""
+    #画面から入力した部門を取得する
+    product_abbreviation = request.GET.get('product_abbreviation',None)
+    response ={
+        'delete_product_abbreviation':EProduct.objects.filter(product_abbreviation__iexact = product_abbreviation).filter(delete=1).exists()
+    }
+    return JsonResponse(response)
+
 class ProductUpdateView(LoginRequiredMixin,generic.UpdateView):
     """品名編集画面"""
-    model = Product
+    model = EProduct
     template_name = 'PRO003_product_update.html'
     form_class = ProductEditForm
 
@@ -107,26 +172,46 @@ class ProductUpdateView(LoginRequiredMixin,generic.UpdateView):
         messages.error(self.request,"品名の登録を失敗しました")
         return super().form_invalid(form)
 
+# @require_POST
+# def ProductDeleteView(request, pk):
+#     """
+#     品名一覧画面の削除ボタンをクリックしたら品名を削除できる処理
+#     """
+#     # データが存在していることを確認する
+#     product = get_object_or_404(EProduct, product_id=pk)
+#     # productの削除
+#     EProduct.objects.filter(product_id=pk).delete()
+#     messages.add_message(request, messages.SUCCESS, 'データを削除しました。')
+#     return redirect('asset_app:product_list')
 @require_POST
 def ProductDeleteView(request, pk):
-    """
-    品名一覧画面の削除ボタンをクリックしたら品名を削除できる処理
-    """
-    # データが存在していることを確認する
-    product = get_object_or_404(Product, product_id=pk)
-    # productの削除
-    Product.objects.filter(product_id=pk).delete()
-    messages.add_message(request, messages.SUCCESS, 'データを削除しました。')
-    return redirect('asset_app:product_list')
+    """品名削除"""
+    logger.debug("pk={}".format(pk))
+    #データが存在していることを確認する
+    product = get_object_or_404(EProduct, product_id=pk)
+    #該当品名に所属している資産の名数をcountする
+    asset = EAsset.objects.filter(product_ass_id=pk).count()
+    if product :
+        if asset > 0:
+            logger.info("品名のデータを削除できません。") 
+            messages.add_message(request, messages.ERROR, '該当品名には資産が所属しているため、削除できません。')
+            return redirect(request.META['HTTP_REFERER'])
+        else:
+            logger.info("これはelse")
+            EProduct.objects.filter(product_id=pk).update(delete = 1)
+            messages.add_message(request, messages.SUCCESS, '品名を削除しました。')
+
+    response = redirect('asset_app:product_list')
+    return response
 
 class AssetListView(generic.ListView):
     """資産一覧画面"""
-    model = Asset
+    model = EAsset
     template_name = 'ASS001_asset_list.html'
     context_object_name = 'asset_list'
     paginate_by = 10
     #ProductとAssetの結合
-    queryset = Asset.objects.select_related('product_ass_id')#prefetch_related('asset_ash_id')      
+    queryset = EAsset.objects.select_related('product_ass_id')#prefetch_related('asset_ash_id')      
     
     def get_count_product(product_list_sql):
         """SQL文の実行"""
@@ -144,83 +229,83 @@ class AssetListView(generic.ListView):
         # 品名の使用可能数、総数を取得するSQL文
         product_list_sql = '''
         SELECT
-            PDT.PRODUCT_ID 
-            , PDT.PRODUCT_NAME
+            EPT.PRODUCT_ID 
+            , EPT.PRODUCT_NAME
             , COUNT(TEMP.STATUS < 3 OR NULL) AS AVAILABLE_CNT
             , COUNT(TEMP.STATUS < 5 OR NULL ) AS TOTAL_CNT
         FROM(
             SELECT
-                AST.PRODUCT_ASS_ID_ID
-                , ASH.ASSET_ASH_ID_ID
-                , ASH.STATUS
-                , ASH.UPDATE_DATE
+                EA.PRODUCT_ASS_ID
+                , EAH.ASSET_ASH_ID
+                , EAH.STATUS
+                , EAH.UPDATE_DATE
             FROM
-                ASSET_HISTORY ASH
-                INNER JOIN ASSET AST
-                ON ASH.ASSET_ASH_ID_ID = AST.ASSET_ID
+                E_ASSET_HISTORY EAH
+                INNER JOIN E_ASSET EA
+                ON EAH.ASSET_ASH_ID = EA.ASSET_ID
             WHERE
-                ASH.UPDATE_DATE = (
+                EAH.UPDATE_DATE = (
                     SELECT
                         MAX(UPDATE_DATE)
                     FROM
-                        ASSET_HISTORY AS AH
+                        E_ASSET_HISTORY AS EH
                     WHERE
-                        ASH.ASSET_ASH_ID_ID = AH.ASSET_ASH_ID_ID
+                        EAH.ASSET_ASH_ID = EH.ASSET_ASH_ID
                 )
-            AND	 ASH.DELETE = 0
-            AND	 AST.DELETE = 0
+            AND	 EAH.DELETE = 0
+            AND	 EA.DELETE = 0
         ) TEMP
-        INNER JOIN PRODUCT PDT
-            ON TEMP.PRODUCT_ASS_ID_ID = PDT.PRODUCT_ID
-            AND PDT.DELETE = 0
-        INNER JOIN ASSET A
-            ON TEMP.ASSET_ASH_ID_ID = A.ASSET_ID
-            AND A.DELETE = 0
+        INNER JOIN E_PRODUCT EPT
+            ON TEMP.PRODUCT_ASS_ID = EPT.PRODUCT_ID
+            AND EPT.DELETE = 0
+        INNER JOIN E_ASSET EAT
+            ON TEMP.ASSET_ASH_ID = EAT.ASSET_ID
+            AND EAT.DELETE = 0
         GROUP BY
-            PDT.PRODUCT_ID
+            EPT.PRODUCT_ID
         ORDER BY
-            PDT.PRODUCT_ID DESC; '''
+            EPT.PRODUCT_ID DESC; '''
         # 資産の使用可能数、総数を取得するSQL文
         asset_list_sql ='''
         SELECT
-            PDT.PRODUCT_ID 
-            ,A.MODEL_NAME
+            EPT.PRODUCT_ID 
+            ,EA.MODEL_NAME
             ,COUNT(MD.STATUS < 3 OR NULL) AS AVAILABLE_CNT
             ,COUNT(MD.STATUS < 5 OR NULL) AS TOTAL_CNT
         FROM(
             SELECT
-                AST.PRODUCT_ASS_ID_ID
-                ,AST.MODEL_NAME
-                , ASH.ASSET_ASH_ID_ID
-                , ASH.STATUS
-                , ASH.UPDATE_DATE
+                EAT.PRODUCT_ASS_ID
+                ,EAT.MODEL_NAME
+                , EAH.ASSET_ASH_ID
+                , EAH.STATUS
+                , EAH.UPDATE_DATE
             FROM
-                ASSET_HISTORY ASH
-                INNER JOIN ASSET AST
-                ON ASH.ASSET_ASH_ID_ID = AST.ASSET_ID
+                E_ASSET_HISTORY EAH
+                INNER JOIN E_ASSET EAT
+                ON EAH.ASSET_ASH_ID = EAT.ASSET_ID
             WHERE
-                ASH.UPDATE_DATE = (
+                EAH.UPDATE_DATE = (
                     SELECT
                         MAX(UPDATE_DATE)
                     FROM
-                        ASSET_HISTORY AS AH
+                        E_ASSET_HISTORY AS EH
                     WHERE
-                        ASH.ASSET_ASH_ID_ID = AH.ASSET_ASH_ID_ID
+                        EAH.ASSET_ASH_ID = EH.ASSET_ASH_ID
                 )
-            AND  ASH.DELETE = 0
-            AND  AST.DELETE = 0
+            AND  EAH.DELETE = 0
+            AND  EAT.DELETE = 0
         ) MD
-        INNER JOIN PRODUCT PDT
-            ON MD.PRODUCT_ASS_ID_ID = PDT.PRODUCT_ID
-            AND  PDT.DELETE = 0
-        INNER JOIN ASSET A
-            ON MD.ASSET_ASH_ID_ID = A.ASSET_ID
-            AND MD.MODEL_NAME = A.MODEL_NAME
-            AND A.DELETE = 0
+        INNER JOIN E_PRODUCT EPT
+            ON MD.PRODUCT_ASS_ID = EPT.PRODUCT_ID
+            AND  EPT.DELETE = 0
+        INNER JOIN E_ASSET EA
+            ON MD.ASSET_ASH_ID = EA.ASSET_ID
+            AND MD.MODEL_NAME = EA.MODEL_NAME
+            AND EA.DELETE = 0
         GROUP BY
-            PDT.PRODUCT_ID,A.MODEL_NAME
+            EPT.PRODUCT_ID,EA.MODEL_NAME
         ORDER BY
-            PDT.PRODUCT_ID DESC,A.MODEL_NAME DESC;'''
+            EPT.PRODUCT_ID DESC,EA.MODEL_NAME DESC;'''
         product_list = AssetListView.get_count_product(product_list_sql)
         asset_list = AssetListView.get_count_asset(asset_list_sql)
         # 継承先のListViewのget_context_dataメソッドを実行し、それをcontext変数に代入しています。
@@ -245,7 +330,7 @@ class AssetListView(generic.ListView):
 
 class AssetCreateView(LoginRequiredMixin,generic.CreateView):
     """資産登録画面"""
-    model = Asset
+    model = EAsset
     template_name = 'ASS002_asset_create.html'
     form_class = AssetCreateForm
     #success_url = reverse_lazy('asset_app:asset_create_done')  
@@ -268,11 +353,11 @@ class AssetCreateView(LoginRequiredMixin,generic.CreateView):
         """ オブジェクトを作成する機能 """        
 
         # DBから読み込み       
-        product_abbreviation = Product.objects.get(product_name=form.cleaned_data['product_ass_id']).product_abbreviation
+        product_abbreviation = EProduct.objects.get(product_id=form.cleaned_data['product_ass_id']).product_abbreviation
         #複数の入力フィールド値 取得
         serial_number_list = request.POST.getlist("serial_number")      
         #DBから同じ品物、日付の資産のnumの最大値を取得する
-        max_serial_number = Asset.objects.filter(asset_id__icontains = "ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])).aggregate(Max('num'))['num__max']       
+        max_serial_number = EAsset.objects.filter(asset_id__icontains = "ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])).aggregate(Max('num'))['num__max']       
         #DBにmax_serial_numberが0ではない場合は+１、
         #0の場合は m=1
         if max_serial_number is not None :                
@@ -283,9 +368,10 @@ class AssetCreateView(LoginRequiredMixin,generic.CreateView):
         #asset_id list
         asset_id_list = []
         #品名ID
-        product_id = Product.objects.get(product_name__exact = form.cleaned_data['product_ass_id']).product_id
+        product_id = EProduct.objects.get(product_id__exact = form.cleaned_data['product_ass_id']).product_id
+
         #品名
-        product_name = Product.objects.get(product_name__exact = form.cleaned_data['product_ass_id']).product_name
+        product_name = EProduct.objects.get(product_id__exact = form.cleaned_data['product_ass_id']).product_name
         #モデル名
         model_name_t = form.cleaned_data['model_name']
         #入庫日
@@ -293,7 +379,7 @@ class AssetCreateView(LoginRequiredMixin,generic.CreateView):
         
         #複数データ挿入
         for serial_number in serial_number_list:
-            self.object = Asset.objects.create(
+            self.object = EAsset.objects.create(
                 asset_id = "ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])+"-"+str(m),
                 model_name = model_name_t,
                 storing_date = timezone.now(),
@@ -304,14 +390,13 @@ class AssetCreateView(LoginRequiredMixin,generic.CreateView):
                 create_id = self.request.user.id,
                 update_date = timezone.now(),
                 update_id = self.request.user.id,
-                product_ass_id_id = product_id,
+                product_ass_id = product_id,
                 num = m,
             )
             asset_id_list.append("ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])+"-"+str(m))            
-            
             #データ挿入(asset_history)
-            self.object = Asset_History.objects.create(
-                asset_ash_id_id = "ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])+"-"+str(m),
+            self.object = EAssetHistory.objects.create(
+                asset_ash_id = "ALIBER-"+product_abbreviation+"-"+str(form.cleaned_data['purchase_date'])+"-"+str(m),
                 status = 0,              
                 delete = 0,
                 create_date = timezone.now(),
@@ -361,10 +446,10 @@ def create_done_view(request):
 
 class AssetView(LoginRequiredMixin,generic.ListView):
     """資産詳細画面"""
-    model = Asset_History
+    model = EAssetHistory
     template_name = "ASS004_asset.html"
     context_object_name = 'asset_detail_list'
-    queryset = Asset_History.objects.select_related('asset_ash_id')
+    queryset = EAssetHistory.objects.select_related('asset_ash_id')
     paginate_by = 10
 
     def get_detail_asset(asset_detail_sql):
@@ -377,8 +462,8 @@ class AssetView(LoginRequiredMixin,generic.ListView):
         #詳細画面の初期表示のSQL文
         asset_detail_sql = '''
         SELECT
-            STS.PRODUCT_ASS_ID_ID
-            ,STS.ASSET_ASH_ID_ID
+            STS.PRODUCT_ASS_ID
+            ,STS.ASSET_ASH_ID
             ,STS.SERIAL_NUMBER
             ,STS.MODEL_NAME
             ,STS.STORING_DATE
@@ -390,48 +475,48 @@ class AssetView(LoginRequiredMixin,generic.ListView):
             ,STS.PRODUCT_NAME
         FROM(
             SELECT
-                A.PRODUCT_ASS_ID_ID
-                ,A.SERIAL_NUMBER
-                ,A.MODEL_NAME
-                ,A.STORING_DATE
-                ,A.PURCHASE_DATE
-                ,ASH.ASSET_ASH_ID_ID
+                EAT.PRODUCT_ASS_ID
+                ,EAT.SERIAL_NUMBER
+                ,EAT.MODEL_NAME
+                ,EAT.STORING_DATE
+                ,EAT.PURCHASE_DATE
+                ,EAH.ASSET_ASH_ID
                 ,M.VALUE
-                ,PAP.LAST_NAME
-                ,PAP.FIRST_NAME
-                ,ASH.UPDATE_DATE
-                ,ASH.REPAIR_REASON
-                ,P.PRODUCT_NAME
+                ,EPE.LAST_NAME
+                ,EPE.FIRST_NAME
+                ,EAH.UPDATE_DATE
+                ,EAH.REPAIR_REASON
+                ,EPT.PRODUCT_NAME
             FROM
-                ASSET_HISTORY ASH
+                E_ASSET_HISTORY EAH
             INNER JOIN
-                ASSET A
-                ON A.ASSET_ID = ASH.ASSET_ASH_ID_ID
+                E_ASSET EAT
+                ON EAT.ASSET_ID = EAH.ASSET_ASH_ID
             INNER JOIN
-                PRODUCT P
-                ON P.PRODUCT_ID = A.PRODUCT_ASS_ID_ID
+                E_PRODUCT EPT
+                ON EPT.PRODUCT_ID = EAT.PRODUCT_ASS_ID
             LEFT JOIN
-                PROFILE_APP_PROFILE PAP
-                ON PAP.USER_ID = ASH.USER_ID
+                E_PROFILE EPE
+                ON EPE.USER_ID = EAH.USER_ID
             INNER JOIN
-                MASTER M
-                ON M.ID = ASH.STATUS
+                M_LIST M
+                ON M.ID = EAH.STATUS
                 AND CODE_TYPE = 2
             WHERE
-                ASH.UPDATE_DATE = (
+                EAH.UPDATE_DATE = (
                     SELECT
                         MAX(UPDATE_DATE)
                     FROM
-                        ASSET_HISTORY AS AH
+                        E_ASSET_HISTORY AS EH
                     WHERE
-                        ASH.ASSET_ASH_ID_ID = AH.ASSET_ASH_ID_ID
+                        EAH.ASSET_ASH_ID = EH.ASSET_ASH_ID
                 )
         )STS
         WHERE
-            STS.PRODUCT_ASS_ID_ID = :PARAM1 
+            STS.PRODUCT_ASS_ID = :PARAM1 
             :PARAM2
         ORDER BY
-            STS.PRODUCT_ASS_ID_ID,STS.ASSET_ASH_ID_ID; '''
+            STS.PRODUCT_ASS_ID,STS.ASSET_ASH_ID; '''
 
         #１番目のパラメータ
         #product_idは使わなく、ｐｋを利用する
@@ -485,7 +570,7 @@ def ajax_get_department(request):
     # pkパラメータがない、もしくはpk=空文字列だった場合は全カテゴリを返しておく。
     if pk:
         # pkがあれば、そのpkでカテゴリを絞り込む
-        profile_list = EProfile.objects.filter(department_pro=pk)
+        profile_list = EProfile.objects.filter(department_pro_id=pk)
 
         # [ {'name': '営業部', 'pk': '1'}, {...}, {...} ] という感じのリストになる。
         profile_list = [{'pk': profile.pk, 'name': profile.last_name + ' ' +  profile.first_name} for profile in profile_list]
@@ -525,7 +610,7 @@ def post(request):
         print('lend以外')
         
     #データ挿入(asset_history)
-    new_asset_history = Asset_History.objects.create(
+    new_asset_history = EAssetHistory.objects.create(
         status = status_t,
         user_id = profile,
         repair_reason = repair_reason,               
@@ -534,13 +619,13 @@ def post(request):
         create_id = request.user.id,
         update_date = timezone.now(),
         update_id = request.user.id,
-        asset_ash_id_id = asset_id_hidden,
+        asset_ash_id = asset_id_hidden,
     )
     return redirect('asset_app:asset_list')
 
 class AssetLifeCycleView(LoginRequiredMixin, generic.ListView):
     """資産ライフサイクル画面"""
-    model = Asset_History
+    model = EAssetHistory
     template_name = "ASS005_asset_lifecycle.html"
     paginate_by = 10
     
@@ -554,33 +639,33 @@ class AssetLifeCycleView(LoginRequiredMixin, generic.ListView):
         #資産ライフサイクル画面の初期表示のSQL文
         asset_lifecycle_sql = '''
         SELECT
-            P.PRODUCT_NAME
-            ,A.MODEL_NAME
-            ,AH.ASSET_ASH_ID_ID
-            ,A.SERIAL_NUMBER
-            ,AH.UPDATE_DATE
+            EPT.PRODUCT_NAME
+            ,EAT.MODEL_NAME
+            ,EAH.ASSET_ASH_ID
+            ,EAT.SERIAL_NUMBER
+            ,EAH.UPDATE_DATE
             ,M.VALUE
-            ,PAP.LAST_NAME
-            ,PAP.FIRST_NAME
+            ,EPE.LAST_NAME
+            ,EPE.FIRST_NAME
         FROM
-            ASSET_HISTORY AH
+            E_ASSET_HISTORY EAH
         INNER JOIN
-            ASSET A
-            ON AH.ASSET_ASH_ID_ID = A.ASSET_ID
+            E_ASSET EAT
+            ON EAH.ASSET_ASH_ID = EAT.ASSET_ID
         LEFT JOIN
-            PROFILE_APP_PROFILE PAP
-            ON PAP.USER_ID = AH.USER_ID
+            E_PROFILE EPE
+            ON EPE.USER_ID = EAH.USER_ID
         INNER JOIN
-            MASTER M
-            ON M.ID = AH.STATUS
+            M_LIST M
+            ON M.ID = EAH.STATUS
             AND CODE_TYPE = 2
         INNER JOIN
-            PRODUCT P
-            ON A.PRODUCT_ASS_ID_ID = P.PRODUCT_ID
+            E_PRODUCT EPT
+            ON EAT.PRODUCT_ASS_ID = EPT.PRODUCT_ID
         WHERE
-            AH.ASSET_ASH_ID_ID = ':parameter'
+            EAH.ASSET_ASH_ID = ':parameter'
         ORDER BY
-            AH.UPDATE_DATE DESC;'''
+            EAH.UPDATE_DATE DESC;'''
         asset_id = self.kwargs['asset_id']
         asset_lifecycle_sql = asset_lifecycle_sql.replace(":parameter", asset_id)
         asset_lifecycle_list = AssetLifeCycleView.get_asset_lifecycle(asset_lifecycle_sql)

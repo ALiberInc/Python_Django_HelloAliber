@@ -15,6 +15,11 @@ from allauth.account.models import EmailAddress
 # form
 from .forms import *
 
+# タイムゾーンを指定
+from django.utils import timezone
+
+from django.http import JsonResponse
+from django.http import HttpResponseRedirect
 # メッセージ用
 from django.contrib import messages
 

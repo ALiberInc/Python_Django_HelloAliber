@@ -6,6 +6,7 @@ from .models import EProfile, EDepartment
 from accounts.models import CustomUser
 import logging
 import re
+from django.forms.fields import DateField, IntegerField
 
 # 210217 @ning about errormessage
 from django.core.exceptions import ValidationError
@@ -243,7 +244,7 @@ class ProfileEditForm(ModelForm):
 
 class DepartmentEditForm(ModelForm):
     class Meta:
-        model = Department
+        model = EDepartment
         exclude = ("delete", "create_date", "create_id","update_date","update_id")
     establish_date = forms.DateField(label = '設立日',widget=forms.DateInput(attrs={'type': 'date'}))
     dep_id = IntegerField(initial=0)
@@ -271,6 +272,6 @@ class DepartmentEditForm(ModelForm):
         id = self.data.get('dep_id')
         if len(department) > 30:
             raise forms.ValidationError("30桁以内を入力してください。")
-        if department and Department.objects.filter(department = department).filter(delete=0).exclude(dep_id=id).count():
+        if department and EDepartment.objects.filter(department = department).filter(delete=0).exclude(dep_id=id).count():
             raise forms.ValidationError("部門が既に存在しました。") 
         return self.cleaned_data["department"]

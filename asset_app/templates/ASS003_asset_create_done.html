@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load index %}
+
 {% block title %}資産登録完了{% endblock %}
 
 {% block head %}
@@ -16,6 +16,10 @@
     <form method="post" enctype="multipart/form-data" class="form" novalidate>
         {% csrf_token %}
         <h1>資産登録完了</h1>
+
+        {% for datum in test %}
+        <p>{{ datum.forloop.conter0 }}</p>
+        {%endfor%}
         <table  cellpadding="15" cellspacing="0"> 
             <tr><td style = "font-size:25px;">品名</td></tr>
             <tr><td>{{product_name}}</td></tr>
@@ -24,10 +28,14 @@
             <tr><td style = "font-size:25px;">入庫日</td></tr>
             <tr><td>{{purchase_date_t|date:"Y/m/j" }}</td></tr>
             <tr><td style = "font-size:25px;">資産番号/識別番号</td></tr>
-            <tr><td>{% for asset_id in asset_id_list %} 
-                {{asset_id}}／{{ serial_number_list|index:forloop.counter0 }}
+            <tr><td>{% for asset_id in asset_id_list %}
+                        {% for serial_number in serial_number_list %}
+                            {% if forloop.counter == forloop.parentloop.counter %}
+                                {{asset_id}}／{{ serial_number }}
                 <br>
-                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
                 </td>
             </tr>
         </table>
