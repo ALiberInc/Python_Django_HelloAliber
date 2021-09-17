@@ -23,7 +23,7 @@
           <tr>
               <td>{{ forloop.counter}}</td>
               <td>{{ department.department }}</td>
-              <td>{{ department.establish_date }}</td>
+              <td>{{ department.establish_date|date:"Y/m/d" }}</td>
               <td>
                 <a class="btn btn-primary btn-sm" href="{% url 'profile_app:department_update' department.dep_id %}">編集</a>
               </td>

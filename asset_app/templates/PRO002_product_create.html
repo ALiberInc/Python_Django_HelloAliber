@@ -4,6 +4,7 @@
 {% block active_product %}active{% endblock %}
 {% block head %}
 <link href="{% static 'css/main.css' %}" rel="stylesheet">
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 {% endblock %}
 {% block contents %}
 
@@ -33,4 +34,83 @@
         </div>
     </form>
 {% endif %}
+<script>
+    $(function(){
+        $("#id_product_name").keyup(function()
+        {
+            var value = $("#id_product_name").val();
+
+            $.ajax({
+                type: "GET",
+                url: '{% url 'asset_app:duplicate_product' %}',
+                data: {
+                    'product_name':value,
+                    },
+                success:function(response){
+                    if (response.exists_product_name == true) {
+                        $("#id_product_name").after("<span class='errorlist'>品名が既に存在しています。</span>"); 
+                    }    
+                }
+            });
+        })
+    });
+
+    $(function(){
+        $("#id_product_abbreviation").keyup(function()
+        {
+            var value = $("#id_product_abbreviation").val();
+
+            $.ajax({
+                type: "GET",
+                url: '{% url 'asset_app:duplicate_product_abbreviation' %}',
+                data: {
+                    'product_abbreviation':value,
+                    },
+                success:function(response){
+                    if (response.exists_product_abbreviation == true) {
+                        $("#id_product_abbreviation").after("<span class='errorlist'>略称が既に存在しています。</span>"); 
+                    }    
+                }
+            });
+        })
+    });
+
+    $(function(){
+        $("#id_product_name").keyup(function()
+        {
+            var value = $("#id_product_name").val();
+            $.ajax({
+                type: "GET",
+                url: '{% url 'asset_app:check_delete_product' %}',
+                data: {
+                    'product_name':value,
+                    },
+                success:function(response){
+                    if (response.delete_product_name == true) {
+                        $("#id_product_name").after("<span class='errorlist'>該当品名を削除したことがありますが、再登録の場合登録ボタンを押してください。</span>"); 
+                    }    
+                }
+            });
+        })
+    });
+
+    $(function(){
+        $("#id_product_abbreviation").keyup(function()
+        {
+            var value = $("#id_product_abbreviation").val();
+            $.ajax({
+                type: "GET",
+                url: '{% url 'asset_app:check_delete_product_abbreviation' %}',
+                data: {
+                    'product_abbreviation':value,
+                    },
+                success:function(response){
+                    if (response.delete_product_abbreviation == true) {
+                        $("#id_product_abbreviation").after("<span class='errorlist'>該当略称を削除したことがありますが、再登録の場合登録ボタンを押してください。</span>"); 
+                    }    
+                }
+            });
+        })
+    });
+</script> 
 {% endblock %}
