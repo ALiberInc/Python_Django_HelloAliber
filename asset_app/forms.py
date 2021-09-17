@@ -167,7 +167,22 @@ class AssetHistoryCreateForm(forms.ModelForm):
         required = False 
     )
 
+    # repair_reason = forms.CharField(
+    #     label = '修理理由',
+    #     queryset = EAssetHistory.objects,
+    #     required = True 
+    # )
+
     field_order = ('department','profile')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['department'].required = True,
+        self.fields['profile'].required = True,
+        # self.fields['repair_reason'].required = True,
+        # self.fields['repair_reason'].widget.attrs['maxlength'] = '200'
+
+        for field in self.fields.values():
+            if field.required:
+                field.error_messages = {'required' : '「'+str(field.label)+'」を入力してください。'}
