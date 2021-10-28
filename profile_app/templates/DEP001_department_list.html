@@ -4,6 +4,14 @@
 {% block active_department %}active{% endblock %}
 {% block head %}
 <link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
+<style>
+  .long{
+    width: 35%;
+  }
+  .short{
+    width: 10%;
+  }
+</style>
 {% endblock %}
 {% block contents %}
 <h1>部門一覧</h1>
@@ -13,11 +21,11 @@
     {% if department_list %}
         <table border="1" cellpadding="5" cellspacing="0">
           <tr>
-            <th>番号</th>
-            <th>部門名</th>
-            <th>設立日</th>
-            <th>編集</th>
-            <th>削除</th>
+            <th class="short">番号</th>
+            <th class="long">部門名</th>
+            <th class="long">設立日</th>
+            <th class="short">編集</th>
+            <th class="short">削除</th>
           </tr>
           {% for department in department_list %}
           <tr>

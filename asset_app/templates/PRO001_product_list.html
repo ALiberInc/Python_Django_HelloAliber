@@ -4,6 +4,14 @@
 {% block active_product %}active{% endblock %}
 {% block head %}
 <link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
+<style>
+  .long{
+    width: 35%;
+  }
+  .short{
+    width: 10%;
+  }
+</style>
 {% endblock %}
 {% block contents %}
 <h1>品名一覧</h1>
@@ -13,11 +21,11 @@
     {% if product_list %}
         <table border="1" cellpadding="5" cellspacing="0">
           <tr>
-            <th>番号</th>
-            <th>品名</th>
-            <th>略称</th>
-            <th>編集</th>
-            <th>削除</th>
+            <th class="short">番号</th>
+            <th class="long">品名</th>
+            <th class="long">略称</th>
+            <th class="short">編集</th>
+            <th class="short">削除</th>
           </tr>
           {% for product in product_list %}
           <tr>

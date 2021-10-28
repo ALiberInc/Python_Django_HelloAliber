@@ -5,6 +5,14 @@
 {% block head %}
 <link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<style>
+.long{
+  width: 46%;
+}
+.short{
+  width: 18%;
+}
+</style>
 {% endblock %}
 {% block contents %}
 <h1>資産一覧</h1>
@@ -14,10 +22,10 @@
     {% if asset_list %}   
         <table border="1" cellpadding="5" cellspacing="0">
           <tr>
-            <th>番号</th>
-            <th>品名(モデル名)</th>
-            <th>使用可能数／総数</th>
-            <th>詳細</th>
+            <th class="short">番号</th>
+            <th class="long">品名(モデル名)</th>
+            <th class="short">使用可能数／総数</th>
+            <th class="short">詳細</th>
           </tr>
       
           {% for product in product_list %}
