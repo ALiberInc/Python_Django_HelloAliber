@@ -158,13 +158,15 @@ class AssetHistoryCreateForm(forms.ModelForm):
     department = forms.ModelChoiceField(
         label = '部門',
         queryset = EDepartment.objects,
-        required = False
+        required = False,
+        empty_label='部門を選択してください',
     )
 
     profile = forms.ModelChoiceField(
         label = '利用者',
         queryset = EProfile.objects.none(),
-        required = False 
+        required = False,
+        empty_label='利用者を選択してください', 
     )
 
     # repair_reason = forms.CharField(
