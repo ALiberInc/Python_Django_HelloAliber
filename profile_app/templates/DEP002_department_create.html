@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}部門登録{% endblock %}
+{% block active_department %}active{% endblock %}
+{% block head %}
+<link href="{% static 'css/main.css' %}" rel="stylesheet">
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+{% endblock %}
+{% block contents %}
+
+{% if not common_is_staff %}
+    <div class="incorrect">
+    <p>不正な操作です</p>
+    </div>
+{% else %}
+    <form method="post" enctype="multipart/form-data" id ="validate_department_form" class="form"   novalidate>
+        {% csrf_token %}
+        <h1>部門登録</h1>
+            {% for field in form %}
+                <div class="field">
+                    {% if not field.is_hidden %}
+                    <label class="login_class" for="{{ field.auto_id }}">{{ field.label }}</label>
+                    {% endif %}                   
+                    {{ field }}
+                    {% if field.help_text %}
+                    <span class="helptext">{{ field.help_text }}</span>
+                    {% endif %}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+        <div class="button_all">
+        <button class="btn_save" type="submit">登録</button>
+        <button class="btn_back" type="button" onclick="location.href='{% url 'profile_app:department_list' %}'">戻る</button>
+        </div>
+    </form>
+{% endif %}
+<script>
+    $(function(){
+        $("#id_department").keyup(function()
+        {
+            var value = $("#id_department").val();
+
+            $.ajax({
+                type: "GET",
+                url: '{% url 'profile_app:validate_department' %}',
+                data: {
+                    'department':value,
+                    },
+                success:function(response){
+                    if (response.exists_department == true) {
+                        $("#id_department").after("<span class='errorlist'>部門が既に存在しています。</span>"); 
+                    }    
+                }
+            });
+        })
+    });
+
+    $(function(){
+        $("#id_department").keyup(function()
+        {
+            var value = $("#id_department").val();
+            $.ajax({
+                type: "GET",
+                url: '{% url 'profile_app:check_delete_department' %}',
+                data: {
+                    'department':value,
+                    },
+                success:function(response){
+                    if (response.delete_department == true) {
+                        $("#id_department").after("<span class='errorlist'>該当部門を削除したことがありますが、再登録の場合登録ボタンを押してください。</span>"); 
+                    }    
+                }
+            });
+        })
+    });
+</script>
+{% endblock %}

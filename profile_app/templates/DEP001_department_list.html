@@ -1,7 +1,7 @@
 {% extends 'base.html'%}
 {% load static %}
-{% block title %}品名一覧{% endblock %}
-{% block active_product %}active{% endblock %}
+{% block title %}部門一覧{% endblock %}
+{% block active_department %}active{% endblock %}
 {% block head %}
 <link href="{% static 'css/clean-blog.min.css' %}" rel="stylesheet">
 <style>
@@ -14,31 +14,31 @@
 </style>
 {% endblock %}
 {% block contents %}
-<h1>品名一覧</h1>
+<h1>部門一覧</h1>
 {% if common_is_staff %}
-<a class="btn btn-primary btn-sm" href="{% url 'asset_app:product_create' %}">品名登録</a>&nbsp;
+<a class="btn btn-primary btn-sm" href="{% url 'profile_app:department_create' %}">部門登録</a>&nbsp;
 <p></p>
-    {% if product_list %}
+    {% if department_list %}
         <table border="1" cellpadding="5" cellspacing="0">
           <tr>
             <th class="short">番号</th>
-            <th class="long">品名</th>
-            <th class="long">略称</th>
+            <th class="long">部門名</th>
+            <th class="long">設立日</th>
             <th class="short">編集</th>
             <th class="short">削除</th>
           </tr>
-          {% for product in product_list %}
+          {% for department in department_list %}
           <tr>
               <td>{{ forloop.counter}}</td>
-              <td>{{ product.product_name }}</td>
-              <td>{{ product.product_abbreviation }}</td>
+              <td>{{ department.department }}</td>
+              <td>{{ department.establish_date|date:"Y/m/d" }}</td>
               <td>
-                <a class="btn btn-primary btn-sm" href="{% url 'asset_app:product_update' product.product_id %}">編集</a>
+                <a class="btn btn-primary btn-sm" href="{% url 'profile_app:department_update' department.dep_id %}">編集</a>
               </td>
               <td>
-                <form method="post" style="display: inline" action="{% url 'asset_app:product_delete' pk=product.product_id %}">{% csrf_token %}
-                <button class="btn btn-delete" type="submit" onclick='return confirm("{{ product.product_name }}のデータを削除しますが、よろしいですか？");'>削除</button>
-                </form>
+                <form method="post" style="display: inline" action="{% url 'profile_app:department_delete' pk=department.dep_id %}">{% csrf_token %} 
+                <button class="btn btn-delete" type="submit" onclick='return confirm("{{ department.department }}のデータを削除しますが、よろしいですか？");'>削除</button>
+                </form> 
               </td>
           </tr>          
           {% endfor %}          

@@ -21,13 +21,13 @@ class Department(models.Model):
 class EDepartment(models.Model):
     """部門モデル"""
     dep_id = models.AutoField(primary_key=True)
-    department = models.CharField(max_length=10)
-    establish_date = models.DateTimeField()
-    delete = models.IntegerField()
-    create_date = models.DateTimeField()
-    create_id = models.IntegerField()
-    update_date = models.DateTimeField()
-    update_id = models.IntegerField()
+    department = models.CharField(verbose_name='部門', max_length=35)
+    establish_date = models.DateTimeField(verbose_name='設立日', default=datetime.datetime.today() - timedelta(days=365 * 30 + 7))
+    delete = models.IntegerField(verbose_name='削除', default=0)
+    create_date = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
+    create_id = models.IntegerField(verbose_name='作成者')
+    update_date = models.DateTimeField(verbose_name='更新日時', auto_now=True)
+    update_id = models.IntegerField(verbose_name='更新者')
 
     class Meta:
         managed = False
@@ -57,8 +57,7 @@ class Profile(models.Model):
     address2 = models.CharField(verbose_name='住所2', max_length=128, blank=True)
     residence_card = models.CharField(verbose_name='在留カード番号', max_length=20, blank=True)
     health_insurance = models.CharField(verbose_name='健康保険番号', max_length=20, blank=True)
-    department_pro = models.ForeignKey(Department, verbose_name='部門', on_delete=models.SET(0),
-                                       related_name='department_pro')
+    department_pro = models.ForeignKey(Department, verbose_name='部門', on_delete=models.SET(0),related_name='department_pro')
     emergency_contact_1_name = models.CharField(verbose_name='緊急連絡先1_名前', max_length=30, blank=True)
     emergency_contact_1_relationship = models.CharField(verbose_name='緊急連絡先1_続柄', max_length=10, blank=True)
     emergency_contact_1_phone = models.CharField(verbose_name='緊急連絡先1_電話番号', max_length=20, blank=True)
