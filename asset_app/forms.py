@@ -55,6 +55,7 @@ class ProductEditForm(forms.ModelForm):
         id = self.data.get('product_id')
         if len(product_name) > 50:
             raise forms.ValidationError("50桁以内を入力してください。")        
+        #if product_name and Product.objects.filter(product_name=product_name).exclude(product_id=id).count():
         if product_name and EProduct.objects.filter(product_name=product_name).filter(delete=0).exclude(product_id=id).count():
             raise forms.ValidationError("品名が既に存在しました。")
         return self.cleaned_data["product_name"]
